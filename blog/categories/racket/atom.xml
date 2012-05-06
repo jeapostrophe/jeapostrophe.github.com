@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Racket | Jay McCarthy]]></title>
+  <link href="http://jeapostrophe.github.com/blog/categories/racket/atom.xml" rel="self"/>
+  <link href="http://jeapostrophe.github.com/"/>
+  <updated>2012-05-06T07:42:26-06:00</updated>
+  <id>http://jeapostrophe.github.com/</id>
+  <author>
+    <name><![CDATA[Jay McCarthy]]></name>
+    <email><![CDATA[jay.mccarthy@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Stupid Interview Questions - Introduction + Reversing a Doubly Linked List]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/03/31/siq-reverse-dll/"/>
+    <updated>2012-03-31T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/03/31/siq-reverse-dll</id>
+    <content type="html"><![CDATA[<p>Stupid interviews ask applicants to write programs on whiteboards or
+pieces of paper without the resources that are normally available when
+programming. These questions purport to be able understanding the
+applicant’s algorithmic design process, but the problems in question are
+almost always so trivial that no interesting thinking is necessary.
+Worse, many of these questions are really more about knowing inane
+tricks than having good design abilities.</p>
+
+<p>Some students in my lab are always talking and worrying about such
+problems. I like to provide unnecessarily silly solutions to some of the
+questions. In this introduction to the series:</p>
+
+<p>How do you reverse a doubly linked list?</p>
+
+<!-- more -->
+
+
+<h1>The Obvious</h1>
+
+<p>The naive implementation looks like this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;naive-impl&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-reverse!</span><span class="err"> </span><span class="nv">l</span><span class="p">)</span>             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">head</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-head</span><span class="err"> </span><span class="nv">l</span><span class="p">))</span>         <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">last</span><span class="err"> </span><span class="no">#f</span><span class="err">] [</span><span class="nv">current</span><span class="err"> </span><span class="nv">head</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="nv">last</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">set-node-last!</span><span class="err"> </span><span class="nv">last</span><span class="err"> </span><span class="nv">current</span><span class="p">))</span> <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="nv">current</span>                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">next</span><span class="err"> </span><span class="p">(</span><span class="nf">node-next</span><span class="err"> </span><span class="nv">current</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">set-node-next!</span><span class="err"> </span><span class="nv">current</span><span class="err"> </span><span class="nv">last</span><span class="p">)</span>  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">current</span><span class="err"> </span><span class="nv">next</span><span class="p">)))</span>          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set-dll-head!</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-tail</span><span class="err"> </span><span class="nv">l</span><span class="p">))</span>     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set-dll-tail!</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="nv">head</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The thing to notice about this implementation is that it takes O(n) time
+and is a tiny bit hairy in the order that the effects have to happen in,
+plus the swapping at the end.</p>
+
+<p>I assume that getting this right is what interviewers are looking for
+when they ask a question like this. It would be even better if they
+asked about how you would validate that your code worked. Here’s what I
+did:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;naive-tests&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-test</span><span class="err"> </span><span class="nv">make-dll</span><span class="err"> </span><span class="nv">dll-cons!</span><span class="err"> </span><span class="nv">dll-snoc!</span>  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                  </span><span class="nv">dll-fold</span><span class="err"> </span><span class="nv">dll-rfold</span><span class="err"> </span><span class="nv">dll-reverse!</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">c123</span><span class="err"> </span><span class="p">(</span><span class="nf">make-dll</span><span class="p">))</span>                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">dll-cons!</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">dll-cons!</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">dll-snoc!</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">check-equal?</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-fold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                </span><span class="o">&#39;</span><span class="p">(</span><span class="mi">1</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="mi">3</span><span class="p">))</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">check-equal?</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-rfold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                </span><span class="o">&#39;</span><span class="p">(</span><span class="mi">3</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="mi">1</span><span class="p">))</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">dll-reverse!</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">check-equal?</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-fold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                </span><span class="o">&#39;</span><span class="p">(</span><span class="mi">3</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="mi">1</span><span class="p">))</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">check-equal?</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-rfold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                </span><span class="o">&#39;</span><span class="p">(</span><span class="mi">1</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="mi">3</span><span class="p">))</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">dll-cons!</span><span class="err"> </span><span class="mi">4</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">dll-reverse!</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">dll-cons!</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">check-equal?</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-fold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                </span><span class="o">&#39;</span><span class="p">(</span><span class="mi">0</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="mi">4</span><span class="p">))</span>                   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">check-equal?</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-rfold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">c123</span><span class="p">)</span>     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                </span><span class="o">&#39;</span><span class="p">(</span><span class="mi">4</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="mi">0</span><span class="p">)))</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">dll-test</span><span class="err"> </span><span class="nv">make-dll</span><span class="err"> </span><span class="nv">dll-cons!</span><span class="err"> </span><span class="nv">dll-snoc!</span>          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">          </span><span class="nv">dll-fold</span><span class="err"> </span><span class="nv">dll-rfold</span><span class="err"> </span><span class="nv">dll-reverse!</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>(Remember how we parameterize these tests over the implementation of the
+functions. We’ll pass in different implementations later.) And, by the
+way, this assumes we have this definition of doubly-linked-lists:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;dll&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">node</span><span class="err"> </span><span class="p">(</span><span class="nf">last</span><span class="err"> </span><span class="nv">element</span><span class="err"> </span><span class="nv">next</span><span class="p">)</span><span class="err"> </span><span class="o">#</span><span class="nv">:transparent</span><span class="err"> </span><span class="o">#</span><span class="nv">:mutable</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">dll</span><span class="err"> </span><span class="p">(</span><span class="nf">head</span><span class="err"> </span><span class="nv">tail</span><span class="p">)</span><span class="err"> </span><span class="o">#</span><span class="nv">:transparent</span><span class="err"> </span><span class="o">#</span><span class="nv">:mutable</span><span class="p">)</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">make-dll</span><span class="p">)</span>                                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">dll</span><span class="err"> </span><span class="no">#f</span><span class="err"> </span><span class="no">#f</span><span class="p">))</span>                                         <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">((</span><span class="nf">make-dll-cons!</span>                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">          </span><span class="nv">dll-head</span><span class="err"> </span><span class="nv">node</span><span class="err"> </span><span class="nv">set-node-last!</span>                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">          </span><span class="nv">dll-tail</span><span class="err"> </span><span class="nv">set-dll-tail!</span><span class="err"> </span><span class="nv">set-dll-head!</span><span class="p">)</span>        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">e</span><span class="err"> </span><span class="nv">l</span><span class="p">)</span>                                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">head</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-head</span><span class="err"> </span><span class="nv">l</span><span class="p">))</span>                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">new</span><span class="err"> </span><span class="p">(</span><span class="nf">node</span><span class="err"> </span><span class="no">#f</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="nv">head</span><span class="p">))</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="nv">head</span>                                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">set-node-last!</span><span class="err"> </span><span class="nv">head</span><span class="err"> </span><span class="nv">new</span><span class="p">))</span>                         <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">unless</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-tail</span><span class="err"> </span><span class="nv">l</span><span class="p">)</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">set-dll-tail!</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="nv">new</span><span class="p">))</span>                             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set-dll-head!</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="nv">new</span><span class="p">))</span>                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">dll-cons!</span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">make-dll-cons!</span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">dll-head</span><span class="err"> </span><span class="nv">node</span><span class="err"> </span><span class="nv">set-node-last!</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">dll-tail</span><span class="err"> </span><span class="nv">set-dll-tail!</span><span class="err"> </span><span class="nv">set-dll-head!</span><span class="p">))</span>              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">dll-snoc!</span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">make-dll-cons!</span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">dll-tail</span>                                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">last</span><span class="err"> </span><span class="nv">element</span><span class="err"> </span><span class="nv">next</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">node</span><span class="err"> </span><span class="nv">next</span><span class="err"> </span><span class="nv">element</span><span class="err"> </span><span class="nv">last</span><span class="p">))</span>    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">set-node-next!</span><span class="err"> </span><span class="nv">dll-head</span>                             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">set-dll-head!</span><span class="err"> </span><span class="nv">set-dll-tail!</span><span class="p">))</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">make-dll-fold</span><span class="err"> </span><span class="nv">dll-head</span><span class="err"> </span><span class="nv">node-next</span><span class="p">)</span>             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-fold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">node</span><span class="p">)</span>                   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">node</span>                                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="nf">node-element</span><span class="err"> </span><span class="nv">node</span><span class="p">)</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">dll-fold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="p">(</span><span class="nf">node-next</span><span class="err"> </span><span class="nv">node</span><span class="p">)))</span>    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="nv">empty</span><span class="p">))</span>                                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">list</span><span class="p">)</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">dll-fold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="p">(</span><span class="nf">dll-head</span><span class="err"> </span><span class="nv">list</span><span class="p">))))</span>            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">dll-fold</span><span class="err"> </span><span class="p">(</span><span class="nf">make-dll-fold</span><span class="err"> </span><span class="nv">dll-head</span><span class="err"> </span><span class="nv">node-next</span><span class="p">))</span>   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">dll-rfold</span><span class="err"> </span><span class="p">(</span><span class="nf">make-dll-fold</span><span class="err"> </span><span class="nv">dll-tail</span><span class="err"> </span><span class="nv">node-last</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>But, remember, my whole goal is to show silly ways to "solve" these
+interview problems... so let’s think of a trick.</p>
+
+<h1>The Trick</h1>
+
+<p>An important trick that functional programmers should always be ready to
+employ is delaying. Rather than actually doing work, just record that
+you should do in the future, so future operations will act as-if the
+operation has been done, or perhaps do (some) of it for you.</p>
+
+<p>In this case, we’ll make dll-reverse! O(1) by simply recording that we
+should consider the list reversed for all future uses.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;rdll-impl&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">rdll-reverse!</span><span class="err"> </span><span class="nv">l</span><span class="p">)</span>    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set-rdll-reversed?!</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">l</span><span class="err"> </span><span class="p">(</span><span class="nf">not</span><span class="err"> </span><span class="p">(</span><span class="nf">rdll-reversed?</span><span class="err"> </span><span class="nv">l</span><span class="p">))))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This, of course, assumes that the rest of the doubly-linked-list code is
+ready to pay attention to this flag. Luckily, it is pretty easy to do
+that, without really writing anything again:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;rdll&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">rdll</span><span class="err"> </span><span class="p">(</span><span class="nf">reversed?</span><span class="err"> </span><span class="nv">dll</span><span class="p">)</span><span class="err"> </span><span class="o">#</span><span class="nv">:transparent</span><span class="err"> </span><span class="o">#</span><span class="nv">:mutable</span><span class="p">)</span>    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">make-rdll</span><span class="p">)</span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">rdll</span><span class="err"> </span><span class="no">#f</span><span class="err"> </span><span class="p">(</span><span class="nf">make-dll</span><span class="p">)))</span>                                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define-syntax-rule</span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define-rdll</span><span class="err"> </span><span class="p">(</span><span class="nf">id</span><span class="err"> </span><span class="nv">arg</span><span class="err"> </span><span class="o">...</span><span class="err"> </span><span class="nv">rl</span><span class="p">)</span><span class="err"> </span><span class="nv">reversed-dll</span><span class="err"> </span><span class="nv">normal-dll</span><span class="p">)</span>  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">id</span><span class="err"> </span><span class="nv">arg</span><span class="err"> </span><span class="o">...</span><span class="err"> </span><span class="nv">rl</span><span class="p">)</span>                                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="p">(</span><span class="nf">rdll-dll</span><span class="err"> </span><span class="nv">rl</span><span class="p">))</span>                             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">rdll-reversed?</span><span class="err"> </span><span class="nv">rl</span><span class="p">)</span>                              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">reversed-dll</span><span class="err"> </span><span class="nv">arg</span><span class="err"> </span><span class="o">...</span><span class="err"> </span><span class="nv">l</span><span class="p">)</span>                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">normal-dll</span><span class="err"> </span><span class="nv">arg</span><span class="err"> </span><span class="o">...</span><span class="err"> </span><span class="nv">l</span><span class="p">))))</span>                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define-rdll</span><span class="err"> </span><span class="p">(</span><span class="nf">rdll-cons!</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="nv">rl</span><span class="p">)</span><span class="err"> </span><span class="nv">dll-snoc!</span><span class="err"> </span><span class="nv">dll-cons!</span><span class="p">)</span>      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define-rdll</span><span class="err"> </span><span class="p">(</span><span class="nf">rdll-snoc!</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="nv">rl</span><span class="p">)</span><span class="err"> </span><span class="nv">dll-cons!</span><span class="err"> </span><span class="nv">dll-snoc!</span><span class="p">)</span>      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define-rdll</span><span class="err"> </span><span class="p">(</span><span class="nf">rdll-fold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">rl</span><span class="p">)</span><span class="err"> </span><span class="nv">dll-rfold</span><span class="err"> </span><span class="nv">dll-fold</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define-rdll</span><span class="err"> </span><span class="p">(</span><span class="nf">rdll-rfold</span><span class="err"> </span><span class="nv">cons</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">rl</span><span class="p">)</span><span class="err"> </span><span class="nv">dll-fold</span><span class="err"> </span><span class="nv">dll-rfold</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now that that’s all setup, we can re-run the earlier tests with these
+new functions:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;rdll-tests&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">dll-test</span>                         <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">make-rdll</span><span class="err"> </span><span class="nv">rdll-cons!</span><span class="err"> </span><span class="nv">rdll-snoc!</span>  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">rdll-fold</span><span class="err"> </span><span class="nv">rdll-rfold</span><span class="err"> </span><span class="nv">rdll-reverse!</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h1>Conclusion</h1>
+
+<p>This idea is the basis of a lot of efficient functional data structures.
+For example, if you want to make append fast, then just store "append
+nodes" in your "list". (<a href="http://news.ycombinator.com/item?id=814632">These are called "conc"
+lists.</a>) If you want to make
+snoc/last fast, then store two lists—one starting from the head and one
+starting from the tail—and deal with one going empty when you get to it.</p>
+
+<h1>Exercises</h1>
+
+<ol>
+<li><p>In this code, I’ve used a functional/structure oriented approach. In
+this case, an object-oriented approach could be more convenient for the
+user, because then they would be inherently parameterized over the set
+of doubly linked-list functions. For your homework, translate this idea
+to an OO setting, where "fast reversible" lists and normal lists just
+implement a common interface.</p></li>
+<li><p>In this code, nodes and lists are distinguished from each other.
+Rewrite it so there is no such distinction, while maintaining the O(1)
+reversability. (Hint: The hard part is telling each node that the list
+is reversed simultaneously.) (Spoiler: Have them store a pointer to a
+flag rather than a flag itself.)</p></li>
+</ol>
+
+
+<h1>Whole Program</h1>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&amp;lt</span><span class="c1">;*&gt; ::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">rackunit</span>  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">racket/list</span><span class="p">)</span>
+</span><span class='line'>  <span class="nv">&lt;dll&gt;</span>              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;naive-impl&gt;</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;naive-tests&gt;</span>      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;rdll&gt;</span>             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;rdll-impl&gt;</span>        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;rdll-tests&gt;&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><a href="/downloads/code/2012-03-31-siq-reverse-dll.rkt">Download</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Professor Layton and the Diabolical Box, Puzzle #132]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132/"/>
+    <updated>2011-06-30T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132</id>
+    <content type="html"><![CDATA[<p>I try to solve a puzzle of some kind every morning. I use
+<a href="https://en.wikipedia.org/wiki/Sudoku">Sudoku</a>,
+<a href="https://en.wikipedia.org/wiki/Picross">Picross</a>, and often, <a href="https://en.wikipedia.org/wiki/Professor_Layton">Professor
+Layton</a>. Sometimes it is
+convenient to write a program to solve some of the more annoying
+"search" puzzles. I’ll post the Racket programs with a little bit of
+commentary.</p>
+
+<!-- more -->
+
+
+<p>This is for <a href="http://tinyurl.com/6pjbzrs">Puzzle 132</a>. Here is the
+puzzle:</p>
+
+<blockquote><p>Two brothers have inherited their parents’ five-piece art collection.
+According to the will, the older brother will get a set of paintings
+worth twice what the younger borther gets. In order to ascertain the
+value of the paintings, the brothers called in an appraiser, who valued
+each painting as shown below. For his services, the appraiser was
+promised the one painting left over after the brothers divided the art
+according to their parents’ wishes.</p>
+
+<p>Assuming that individual paintings can’t be divided, which one does
+the appraiser get?</p></blockquote>
+
+<p>There is then a picture of five paintings with prices underneath. They
+are: A worth 20,000, B worth 60,000, C worth 55,000, D worth 45,000, E
+worth 95,000.</p>
+
+<p>I encoded this information into a vector in Racket:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;paintings&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">paintings</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">vector</span><span class="err"> </span><span class="mi">20</span><span class="err"> </span><span class="mi">60</span><span class="err"> </span><span class="mi">55</span><span class="err"> </span><span class="mi">45</span><span class="err"> </span><span class="mi">95</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>We won’t keep track of the labels, we’ll just remember that, for
+example, 0 is A and 4 is E. Also, we divide everything by 1,000 so we
+don’t have to type so much.</p>
+
+<p>The basic algorithm we’ll use is a trivial search: try assigning each
+painting to each brother and stop when the value of the older brother’s
+paintings is twice that of the younger.</p>
+
+<p>The trick, however, is that we’ll represent the assignment as the older
+brother’s set combined with the younger brother’s set. We’ll do this
+simultaneously with a bit-vector, where the 1s indicate that the older
+brother gets it and the 0s indicate that the younger brother does. We’ll
+independently pick one painting which will be "left over" that the
+appraiser will get. Here’s the main loop:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;solver&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">for&lt;em&gt;</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">assignment</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="mi">31</span><span class="p">))</span><span class="err">]</span>              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">       [</span><span class="nv">appraiser</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">vector-length</span><span class="err"> </span><span class="nv">paintings</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">older-value</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">assignment-&gt;value</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">appraiser</span><span class="err"> </span><span class="no">#t</span><span class="p">))</span>      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">younger-value</span>                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">assignment-&gt;value</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">appraiser</span><span class="err"> </span><span class="no">#f</span><span class="p">))</span>      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="p">(</span><span class="nf">=</span><span class="err"> </span><span class="nv">older-value</span><span class="err"> </span><span class="p">(</span><span class="nf">&lt;/em&gt;</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="nv">younger-value</span><span class="p">))</span>           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">return</span><span class="err"> </span><span class="nv">appraiser</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>One thing to note here: for* is like a nested for—we loop over the
+assignments /and/ loop over every painting each round. (This, by the
+way, means that we do twice as much work because we consider both
+assignments for the appraiser’s painting.)</p>
+
+<p>Two other cute things: First, we use a literal binary number to write
+down the completely full set, but we have to add one to actually visit
+it. Second, the assignment->value function (below) will take an argument
+to determine whether to add up the 1s or the 0s. Here’s it’s definition</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;valuation&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">assignment-&gt;value</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">ignored</span><span class="err"> </span><span class="nv">which</span><span class="p">)</span>           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for/sum</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">painting</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">vector-length</span><span class="err"> </span><span class="nv">paintings</span><span class="p">))</span><span class="err">]</span>    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">            </span><span class="o">#</span><span class="nv">:unless</span><span class="err"> </span><span class="p">(</span><span class="nf">=</span><span class="err"> </span><span class="nv">painting</span><span class="err"> </span><span class="nv">ignored</span><span class="p">))</span>                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">           </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">eq?</span><span class="err"> </span><span class="nv">which</span><span class="err"> </span><span class="p">(</span><span class="nf">bitwise-bit-set?</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">painting</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">vector-ref</span><span class="err"> </span><span class="nv">paintings</span><span class="err"> </span><span class="nv">painting</span><span class="p">)</span>                   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">             </span><span class="mi">0</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The for/sum variant adds up the result of each iteration of the loop,
+the #:unless clause skips the iteration where the appraiser’s painting
+is considered, and the if determines which brother we’re considering.</p>
+
+<p>If you know anything about Racket, there may be one more confusing thing
+about the code in <valuation>... return! Expressions in Racket don’t
+normally have non-local returns like that. How can we make the inner
+area of the loop stop and return the appraiser painting that works? It’s
+simple: bind return to an escape continuation:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;escape-continuation&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">let/ec</span><span class="err"> </span><span class="nv">return</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;solver&gt;</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Was this faster or slower than doing it the old fashion way...? Who
+knows.</p>
+
+<p>Can you work out what the answer is...?</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&amp;lt</span><span class="c1">;*&gt; ::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="nv">&lt;paintings&gt;</span>           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;valuation&gt;</span>           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">vector-ref </span>          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">vector</span><span class="err"> </span><span class="ss">&#39;A</span><span class="err"> </span><span class="ss">&#39;B</span><span class="err"> </span><span class="ss">&#39;C</span><span class="err"> </span><span class="ss">&#39;D</span><span class="err"> </span><span class="ss">&#39;E</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">&lt;escape-continuation&gt;</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><a href="/downloads/code/2011-06-30-professor-layton-and-the-diabolical-box-puzzle-132.rkt">Download</a></p>
+]]></content>
+  </entry>
+  
+</feed>
