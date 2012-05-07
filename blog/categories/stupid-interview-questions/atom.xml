@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Stupid Interview Questions | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/stupid-interview-questions/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-05-06T07:42:26-06:00</updated>
+  <updated>2012-05-07T07:13:21-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -356,7 +356,7 @@ to an OO setting, where "fast reversible" lists and normal lists just
 implement a common interface.</p></li>
 <li><p>In this code, nodes and lists are distinguished from each other.
 Rewrite it so there is no such distinction, while maintaining the O(1)
-reversability. (Hint: The hard part is telling each node that the list
+reversibility. (Hint: The hard part is telling each node that the list
 is reversed simultaneously.) (Spoiler: Have them store a pointer to a
 flag rather than a flag itself.)</p></li>
 </ol>

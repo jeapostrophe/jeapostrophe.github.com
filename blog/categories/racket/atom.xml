@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Racket | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/racket/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-05-06T07:42:26-06:00</updated>
+  <updated>2012-05-07T07:13:21-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -12,6 +12,253 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Professor Layton and the Last Specter, Puzzle #146]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146/"/>
+    <updated>2012-05-07T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146</id>
+    <content type="html"><![CDATA[<p>This is for <a href="http://tinyurl.com/7yefk76">Puzzle 146</a>. Here is the
+puzzle:</p>
+
+<blockquote><p>A bookcase has seven shelves each filled with 10 books of the same
+size.</p>
+
+<p>When you choose a book, you must also take the two books above, below,
+to the left, and to the right of the one you actually want. If there are
+fewer than two books in any of these directions, you cannot choose that
+book.</p>
+
+<p>Choosing as many books as possible, how many books will you end up
+taking?</p></blockquote>
+
+<!-- more -->
+
+
+<p>I encoded the bookcase as a hash table in Racket, where the key is the
+coordinate of the book and the value is whether the book has been taken.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;bookcase&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">bookcase</span>                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for*/hash</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">shelf</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="mi">7</span><span class="p">)</span><span class="err">]</span>        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">              [</span><span class="nv">book</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="mi">10</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">shelf</span><span class="err"> </span><span class="nv">book</span><span class="p">)</span><span class="err"> </span><span class="no">#t</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>I didn’t know when I wrote it, but I assumed that it would not matter
+what order you picked the books in, so I just considered taking them
+from left to right, and top to bottom. After consider each book, I would
+return the new bookcase, after having removed some books. The number of
+books in this bookcase, subtracted from 70, would give me the number
+selected:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;selecting&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">final-bookcase</span>          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for*/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">bookcase</span><span class="err"> </span><span class="nv">bookcase</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">shelf</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="mi">7</span><span class="p">)</span><span class="err">]</span>     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">       [</span><span class="nv">book</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="mi">10</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="nv">&lt;loop-body&gt;</span><span class="p">))</span>               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="mi">70</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-count</span><span class="err"> </span><span class="nv">final-bookcase</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Inside the loop, it will be convenient to bind an escape continuation to
+return early. The actual loop body is divided into three parts. First,
+we’ll make sure that the book we’re consider is actually there. Then,
+we’ll make sure it has two books in every directions. Finally, we’ll
+return the updated bookcase. The code will look like this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;loop-body&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">let/ec</span><span class="err"> </span><span class="nv">return</span>    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;check-this-book&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;check-others&gt;</span>  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;update-bookcase&gt;</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The first part is really simple: just call our predicate and if it isn’t
+there, call the escape continuation to jump past the rest of the code
+and leave the bookcase unchanged.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;check-this-book&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">unless</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-has-key?</span><span class="err"> </span><span class="nv">bookcase</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">shelf</span><span class="err"> </span><span class="nv">book</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">return</span><span class="err"> </span><span class="nv">bookcase</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The middle part is the most complicated. Here’s the idea: we’ll loop
+over the eight other different books (the two above, below, to the left,
+and to the right) and remove them from the bookcase, if they are there.
+If any book isn’t there, we’ll return from the outer loop with the
+original bookcase, because the conditions aren’t met, using the escape
+continuation.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;check-others&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">other-book-offsets</span>                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span>              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">-1</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">-2</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span>            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">1</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">2</span><span class="p">)</span>              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">-1</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">-2</span><span class="p">)))</span>          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">new-bookcase</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for*/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">new-bookcase</span><span class="err"> </span><span class="nv">bookcase</span><span class="err">]</span><span class="p">)</span>     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">diff</span><span class="err"> </span><span class="p">(</span><span class="nf">in-list</span><span class="err"> </span><span class="nv">other-book-offsets</span><span class="p">)</span><span class="err">]</span><span class="p">)</span><span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">new-book</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">shelf</span><span class="err"> </span><span class="p">(</span><span class="nf">car</span><span class="err"> </span><span class="nv">diff</span><span class="p">))</span>           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">book</span><span class="err"> </span><span class="p">(</span><span class="nf">cdr</span><span class="err"> </span><span class="nv">diff</span><span class="p">))))</span>          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-has-key?</span><span class="err"> </span><span class="nv">new-bookcase</span><span class="err"> </span><span class="nv">new-book</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">hash-remove</span><span class="err"> </span><span class="nv">new-bookcase</span><span class="err"> </span><span class="nv">new-book</span><span class="p">)</span>  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">return</span><span class="err"> </span><span class="nv">bookcase</span><span class="p">))))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>If the earlier two tests haven’t returned, then when we get to the
+third, we’ll know all the right conditions are met, so we can remove the
+current book from the bookcase (the one after the other books were
+removed):</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;update-bookcase&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">hash-remove</span><span class="err"> </span><span class="nv">new-bookcase</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">shelf</span><span class="err"> </span><span class="nv">book</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This technique makes inherent use of functional data-structures, because
+the bookcase is not destructively modified during the trial deletions of
+the eight books. If it were, then we couldn’t just return the original
+bookcase. Instead, we’d have to undo the changes, or do the inner loop
+twice: once to check if we should and once to actually remove them.
+Either way, we’d be doing about twice as much work.</p>
+
+<p>This program also demonstrates how useful early return, escape
+continuations can be. If we didn’t have them, then in the first case,
+we’d just have to change the syntactic structure of the program, by
+putting the rest of the loop body on the false side of if. In the second
+case, however, it would be more complicated, because we’d have to
+continue the loop past the point of usefulness and check if it was
+successful at the end—maybe seeing how many books were removed or by
+keeping a boolean on the side. Either way, escape continuations saved
+the day.</p>
+
+<p>Was this faster or slower than doing it the old fashion way...? Who
+knows.</p>
+
+<p>Can you work out what the answer is...?</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&amp;lt</span><span class="c1">;*&gt; ::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="nv">&lt;bookcase&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;selecting&gt;&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><a href="/downloads/code/2012-05-07-professor-layton-and-the-last-specter-puzzle-146.rkt">Download</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Stupid Interview Questions - Introduction + Reversing a Doubly Linked List]]></title>
@@ -356,7 +603,7 @@ to an OO setting, where "fast reversible" lists and normal lists just
 implement a common interface.</p></li>
 <li><p>In this code, nodes and lists are distinguished from each other.
 Rewrite it so there is no such distinction, while maintaining the O(1)
-reversability. (Hint: The hard part is telling each node that the list
+reversibility. (Hint: The hard part is telling each node that the list
 is reversed simultaneously.) (Spoiler: Have them store a pointer to a
 flag rather than a flag itself.)</p></li>
 </ol>
@@ -422,7 +669,7 @@ puzzle:</p>
 
 <blockquote><p>Two brothers have inherited their parents’ five-piece art collection.
 According to the will, the older brother will get a set of paintings
-worth twice what the younger borther gets. In order to ascertain the
+worth twice what the younger brother gets. In order to ascertain the
 value of the paintings, the brothers called in an appraiser, who valued
 each painting as shown below. For his services, the appraiser was
 promised the one painting left over after the brothers divided the art

@@ -28,7 +28,7 @@ This is for [Puzzle 132](http://tinyurl.com/6pjbzrs). Here is the puzzle:
 
 > Two brothers have inherited their parents' five-piece art
 collection. According to the will, the older brother will get a set of
-paintings worth twice what the younger borther gets. In order to
+paintings worth twice what the younger brother gets. In order to
 ascertain the value of the paintings, the brothers called in an
 appraiser, who valued each painting as shown below. For his services,
 the appraiser was promised the one painting left over after the

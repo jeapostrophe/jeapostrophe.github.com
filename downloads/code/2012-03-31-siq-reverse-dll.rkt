@@ -190,7 +190,7 @@ reversible" lists and normal lists just implement a common interface.
 
 2. In this code, nodes and lists are distinguished from each
 other. Rewrite it so there is no such distinction, while maintaining
-the O(1) reversability. (Hint: The hard part is telling each node that
+the O(1) reversibility. (Hint: The hard part is telling each node that
 the list is reversed simultaneously.) (Spoiler: Have them store a
 pointer to a flag rather than a flag itself.)
 
