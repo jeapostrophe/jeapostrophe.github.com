@@ -122,6 +122,11 @@ was successful at the end---maybe seeing how many books were removed
 or by keeping a boolean on the side. Either way, escape continuations
 saved the day.
 
+In retrospect, I think a good way to solve this would be to think of
+it has a packing problem where you have a plus sign where the legs are
+each two units and you are trying to fit as many as possible on a 7x10
+grid.
+
 Was this faster or slower than doing it the old fashion way...? Who
 knows.
 

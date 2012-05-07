@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Racket | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/racket/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-05-07T07:13:21-06:00</updated>
+  <updated>2012-05-07T07:42:46-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -229,6 +229,10 @@ continue the loop past the point of usefulness and check if it was
 successful at the end—maybe seeing how many books were removed or by
 keeping a boolean on the side. Either way, escape continuations saved
 the day.</p>
+
+<p>In retrospect, I think a good way to solve this would be to think of it
+has a packing problem where you have a plus sign where the legs are each
+two units and you are trying to fit as many as possible on a 7x10 grid.</p>
 
 <p>Was this faster or slower than doing it the old fashion way...? Who
 knows.</p>
