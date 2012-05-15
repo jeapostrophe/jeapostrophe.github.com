@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Puzzles | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/puzzles/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-05-14T20:38:09-06:00</updated>
+  <updated>2012-05-15T15:41:44-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -18,7 +18,7 @@
     <link href="http://jeapostrophe.github.com/blog/2012/05/14/boggle/"/>
     <updated>2012-05-14T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/14/boggle</id>
-    <content type="html"><![CDATA[<p>Boggle is a classic word game that lends its well to algorithmic
+    <content type="html"><![CDATA[<p>Boggle is a classic word game that lends itself well to algorithmic
 attacks. A student of mine wanted to show me his solution (as it is an
 assignment in one of BYU early classes), but I have a hard time
 evaluating things like this unless I’ve done them myself. So, I decided

@@ -13,7 +13,7 @@ categories:
 ---
 }
 
-Boggle is a classic word game that lends its well to algorithmic
+Boggle is a classic word game that lends itself well to algorithmic
 attacks. A student of mine wanted to show me his solution (as it is an
 assignment in one of BYU early classes), but I have a hard time
 evaluating things like this unless I've done them myself. So, I
