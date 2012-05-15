@@ -1,0 +1,785 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>A Boggle Solver - Jay McCarthy</title>
+  <meta name="author" content="Jay McCarthy">
+
+  
+  <meta name="description" content="Boggle is a classic word game that lends its well to algorithmic
+attacks. A student of mine wanted to show me his solution (as it is an
+assignment in &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/05/14/boggle">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Jay McCarthy" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30131476-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Jay McCarthy</a></h1>
+  
+    <h2>'Cowards die many times before their deaths, The valiant never taste of death but once.'</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jeapostrophe.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="http://faculty.cs.byu.edu/~jay/home/">Publications</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">A Boggle Solver</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-14T00:00:00-06:00" pubdate data-updated="true">May 14<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Boggle is a classic word game that lends its well to algorithmic
+attacks. A student of mine wanted to show me his solution (as it is an
+assignment in one of BYU early classes), but I have a hard time
+evaluating things like this unless I’ve done them myself. So, I decided
+to make an attempt. I was able to do it in about 19 lines of code, minus
+the 24 to set up the data-structures. Let’s see how it goes&#8230;</p>
+
+</div>
+  
+  
+    <div style="text-align: center;">
+  <script type="text/javascript"><!--
+   google_ad_client = "ca-pub-8940021471694041";
+   /* jeapostrophe - body */
+   google_ad_slot = "2685812826";
+   google_ad_width = 728;
+   google_ad_height = 90;
+   //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</div>
+
+    <div class="entry-content" style="margin-top: 1em;">
+
+
+<p>Let’s review the rules of Boggle. You have a square board of characters.
+You are trying to find words from a dictionary of valid words. The
+standard word list does not have words under three letters, etc. The
+word may be constructed from any string of adjacent characters—including
+the diagonals—provided it does not use the same board position twice.</p>
+
+<p>The two most important decision we make in the algorithm are
+representing the dictionary and representing the board. Once these are
+in place, the result is pretty obvious.</p>
+
+<h1>The board</h1>
+
+<p>Let’s start with the board. We’ll represent it as a hash table mapping
+coordinates, like (0,0), to the letter at that coordinate. The program
+will generate a random board configuration before solving it.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;board&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">board-n</span><span class="err"> </span><span class="mi">4</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">board</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for*/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">cell-&gt;char</span><span class="err"> </span><span class="p">(</span><span class="nf">hash</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">row</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">board-n</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">       [</span><span class="nv">col</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">board-n</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">hash-set</span><span class="err"> </span><span class="nv">cell-&gt;char</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">row</span><span class="err"> </span><span class="nv">col</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">random-letter</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The standard game of Boggle is played on a 4x4 gird, but we’ll be
+parameterized over board-n.</p>
+
+<p>The hash table doesn’t have any particular order, but that’s fine
+because we’ll be using the coordinates directly. Still, printing out the
+board is pretty convenient:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;printing&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">row</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">board-n</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">col</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">board-n</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-ref</span><span class="err"> </span><span class="nv">board</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">row</span><span class="err"> </span><span class="nv">col</span><span class="p">))))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">newline</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At this point, we have six essential lines of code. (I don’t count the
+printer.)</p>
+
+<h1>The dictionary</h1>
+
+<p>The more interesting decision comes from how we’ll represent the
+dictionary. The core idea is to use a regular expression derivative,
+where the regular expression is accepting when the string is in the
+dictionary. The representation will be tabled and gradually constructed
+by adding the words one at a time.</p>
+
+<p>We’ll define a dictionary as a hash mapping characters to a boolean and
+another dictionary. The boolean will describe if the string is accepted
+(i.e. corresponds to a word) and the dictionary will be the transitions
+from this string prefix. For example, the dictionary that only contains
+&#8220;cat&#8221; and &#8220;cats&#8221; is:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dict-example&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="sc">#\c</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="no">#f</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="sc">#\a</span>
+</span><span class='line'>  <span class="err">                      </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="no">#f</span>
+</span><span class='line'>  <span class="err">                            </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="sc">#\t</span>
+</span><span class='line'>  <span class="err">                                    </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="no">#t</span>
+</span><span class='line'>  <span class="err">                                          </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="sc">#\s</span>
+</span><span class='line'>  <span class="err">                                                  </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="no">#t</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="p">)))))))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following provdes the necessary function for extending an empty
+dictionary like this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dict&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">empty-dict</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">empty-entry</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="no">#f</span><span class="err"> </span><span class="nv">empty-dict</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">dict-add</span><span class="err"> </span><span class="nv">d</span><span class="err"> </span><span class="nv">w</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">empty?</span><span class="err"> </span><span class="nv">w</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="nv">d</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">hash-update</span><span class="err"> </span><span class="nv">d</span><span class="err"> </span><span class="p">(</span><span class="nf">first</span><span class="err"> </span><span class="nv">w</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">                 </span><span class="p">(</span><span class="nf">match-lambda</span>
+</span><span class='line'>  <span class="err">                  [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">word?</span><span class="err"> </span><span class="nv">rest-d</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">                   </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="nf">or</span><span class="err"> </span><span class="nv">word?</span><span class="err"> </span><span class="p">(</span><span class="nf">empty?</span><span class="err"> </span><span class="p">(</span><span class="nf">rest</span><span class="err"> </span><span class="nv">w</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">                         </span><span class="p">(</span><span class="nf">dict-add</span><span class="err"> </span><span class="nv">rest-d</span><span class="err"> </span><span class="p">(</span><span class="nf">rest</span><span class="err"> </span><span class="nv">w</span><span class="p">)))</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">                 </span><span class="nv">empty-entry</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="nv">d</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">dict-add</span><span class="err"> </span><span class="nv">d</span><span class="err"> </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>dict-add* breaks a string into a list of characters, which are read
+one-by-one extending the dictionary gradually. If the rest of the list
+after a given character is ever empty, then the dictionary entry
+corresponds to a complete word.</p>
+
+<p>We can test to make sure this function works by comparing to our
+manually constructed example:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dict-test&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">cat-dict</span><span class="err"> </span><span class="nv">&lt;dict-example&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">check-equal?</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="nv">empty-dict</span><span class="err"> </span><span class="s">&quot;cat&quot;</span><span class="p">)</span><span class="err"> </span><span class="s">&quot;cats&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">cat-dict</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">check-equal?</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="nv">empty-dict</span><span class="err"> </span><span class="s">&quot;cats&quot;</span><span class="p">)</span><span class="err"> </span><span class="s">&quot;cat&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">cat-dict</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can build the whole dictionary from a standard word list, like so:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dict-parse&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">dict-pth</span><span class="err"> </span><span class="s">&quot;/usr/share/dict/words&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">the-dictionary</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">d</span><span class="err"> </span><span class="nv">empty-dict</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">w</span><span class="err"> </span><span class="p">(</span><span class="nf">in-lines</span><span class="err"> </span><span class="p">(</span><span class="nf">open-input-file</span><span class="err"> </span><span class="nv">dict-pth</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="nv">d</span><span class="err"> </span><span class="nv">w</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The standard dictionary is not Boggle-legal, because it contains words
+under three letters, apostrophes, proper names, etc. But the algorithm
+wouldn’t change with a different list.</p>
+
+<p>At this point, we have 18 more lines of essential code, bringing the
+total to 24. (I don’t count the test.)</p>
+
+<h1>The solver</h1>
+
+<p>Now that we have our data-structures ready, it’s a pretty straight path.
+We’ll be exploring the board like a graph, looking for paths where the
+nodes correspond to accepting strings. After visiting a node, we’ll
+remove it from the graph and proceed to all the neighbors, provided that
+the dictionary is not empty from the current path.</p>
+
+<p>The main loop simply starts this process from every possible square with
+the complete board, the complete dictionary, and an empty path:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;main&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">k</span><span class="err"> </span><span class="p">(</span><span class="nf">in-hash-keys</span><span class="err"> </span><span class="nv">board</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">solutions-from</span><span class="err"> </span><span class="nv">board</span><span class="err"> </span><span class="nv">the-dictionary</span><span class="err"> </span><span class="nv">k</span><span class="err"> </span><span class="nv">empty</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We make use of a slight pun by iterating through the board’s hash keys,
+which correspond to the cell coordinates.</p>
+
+<p>(Solution so far: 2 lines)</p>
+
+<p>The solutions-from function is a bit more complicated.</p>
+
+<p>Its first task will be to determine if a cell is actually on the board
+(i.e. it has not been removed already and was there in the first place):</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;solutions-from&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">solutions-from</span><span class="err"> </span><span class="nv">board</span><span class="err"> </span><span class="nv">dict</span><span class="err"> </span><span class="nv">k</span><span class="err"> </span><span class="nv">path</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-ref</span><span class="err"> </span><span class="nv">board</span><span class="err"> </span><span class="nv">k</span><span class="err"> </span><span class="no">#f</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="nv">c</span>
+</span><span class='line'>  <span class="err">    </span><span class="nv">&lt;step-one&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="nv">&lt;step-two&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="nv">&lt;step-three&gt;</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(Solution so far: 5 lines)</p>
+
+<p>If it was there, then we’ll want to know if the new path is a word, what
+the new state machine is, and what the new path is:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;step-one&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">match-define</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">word?</span><span class="err"> </span><span class="nv">new-dict</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">hash-ref</span><span class="err"> </span><span class="nv">dict</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="nv">empty-entry</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">new-path</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="nv">path</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(Solution so far: 8 lines)</p>
+
+<p>If the current path is a word, then we can print it out, which is a bit
+complicated since we’re just storing the path backwards, so we have to
+reverse the list (to make it forwards) and then turn the list of
+characters into a string:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;step-two&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="nv">word?</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="p">(</span><span class="nf">list-&gt;string</span><span class="err"> </span><span class="p">(</span><span class="nf">reverse</span><span class="err"> </span><span class="nv">new-path</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(Solution so far: 10 lines)</p>
+
+<p>If it possible to have any more words from this path (i.e. if the new
+dictionary isn’t empty), then we’ll want to remove this node from the
+board and vist all adjacent positions:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;step-three&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">unless</span><span class="err"> </span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-count</span><span class="err"> </span><span class="nv">new-dict</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">new-board</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-remove</span><span class="err"> </span><span class="nv">board</span><span class="err"> </span><span class="nv">k</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match-define</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">row</span><span class="err"> </span><span class="nv">col</span><span class="p">)</span><span class="err"> </span><span class="nv">k</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for*</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">drow</span><span class="err"> </span><span class="p">(</span><span class="nf">in-list</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="mi">-1</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">1</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">         [</span><span class="nv">dcol</span><span class="err"> </span><span class="p">(</span><span class="nf">in-list</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="mi">-1</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">1</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">solutions-from</span><span class="err"> </span><span class="nv">new-board</span><span class="err"> </span><span class="nv">new-dict</span>
+</span><span class='line'>  <span class="err">                    </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">row</span><span class="err"> </span><span class="nv">drow</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">                          </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">col</span><span class="err"> </span><span class="nv">dcol</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">                    </span><span class="nv">new-path</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We make some fun abuses for the sake of simplicity. For example, this
+will re-visit the current node, but we’ve already removed it from the
+board, so the body of the function will be skipped. Similarly, we don’t
+care about going off the board, because the same test will find those.
+This is by far the largest block of the solution, but it is still quite
+simple.</p>
+
+<p>This actually concludes the solution, which is a whopping 19 lines!</p>
+
+<h1>The whole program</h1>
+
+<p>The whole program is a mere 43 lines of essential code but is a complete
+and efficient Boggle solver.</p>
+
+<p>Regarding the efficiency, it takes about a 56x56 board to take more than
+1 second, but that time is dominated by printing. When I turn off
+printing (but not the construction of the string to be printed), it is
+under a second until about 110x110.</p>
+
+<p>The major wins are:</p>
+
+<ol>
+<li><p>A good data-structure for the dictionary, corresponding to top-notch
+regular expression matching theory.</p></li>
+<li><p>A functional representation of the board, so we can safely remove
+nodes from the board without doing any bookkeeping or undo-ing.</p></li>
+<li><p>A snoc-list of the path backwards to maximize sharing. (Exercise:
+Change the code so that it doesn’t need to do any allocation for
+successes. Right now it has to allocate another list and then convert it
+into a string. Try to print out a list backwards without allocation.)</p></li>
+<li><p>Eliminating duplicate work: it never explores any path more than
+once, but will discover the same word through multiple paths, if
+possible.</p></li>
+</ol>
+
+
+<p>Returning to the student, he sent me about 700 lines of complicated and
+inefficent C++ code and was working on a new version that was currently
+500 lines and broken. Maybe this will be a good push in the right
+direction?</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/list</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">racket/match</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">rackunit</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">letters</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="s">&quot;abcdefghijklmnopqrstuvwxyz&quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">random-list-ref</span><span class="err"> </span><span class="nv">l</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">list-ref</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="p">(</span><span class="nf">random</span><span class="err"> </span><span class="p">(</span><span class="nf">length</span><span class="err"> </span><span class="nv">l</span><span class="p">))))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">random-letter</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">random-list-ref</span><span class="err"> </span><span class="nv">letters</span><span class="p">))</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="nv">&lt;board&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;printing&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">newline</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="nv">&lt;dict&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;dict-test&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;dict-parse&gt;</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="nv">&lt;solutions-from&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">time</span><span class="err"> </span><span class="nv">&lt;main&gt;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="/downloads/code/2012-05-14-boggle.rkt">Download</a></p>
+</div>
+  
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jay McCarthy</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-14T00:00:00-06:00" pubdate data-updated="true">May 14<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/puzzles/'>Puzzles</a>, <a class='category' href='/blog/categories/racket/'>Racket</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/05/14/boggle/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/05/14/boggle/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/07/quilt-colouring/" title="Previous Post: Quilt Colouring">&laquo; Quilt Colouring</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+<div style="text-align: center;">
+  <script type="text/javascript"><!--
+   google_ad_client = "ca-pub-8940021471694041";
+   /* jeapostrophe - body */
+   google_ad_slot = "2685812826";
+   google_ad_width = 728;
+   google_ad_height = 90;
+   //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</div>
+
+
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>I am an assistant professor at <a href="http://byu.edu">Brigham Young University</a> in the
+  <a href="http://cs.byu.edu">Computer Science department</a>. I work
+  on the <a href="http://racket-lang.org/">Racket</a> programming
+  language</a>.</p>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/05/14/boggle/">A Boggle Solver</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/07/quilt-colouring/">Quilt Colouring</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146/">Professor Layton and the Last Specter, Puzzle #146</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/31/siq-reverse-dll/">Stupid Interview Questions - Introduction + Reversing a Doubly Linked List</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132/">Professor Layton and the Diabolical Box, Puzzle #132</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("jeapostrophe", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/jeapostrophe" class="twitter-follow-button" data-show-count="false">Follow @jeapostrophe</a>
+  
+</section>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/101670206687664104937?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+<section style="text-align: center;">
+  <script type="text/javascript"><!--
+    google_ad_client = "ca-pub-8940021471694041";
+    /* jeapostrophe - side */
+    google_ad_slot = "3412706495";
+    google_ad_width = 200;
+    google_ad_height = 200;
+    //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/jeapostrophe">@jeapostrophe</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'jeapostrophe',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Jay McCarthy -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jaymccarthy';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
