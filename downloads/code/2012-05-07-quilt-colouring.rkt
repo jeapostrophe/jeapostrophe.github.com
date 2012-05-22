@@ -297,6 +297,8 @@ You can see an example colouring:
 When she finishes the quilt, I'll update this post with a picture of
 what she went with.
 
+(*UPDATE* Here's her blog post about the finished quilt: <a href="http://madlibster.blogspot.jp/2012/05/quilt-for-iris.html">read it</a>!)
+
 By the way, if you use this code at home, make sure you put the code in this
 order:
 
