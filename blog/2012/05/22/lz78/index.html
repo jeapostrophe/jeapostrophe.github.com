@@ -1,0 +1,768 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>An LZ78 Implementation - Jay McCarthy</title>
+  <meta name="author" content="Jay McCarthy">
+
+  
+  <meta name="description" content="For a long time I’ve known about and relied on the LZ77/78 compression
+algorithms. Once when I was in middle school, I told a friend an idea I
+had &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/05/22/lz78">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Jay McCarthy" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30131476-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Jay McCarthy</a></h1>
+  
+    <h2>'Cowards die many times before their deaths, The valiant never taste of death but once.'</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jeapostrophe.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="http://faculty.cs.byu.edu/~jay/home/">Publications</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">An LZ78 Implementation</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-22T00:00:00-06:00" pubdate data-updated="true">May 22<span>nd</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>For a long time I’ve known about and relied on the LZ77/78 compression
+algorithms. Once when I was in middle school, I told a friend an idea I
+had about compression, and the friend—who was in college at the
+time—said it sounded exactly like LZ77. I don’t remember what my idea
+was, but I do remember that incident.</p>
+
+<p>Despite this long connection, I’d never implemented the algorithm
+before. I sought to rectify that situation.</p>
+
+</div>
+  
+  
+    <div style="text-align: center;">
+  <script type="text/javascript"><!--
+   google_ad_client = "ca-pub-8940021471694041";
+   /* jeapostrophe - body */
+   google_ad_slot = "2685812826";
+   google_ad_width = 728;
+   google_ad_height = 90;
+   //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</div>
+
+    <div class="entry-content" style="margin-top: 1em;">
+
+
+<p>First, I read about the algorithm on Wikipedia. The
+<a href="https://en.wikipedia.org/wiki/LZ77">article</a> is pretty informative.
+I’ll briefly recap it.</p>
+
+<p>As you read through the content to compress, you keep track of a
+dictionary of previously seen phrases. Whenever you discover a yet
+undiscovered phrase, add it to the dictionary and encode it as the
+previously-seen prefix and the new character. Decoding works in reverse.
+Since the very first character of the encoded output is necessarily not
+in the dictionary, its prefix will be empty and it will establish the
+first phrase. As you read the encoding, you maintain the same dictionary
+and decode by following the phrase-reference backwards and then emitting
+the new character.</p>
+
+<p>For an implementation, the signature of the function is pretty
+straight-forward: it takes a character source, which I’ll use an
+input-port for, and it returns a list of pairs of the previously seen
+reference and the new character.</p>
+
+<p>However, there’s one hitch. If the last phrase of the input is
+previously seen, then there will be no right-hand side of the output
+pair. You could add a special character to indicate that. I decided to
+output just the phrase reference, in that case.</p>
+
+<h1>Compression</h1>
+
+<p>My compression code looks like this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;compress&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">compress</span><span class="err"> </span><span class="nv">ip</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;next-unseen&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">outer-loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">next</span><span class="err"> </span><span class="mi">1</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="p">(</span><span class="nf">next-unseen</span><span class="err"> </span><span class="nv">next</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">?</span><span class="err"> </span><span class="nv">number?</span><span class="err"> </span><span class="nv">ref</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">stream</span><span class="err"> </span><span class="nv">ref</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">and</span><span class="err"> </span><span class="nv">W</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">ref</span><span class="err"> </span><span class="nv">c</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">stream-cons</span><span class="err"> </span><span class="nv">W</span><span class="err"> </span><span class="p">(</span><span class="nf">outer-loop</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">next</span><span class="p">)))</span><span class="err">]</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The main work all happens in next-unseen which takes the reference that
+the next phrase will be given and either returns a number, for the final
+reference in the stream, or a cons of the last reference and the new
+character, which is added to the output and then the compression
+continues. The dictionary itself is totally maintained by the
+next-unseen function.</p>
+
+<p>next-unseen runs in a loop keeping track of the current dictionary and
+prefix phrase reference. At each iteration it reads a byte from the
+input. There are then three cases:</p>
+
+<ol>
+<li><p>The input is empty, in which case, the last seen phrase reference is
+returned.</p></li>
+<li><p>The current dictionary has a reference starting with that byte, in
+which case, the prefix phrase is extended. This means the loop is
+continued with a new dictionary and a new prefix phrase. For example, if
+the current phrase is A, named 1, and the next input is B, and AB is
+previously seen and named 2, then the dictionary will have a mapping in
+it from B to a new dictionary and the number 2, which are used in the
+next iteration of the loop.</p></li>
+<li><p>The current dictionary does <em>not</em> have a reference for this byte,
+meaning that we’ve encoded a new phrase. In that case, we can add this
+byte to current dictionary and allocate a new name for it, then return
+that new name.</p></li>
+</ol>
+
+
+<p>Here’s that in code:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;next-unseen&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">top-dict</span><span class="err"> </span><span class="p">(</span><span class="nf">make-hasheq</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">next-unseen</span><span class="err"> </span><span class="nv">this</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">dict</span><span class="err"> </span><span class="nv">top-dict</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">             [</span><span class="nv">last</span><span class="err"> </span><span class="mi">0</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">b</span><span class="err"> </span><span class="p">(</span><span class="nf">read-byte</span><span class="err"> </span><span class="nv">ip</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="k">cond </span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">eof-object?</span><span class="err"> </span><span class="nv">b</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="nv">last</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">hash-ref</span><span class="err"> </span><span class="nv">dict</span><span class="err"> </span><span class="nv">b</span><span class="err"> </span><span class="no">#f</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="k">=&gt; </span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">next</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">cdr</span><span class="err"> </span><span class="nv">next</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">car</span><span class="err"> </span><span class="nv">next</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="k">else </span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">hash-set!</span><span class="err"> </span><span class="nv">dict</span><span class="err"> </span><span class="nv">b</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="p">(</span><span class="nf">make-hasheq</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">last</span><span class="err"> </span><span class="nv">b</span><span class="p">)</span><span class="err">]</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This code uses a similar dictionary structure to my Boggle solver, from
+the previous blog post. However, in this code, it’s mutable because the
+dictionary is extended as we go and it would be tedious to thread the
+state.</p>
+
+<p>I’m kind of amazed that the compression can fit in 23 lines!</p>
+
+<p>Here’s a little example:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;compress-example&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">some-input</span><span class="err"> </span><span class="o">#</span><span class="s">&quot;AABABBBABAABABBBABBABB&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">compressed</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">compress</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">open-input-bytes</span><span class="err"> </span><span class="nv">some-input</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">A</span><span class="err"> </span><span class="p">(</span><span class="nf">char-&gt;integer</span><span class="err"> </span><span class="sc">#\A</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">B</span><span class="err"> </span><span class="p">(</span><span class="nf">char-&gt;integer</span><span class="err"> </span><span class="sc">#\B</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">check-equal?</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">stream-&gt;list</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">compressed</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="nv">A</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="nv">B</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="nv">B</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="nv">B</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="nv">A</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">5</span><span class="err"> </span><span class="nv">B</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">4</span><span class="err"> </span><span class="nv">B</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="nv">A</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="mi">7</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this example, the final dictionary looks like this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;compress-example-dict&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">hasheq</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">B</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">4</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="nv">B</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">7</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="p">))))</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">A</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">1</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="nv">B</span>
+</span><span class='line'>  <span class="err">               </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">2</span>
+</span><span class='line'>  <span class="err">                     </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="nv">B</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="nv">A</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">8</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="p">))))</span>
+</span><span class='line'>  <span class="err">                             </span><span class="nv">A</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">5</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="nv">B</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">6</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="p">)))))))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Decompression</h1>
+
+<p>Naturally, decompression is dual to compression. It will also maintain a
+dictionary, but it will have the opposite information: rather than
+mapping characters to references and suffixes, it will map references to
+characters and prefixes.</p>
+
+<p>The code is considerably simpler because there is a single dictionary
+(rather than a structured one) and the decompression is a fold over the
+input stream, rather than a more generative loop.</p>
+
+<p>Here’s the core of it:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;decompress&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">decompress</span><span class="err"> </span><span class="nv">str</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">dict</span><span class="err"> </span><span class="p">(</span><span class="nf">make-hasheq</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;output-from-dict&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">next</span><span class="err"> </span><span class="mi">1</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">p</span><span class="err"> </span><span class="p">(</span><span class="nf">in-stream</span><span class="err"> </span><span class="nv">str</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">p</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">ref</span><span class="err"> </span><span class="nv">b</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">hash-set!</span><span class="err"> </span><span class="nv">dict</span><span class="err"> </span><span class="nv">next</span><span class="err"> </span><span class="nv">p</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">output-from-dict</span><span class="err"> </span><span class="nv">next</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">next</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">?</span><span class="err"> </span><span class="nv">number?</span><span class="err"> </span><span class="nv">ref</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">output-from-dict</span><span class="err"> </span><span class="nv">ref</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="nv">next</span><span class="err">]</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Basically, each element of the stream is either a new dictionary entry,
+in which case we remember it and output it, or it’s just a reference and
+we output without remembering. Pretty simple. (We could use a functional
+hash, but there’s no benefit here.)</p>
+
+<p>When you get a reference and need to output it, it’s also quite easy:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;output-from-dict&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">output-from-dict</span><span class="err"> </span><span class="nv">this</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-ref</span><span class="err"> </span><span class="nv">dict</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="no">#f</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    [</span><span class="no">#f</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">void</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">last</span><span class="err"> </span><span class="nv">this-b</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">output-from-dict</span><span class="err"> </span><span class="nv">last</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">write-byte</span><span class="err"> </span><span class="nv">this-b</span><span class="p">)</span><span class="err">]</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Either the reference isn’t in the dictionary, so you stop, or it is, so
+you output its prefix and then the byte associated with it. We use the
+stack as our data-structure to keep track of bytes to write, because the
+dictionary stores the prefixes, not the suffixes.</p>
+
+<p>We can check that the output is the same as the input:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;decompress-example&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">check-equal?</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">with-output-to-bytes</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">decompress</span><span class="err"> </span><span class="nv">compressed</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">some-input</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the example, the dictionary is:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;decompress-example-dict&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="mi">8</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="nv">A</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="mi">7</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">4</span><span class="err"> </span><span class="nv">B</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="mi">6</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">5</span><span class="err"> </span><span class="nv">B</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="mi">5</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="nv">A</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="mi">4</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="nv">B</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="mi">3</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="nv">B</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="mi">2</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="nv">B</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="mi">1</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="nv">A</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And that’s it!</p>
+
+<h1>Further work</h1>
+
+<p>One strange thing about this implementation is that the output is just a
+stream of pairs rather than bytes. The easiest way to encode it as bytes
+is to write each pair as two bytes. That’s not totally correct, however,
+because the number of prefixes may exceed the number of bytes, so you’ll
+need to use the length of the input log-2 for the number of bits per
+reference. You can do a little bit better by having the decoder keep
+track of this number during decoding and gradually use more bits.</p>
+
+<p>It is interesting to think of what kinds of input this algorithm fails
+to compress. It’s those without common prefixes. For example, if you had
+all the bytes from 0 to 255, then the output would be double (plus one!
+Why?) the input. If you then added each byte to every other byte, then
+you’d double again.</p>
+
+<p>Another surprising thing about the algorithm is that the dictionary is
+just as long as the compressed output because the compressed output IS
+the dictionary. The compression algorithm is inherently non-random
+access because you need to read it linearly to know the context of the
+prefix references.</p>
+
+<p>This was a very fun thing to implement. I hope you enjoy it!</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">rackunit</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">racket/list</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">racket/match</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">racket/stream</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">racket/port</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="nv">&lt;compress&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;compress-example&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;compress-example-dict&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;decompress&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;decompress-example&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;decompress-example-dict&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="/downloads/code/2012-05-22-lz78.rkt">Download</a></p>
+</div>
+  
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jay McCarthy</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-22T00:00:00-06:00" pubdate data-updated="true">May 22<span>nd</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/compression/'>Compression</a>, <a class='category' href='/blog/categories/racket/'>Racket</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/05/22/lz78/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/05/22/lz78/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/14/boggle/" title="Previous Post: A Boggle Solver">&laquo; A Boggle Solver</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+<div style="text-align: center;">
+  <script type="text/javascript"><!--
+   google_ad_client = "ca-pub-8940021471694041";
+   /* jeapostrophe - body */
+   google_ad_slot = "2685812826";
+   google_ad_width = 728;
+   google_ad_height = 90;
+   //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</div>
+
+
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>I am an assistant professor at <a href="http://byu.edu">Brigham Young University</a> in the
+  <a href="http://cs.byu.edu">Computer Science department</a>. I work
+  on the <a href="http://racket-lang.org/">Racket</a> programming
+  language</a>.</p>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/05/22/lz78/">An LZ78 Implementation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/14/boggle/">A Boggle Solver</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/07/quilt-colouring/">Quilt Colouring</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146/">Professor Layton and the Last Specter, Puzzle #146</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/31/siq-reverse-dll/">Stupid Interview Questions - Introduction + Reversing a Doubly Linked List</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("jeapostrophe", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/jeapostrophe" class="twitter-follow-button" data-show-count="false">Follow @jeapostrophe</a>
+  
+</section>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/101670206687664104937?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+<section style="text-align: center;">
+  <script type="text/javascript"><!--
+    google_ad_client = "ca-pub-8940021471694041";
+    /* jeapostrophe - side */
+    google_ad_slot = "3412706495";
+    google_ad_width = 200;
+    google_ad_height = 200;
+    //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/jeapostrophe">@jeapostrophe</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'jeapostrophe',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Jay McCarthy -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jaymccarthy';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
