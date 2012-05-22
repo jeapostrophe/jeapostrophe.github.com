@@ -199,6 +199,8 @@ so you output its prefix and then the byte associated with it. We use
 the stack as our data-structure to keep track of bytes to write,
 because the dictionary stores the prefixes, not the suffixes.
 
+The whole decompression is just 20 lines. Wow!
+
 We can check that the output is the same as the input:
 
 @chunky[<decompress-example>

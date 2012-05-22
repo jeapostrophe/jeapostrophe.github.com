@@ -4,7 +4,7 @@
   <title><![CDATA[Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-05-22T01:20:51-06:00</updated>
+  <updated>2012-05-22T02:13:10-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -305,6 +305,8 @@ hash, but there’s no benefit here.)</p>
 you output its prefix and then the byte associated with it. We use the
 stack as our data-structure to keep track of bytes to write, because the
 dictionary stores the prefixes, not the suffixes.</p>
+
+<p>The whole decompression is just 20 lines. Wow!</p>
 
 <p>We can check that the output is the same as the input:</p>
 
