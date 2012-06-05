@@ -1,0 +1,570 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>LaTeX and Word Counts - Jay McCarthy</title>
+  <meta name="author" content="Jay McCarthy">
+
+  
+  <meta name="description" content="A few years ago, a proposal came to a committee I was on to limit the
+documents we evaluated based on their word count, rather than their page
+length &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/06/05/word-count">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Jay McCarthy" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30131476-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Jay McCarthy</a></h1>
+  
+    <h2>'Cowards die many times before their deaths, The valiant never taste of death but once.'</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jeapostrophe.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="http://faculty.cs.byu.edu/~jay/home/">Publications</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">LaTeX and Word Counts</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-05T00:00:00-06:00" pubdate data-updated="true">Jun 5<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A few years ago, a proposal came to a committee I was on to limit the
+documents we evaluated based on their word count, rather than their page
+length.</p>
+
+<p>The rationale was that so-called &#8220;graphics&#8221; research would include many
+pictures which would increase the rage length, but not necessarily the
+word count.</p>
+
+<p>I was opposed to this proposal on technical grounds.</p>
+
+</div>
+  
+  
+    <div style="text-align: center;">
+  <script type="text/javascript"><!--
+   google_ad_client = "ca-pub-8940021471694041";
+   /* jeapostrophe - body */
+   google_ad_slot = "2685812826";
+   google_ad_width = 728;
+   google_ad_height = 90;
+   //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</div>
+
+    <div class="entry-content" style="margin-top: 1em;">
+
+
+<p>My rationale was that it is easy to manually count pages, but difficult
+(and not worth it) to count words AND manual counting is the only
+reliable method to discover the number of words.</p>
+
+<p>This proposal was made by someone who uses Word (ugh) to prepare their
+documents, so it was easy, in their mind, to find the word count of a
+document and report it when the document was turned in.</p>
+
+<p>I, however, like all True Computer Scientists use LaTeX (and Scribble)
+to prepare my documents, via rendering to PostScript or PDF.</p>
+
+<h1>Word Counts from PostScript</h1>
+
+<p>You may think that you could just count the words directly from the
+PostScript. This is not the case, however.</p>
+
+<p>PostScript is a very low-level programming language with a basic set of
+vector-graphic-like primitives for moving the pen and drawing shapes,
+letters, etc. A sentence like &#8220;The quick brown fox jumped over the lazy
+dog.&#8221; could get warped into many drawing commands, particularly when
+effects like sentence spacing, rivers, justifications are taking into
+consideration during the compilation process. Compilers to PostScript,
+like LaTeX, in fact do this, making the PostScript practically un-usable
+for analysis.</p>
+
+<p>PDF improves on PostScript in numerous ways for analysis purposes (such
+as computing where a new page will occur in the code) but it is not
+significant enough discover individual words in the presence of advanced
+typography and styling.</p>
+
+<p>But, is it really surprising that it is hard to learn higher-level
+things about a program from its compiled form? What if we looked
+directly at the LaTeX?</p>
+
+<h1>Word Counts from LaTeX</h1>
+
+<p>Unfortunately, LaTeX is a Lambda-complete language due to its advanced
+macro system. By writing macros, you can add new output (words) to the
+document and change the meaning of terms later in the document by
+introducing new macros and/or changing the environment.</p>
+
+<p>This means that you can’t analyze pieces of LaTeX independent from
+everything that came before them and that pretty much the only way to
+analyze them is to run them, but because of the Lambda-completeness,
+evaluation may not terminate.</p>
+
+<p>I wanted to demonstrate this to those on the committee, so I wrote a
+short example program that had a very difficult to discover word count.</p>
+
+<h1>The Collatz Conjecture</h1>
+
+<p>The Collatz Conjecture, proposed in 1937, states that if you take any
+natural number, n, and repeat on either n/2 if n is even or 3n+1 if n is
+odd, then you will eventually reach 1.</p>
+
+<p>Every natural number, n, has a Collatz sequence, or the sequence of
+numbers visited starting from n. (The conjecture says that all such
+sequences include 1.) For example, the sequence for 6 is 6, 3, 10, 5,
+16, 8, 4, 2, 1.</p>
+
+<p>The Collatz Conjecture has not been proved, nor has any counter-example
+been discovered.</p>
+
+<h1>The Collatz Sequence in LaTeX</h1>
+
+<p>Below is a short LaTeX file that renders to the Collatz sequence of a
+random integer between 0 and 1,000,000,000:</p>
+
+<figure class='code'><figcaption><span>collatz.tex </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\documentclass</span><span class="nb">{</span>article<span class="nb">}</span>
+</span><span class='line'><span class="k">\usepackage</span><span class="nb">{</span>fp<span class="nb">}</span>
+</span><span class='line'> 
+</span><span class='line'><span class="k">\FPrandom</span> <span class="k">\n</span>
+</span><span class='line'><span class="k">\FPmul</span> <span class="k">\n</span> <span class="k">\n</span> <span class="nb">{</span>1000000000<span class="nb">}</span>
+</span><span class='line'><span class="k">\FPround</span> <span class="k">\n</span> <span class="k">\n</span> 0
+</span><span class='line'> 
+</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\collatz</span><span class="nb">}</span>
+</span><span class='line'><span class="nb">{</span>
+</span><span class='line'> <span class="k">\FPclip</span> <span class="k">\n</span> <span class="k">\n</span>
+</span><span class='line'> <span class="k">\FPprint</span> <span class="k">\n</span>
+</span><span class='line'> <span class="k">\FPifeq</span> <span class="k">\n</span> 1
+</span><span class='line'> <span class="k">\else</span>
+</span><span class='line'><span class="k">\ifodd</span> <span class="k">\FPprint</span> <span class="k">\n</span>
+</span><span class='line'>    <span class="k">\FPmul</span> <span class="k">\n</span> 3 <span class="k">\n</span>
+</span><span class='line'>     <span class="k">\FPadd</span> <span class="k">\n</span> <span class="k">\n</span> 1
+</span><span class='line'>     <span class="k">\collatz</span>
+</span><span class='line'> <span class="k">\else</span>
+</span><span class='line'>    <span class="k">\FPdiv</span> <span class="k">\n</span> <span class="k">\n</span> 2
+</span><span class='line'>     <span class="k">\collatz</span>
+</span><span class='line'> <span class="k">\fi</span>
+</span><span class='line'> <span class="k">\fi</span>
+</span><span class='line'><span class="nb">}</span>
+</span><span class='line'> 
+</span><span class='line'><span class="k">\begin</span><span class="nb">{</span>document<span class="nb">}</span>
+</span><span class='line'><span class="k">\collatz</span>
+</span><span class='line'><span class="k">\end</span><span class="nb">{</span>document<span class="nb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This 27 line program demonstrates the absurd power of LaTeX. When you
+run it, sometimes you get pages and pages of numbers. Other times, the
+number of words will be so small it fits on just a few lines.</p>
+
+<h1>Word Counts from LaTeX (redux)</h1>
+
+<p>The beauty of this program is that you can’t tell how many words will be
+in the output by looking at the program source or the output, because
+the output is only visible in the PostScript in a way that can’t really
+be discovered automatically.</p>
+
+<p>The only way to get the word count is either manually or, perhaps, a
+hacked version of LaTeX that computer the word count as it went. But, of
+course, there are ways around the hacked version like by inserting
+negative space sequences:</p>
+
+<figure class='code'><figcaption><span>negspace.tex </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'>
+</span><span class='line'><span class="k">\documentclass</span><span class="nb">{</span>article<span class="nb">}</span>
+</span><span class='line'><span class="k">\begin</span><span class="nb">{</span>document<span class="nb">}</span>
+</span><span class='line'>The qui <span class="k">\hspace</span><span class="nb">{</span>+9.5px<span class="nb">}</span>brown<span class="k">\hspace</span><span class="nb">{</span>-39.5px<span class="nb">}</span>ck
+</span><span class='line'> 
+</span><span class='line'>The quick brown
+</span><span class='line'><span class="k">\end</span><span class="nb">{</span>document<span class="nb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This document appears to have six words to the human eye, but I am
+highly skeptical of any analysis that would decide that from the seven
+word-like tokens in the source.</p>
+
+<h1>The Resolution</h1>
+
+<p>Naturally, this argument swayed the rest of the committee and we stuck
+with page limits rather than switching to word limits.</p>
+
+<p>Luckily, no one noticed the problem with the program. You see, it only
+considers numbers between 10<sup>0</sup> and 10<sup>9,</sup> which have all been verified to
+not repeat. We’d have to go up past 10<sup>18,</sup> but the LaTeX fp package only
+handles up to the top of 10<sup>17,</sup> so we could never get to a number where
+there is doubt about termination. Of course, the program still has a
+very unpredictable output, which is computationally challenging to
+discover. Additionally, it is natural to imagine putting more work into
+the fp package, such as reimplementing GMP in it to get arbitrary length
+integers.</p>
+
+<p>Thus we see that LaTeX will always dominate Word. (And, of course, since
+Scribble allows embedding Racket directly, potentially non-terminating
+documents like this are much easier to write.)</p>
+</div>
+  
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jay McCarthy</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-05T00:00:00-06:00" pubdate data-updated="true">Jun 5<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/latex/'>LaTeX</a>, <a class='category' href='/blog/categories/mathematics/'>Mathematics</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/06/05/word-count/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/06/05/word-count/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/28/exec-vs-system/" title="Previous Post: exec and Tail-call Optimization">&laquo; exec and Tail-call Optimization</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+<div style="text-align: center;">
+  <script type="text/javascript"><!--
+   google_ad_client = "ca-pub-8940021471694041";
+   /* jeapostrophe - body */
+   google_ad_slot = "2685812826";
+   google_ad_width = 728;
+   google_ad_height = 90;
+   //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</div>
+
+
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>I am an assistant professor at <a href="http://byu.edu">Brigham Young University</a> in the
+  <a href="http://cs.byu.edu">Computer Science department</a>. I work
+  on the <a href="http://racket-lang.org/">Racket</a> programming
+  language</a>.</p>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/06/05/word-count/">LaTeX and Word Counts</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/28/exec-vs-system/">exec and Tail-call Optimization</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/22/lz78/">An LZ78 Implementation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/14/boggle/">A Boggle Solver</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/07/quilt-colouring/">Quilt Colouring</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("jeapostrophe", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/jeapostrophe" class="twitter-follow-button" data-show-count="false">Follow @jeapostrophe</a>
+  
+</section>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/101670206687664104937?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+<section style="text-align: center;">
+  <script type="text/javascript"><!--
+    google_ad_client = "ca-pub-8940021471694041";
+    /* jeapostrophe - side */
+    google_ad_slot = "3412706495";
+    google_ad_width = 200;
+    google_ad_height = 200;
+    //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/jeapostrophe">@jeapostrophe</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'jeapostrophe',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Jay McCarthy -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jaymccarthy';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

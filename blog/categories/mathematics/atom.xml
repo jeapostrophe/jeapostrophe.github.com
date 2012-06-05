@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Mathematics | Jay McCarthy]]></title>
+  <link href="http://jeapostrophe.github.com/blog/categories/mathematics/atom.xml" rel="self"/>
+  <link href="http://jeapostrophe.github.com/"/>
+  <updated>2012-06-05T12:15:59-06:00</updated>
+  <id>http://jeapostrophe.github.com/</id>
+  <author>
+    <name><![CDATA[Jay McCarthy]]></name>
+    <email><![CDATA[jay.mccarthy@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[LaTeX and Word Counts]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/06/05/word-count/"/>
+    <updated>2012-06-05T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/06/05/word-count</id>
+    <content type="html"><![CDATA[<p>A few years ago, a proposal came to a committee I was on to limit the
+documents we evaluated based on their word count, rather than their page
+length.</p>
+
+<p>The rationale was that so-called "graphics" research would include many
+pictures which would increase the rage length, but not necessarily the
+word count.</p>
+
+<p>I was opposed to this proposal on technical grounds.</p>
+
+<!-- more -->
+
+
+<p>My rationale was that it is easy to manually count pages, but difficult
+(and not worth it) to count words AND manual counting is the only
+reliable method to discover the number of words.</p>
+
+<p>This proposal was made by someone who uses Word (ugh) to prepare their
+documents, so it was easy, in their mind, to find the word count of a
+document and report it when the document was turned in.</p>
+
+<p>I, however, like all True Computer Scientists use LaTeX (and Scribble)
+to prepare my documents, via rendering to PostScript or PDF.</p>
+
+<h1>Word Counts from PostScript</h1>
+
+<p>You may think that you could just count the words directly from the
+PostScript. This is not the case, however.</p>
+
+<p>PostScript is a very low-level programming language with a basic set of
+vector-graphic-like primitives for moving the pen and drawing shapes,
+letters, etc. A sentence like "The quick brown fox jumped over the lazy
+dog." could get warped into many drawing commands, particularly when
+effects like sentence spacing, rivers, justifications are taking into
+consideration during the compilation process. Compilers to PostScript,
+like LaTeX, in fact do this, making the PostScript practically un-usable
+for analysis.</p>
+
+<p>PDF improves on PostScript in numerous ways for analysis purposes (such
+as computing where a new page will occur in the code) but it is not
+significant enough discover individual words in the presence of advanced
+typography and styling.</p>
+
+<p>But, is it really surprising that it is hard to learn higher-level
+things about a program from its compiled form? What if we looked
+directly at the LaTeX?</p>
+
+<h1>Word Counts from LaTeX</h1>
+
+<p>Unfortunately, LaTeX is a Lambda-complete language due to its advanced
+macro system. By writing macros, you can add new output (words) to the
+document and change the meaning of terms later in the document by
+introducing new macros and/or changing the environment.</p>
+
+<p>This means that you can’t analyze pieces of LaTeX independent from
+everything that came before them and that pretty much the only way to
+analyze them is to run them, but because of the Lambda-completeness,
+evaluation may not terminate.</p>
+
+<p>I wanted to demonstrate this to those on the committee, so I wrote a
+short example program that had a very difficult to discover word count.</p>
+
+<h1>The Collatz Conjecture</h1>
+
+<p>The Collatz Conjecture, proposed in 1937, states that if you take any
+natural number, n, and repeat on either n/2 if n is even or 3n+1 if n is
+odd, then you will eventually reach 1.</p>
+
+<p>Every natural number, n, has a Collatz sequence, or the sequence of
+numbers visited starting from n. (The conjecture says that all such
+sequences include 1.) For example, the sequence for 6 is 6, 3, 10, 5,
+16, 8, 4, 2, 1.</p>
+
+<p>The Collatz Conjecture has not been proved, nor has any counter-example
+been discovered.</p>
+
+<h1>The Collatz Sequence in LaTeX</h1>
+
+<p>Below is a short LaTeX file that renders to the Collatz sequence of a
+random integer between 0 and 1,000,000,000:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>collatz.tex </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'><span class="k">\documentclass</span><span class="nb">{</span>article<span class="nb">}</span>  &lt;br/&gt;
+</span><span class='line'><span class="k">\usepackage</span><span class="nb">{</span>fp<span class="nb">}</span>          &lt;br/&gt;
+</span><span class='line'>                         &lt;br/&gt;
+</span><span class='line'><span class="k">\FPrandom</span> <span class="k">\n</span>             &lt;br/&gt;
+</span><span class='line'><span class="k">\FPmul</span> <span class="k">\n</span> <span class="k">\n</span> <span class="nb">{</span>1000000000<span class="nb">}</span>&lt;br/&gt;
+</span><span class='line'><span class="k">\FPround</span> <span class="k">\n</span> <span class="k">\n</span> 0         &lt;br/&gt;
+</span><span class='line'>                         &lt;br/&gt;
+</span><span class='line'><span class="k">\newcommand</span><span class="nb">{</span><span class="k">\collatz</span><span class="nb">}</span>    &lt;br/&gt;
+</span><span class='line'><span class="nb">{</span>                        &lt;br/&gt;
+</span><span class='line'> <span class="k">\FPclip</span> <span class="k">\n</span> <span class="k">\n</span>           &lt;br/&gt;
+</span><span class='line'> <span class="k">\FPprint</span> <span class="k">\n</span>             &lt;br/&gt;
+</span><span class='line'> <span class="k">\FPifeq</span> <span class="k">\n</span> 1            &lt;br/&gt;
+</span><span class='line'> <span class="k">\else</span>                   &lt;br/&gt;
+</span><span class='line'><span class="k">\ifodd</span> <span class="k">\FPprint</span> <span class="k">\n</span>       &lt;br/&gt;
+</span><span class='line'>    <span class="k">\FPmul</span> <span class="k">\n</span> 3 <span class="k">\n</span>       &lt;br/&gt;
+</span><span class='line'>     <span class="k">\FPadd</span> <span class="k">\n</span> <span class="k">\n</span> 1      &lt;br/&gt;
+</span><span class='line'>     <span class="k">\collatz</span>            &lt;br/&gt;
+</span><span class='line'> <span class="k">\else</span>                   &lt;br/&gt;
+</span><span class='line'>    <span class="k">\FPdiv</span> <span class="k">\n</span> <span class="k">\n</span> 2       &lt;br/&gt;
+</span><span class='line'>     <span class="k">\collatz</span>            &lt;br/&gt;
+</span><span class='line'> <span class="k">\fi</span>                     &lt;br/&gt;
+</span><span class='line'> <span class="k">\fi</span>                     &lt;br/&gt;
+</span><span class='line'><span class="nb">}</span>                        &lt;br/&gt;
+</span><span class='line'>                         &lt;br/&gt;
+</span><span class='line'><span class="k">\begin</span><span class="nb">{</span>document<span class="nb">}</span>         &lt;br/&gt;
+</span><span class='line'><span class="k">\collatz</span>                 &lt;br/&gt;
+</span><span class='line'><span class="k">\end</span><span class="nb">{</span>document<span class="nb">}</span>           &lt;br/&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This 27 line program demonstrates the absurd power of LaTeX. When you
+run it, sometimes you get pages and pages of numbers. Other times, the
+number of words will be so small it fits on just a few lines.</p>
+
+<h1>Word Counts from LaTeX (redux)</h1>
+
+<p>The beauty of this program is that you can’t tell how many words will be
+in the output by looking at the program source or the output, because
+the output is only visible in the PostScript in a way that can’t really
+be discovered automatically.</p>
+
+<p>The only way to get the word count is either manually or, perhaps, a
+hacked version of LaTeX that computer the word count as it went. But, of
+course, there are ways around the hacked version like by inserting
+negative space sequences:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>negspace.tex </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='tex'><span class='line'>                &lt;br/&gt;
+</span><span class='line'><span class="k">\documentclass</span><span class="nb">{</span>article<span class="nb">}</span>                     &lt;br/&gt;
+</span><span class='line'><span class="k">\begin</span><span class="nb">{</span>document<span class="nb">}</span>                            &lt;br/&gt;
+</span><span class='line'>The qui <span class="k">\hspace</span><span class="nb">{</span>+9.5px<span class="nb">}</span>brown<span class="k">\hspace</span><span class="nb">{</span>-39.5px<span class="nb">}</span>ck
+</span><span class='line'>                                            &lt;br/&gt;
+</span><span class='line'>The quick brown                             &lt;br/&gt;
+</span><span class='line'><span class="k">\end</span><span class="nb">{</span>document<span class="nb">}</span>                              &lt;br/&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This document appears to have six words to the human eye, but I am
+highly skeptical of any analysis that would decide that from the seven
+word-like tokens in the source.</p>
+
+<h1>The Resolution</h1>
+
+<p>Naturally, this argument swayed the rest of the committee and we stuck
+with page limits rather than switching to word limits.</p>
+
+<p>Luckily, no one noticed the problem with the program. You see, it only
+considers numbers between 10<sup>0</sup> and 10<sup>9,</sup> which have all been verified to
+not repeat. We’d have to go up past 10<sup>18,</sup> but the LaTeX fp package only
+handles up to the top of 10<sup>17,</sup> so we could never get to a number where
+there is doubt about termination. Of course, the program still has a
+very unpredictable output, which is computationally challenging to
+discover. Additionally, it is natural to imagine putting more work into
+the fp package, such as reimplementing GMP in it to get arbitrary length
+integers.</p>
+
+<p>Thus we see that LaTeX will always dominate Word. (And, of course, since
+Scribble allows embedding Racket directly, potentially non-terminating
+documents like this are much easier to write.)</p>
+]]></content>
+  </entry>
+  
+</feed>
