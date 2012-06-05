@@ -18,7 +18,7 @@ documents we evaluated based on their word count, rather than their
 page length.
 
 The rationale was that so-called "graphics" research would include
-many pictures which would increase the rage length, but not
+many pictures which would increase the page length, but not
 necessarily the word count.
 
 I was opposed to this proposal on technical grounds.
