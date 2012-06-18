@@ -4,7 +4,7 @@
   <title><![CDATA[Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-06-05T16:18:07-06:00</updated>
+  <updated>2012-06-18T15:41:57-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -12,6 +12,510 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Delimited Pipes]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/06/18/pipe/"/>
+    <updated>2012-06-18T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/06/18/pipe</id>
+    <content type="html"><![CDATA[<p>I love continuations. We couldn’t do much of anything on a computer
+without them. But, I love first-class access to continuations (i.e.
+call/cc) even more.</p>
+
+<p>The standard reason is that call/cc allows you to express things that
+are not possible at the user-level without it. For example, generators,
+implicit back-tracking search, threads, etc.</p>
+
+<p>However, many of these use-cases for call/cc use mutation in an
+essential way and have let some to criticize useful uses of call/cc to
+be necessarily tied to mutation.</p>
+
+<p>In this post, I’ll show how call/cc saves use from mutation and produces
+something pretty elegant.</p>
+
+<!-- more -->
+
+
+<p>Suppose you are parsing a parenthetical language (for some crazy reason)
+and you need to associate parens and then deal with the list structure
+later.</p>
+
+<p>The obvious way to do that is:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;obvious&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="nv">ip</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">inside?</span><span class="err"> </span><span class="no">#f</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="p">(</span><span class="nf">read-char</span><span class="err"> </span><span class="nv">ip</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      [</span><span class="sc">#\(</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="no">#t</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="sc">#\)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">empty</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching right paren&quot;</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">?</span><span class="err"> </span><span class="nv">eof-object?</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching left paren&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">empty</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="nv">this</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here’s a little test suite:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;tests&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">test</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">=&gt;</span><span class="err"> </span><span class="nv">empty</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;a&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">=&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\a</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;(&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">=error&gt;</span><span class="err"> </span><span class="o">#</span><span class="nv">rx</span><span class="s">&quot;left paren&quot;</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;)&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">=error&gt;</span><span class="err"> </span><span class="o">#</span><span class="nv">rx</span><span class="s">&quot;right paren&quot;</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;b(a)c&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">=&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\b</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\a</span><span class="p">)</span><span class="err"> </span><span class="sc">#\c</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;(a((a)a))b(a)c&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span><span class="nv">=&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\a</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\a</span><span class="p">)</span><span class="err"> </span><span class="sc">#\a</span><span class="p">))</span><span class="err"> </span><span class="sc">#\b</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\a</span><span class="p">)</span><span class="err"> </span><span class="sc">#\c</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The problem with this solution is that it uses side-effects! Each call
+to read-char is mutation of the input-port data-structure’s
+next-position-to-read field. It would be more elegant to use a stream to
+represent the input.</p>
+
+<p>Unfortunately, the obvious stream-based solution is broken:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;obvious-list&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="nv">i</span><span class="err">] [</span><span class="nv">inside?</span><span class="err"> </span><span class="no">#f</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">i</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="sc">#\(</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="no">#t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="sc">#\)</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">empty</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching right paren&quot;</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching left paren&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">empty</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The problem is that after the matching right-paren is found for a given
+left-paren, you must &#8220;skip&#8221; the interleaving characters on the
+recursion. In the code, the problem is the first case of the match,
+where more is used in two recursion.</p>
+
+<p>The correct version is written monadically:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;monad-list&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="nv">i</span><span class="err">] [</span><span class="nv">inside?</span><span class="err"> </span><span class="no">#f</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">i</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="sc">#\(</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">this</span><span class="err"> </span><span class="nv">more-p</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="no">#t</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">that</span><span class="err"> </span><span class="nv">more-pp</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more-p</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="nv">that</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">               </span><span class="nv">more-pp</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="sc">#\)</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching right paren&quot;</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching left paren&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">empty</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">that</span><span class="err"> </span><span class="nv">more-p</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="nv">that</span><span class="p">)</span><span class="err"> </span><span class="nv">more-p</span><span class="p">)</span><span class="err">]</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Unfortunately, monadic programming is effectful programming, just with
+more pain, because you have to do the plumbing yourself or contaminate
+the rest of your program with the effectful type sewage.</p>
+
+<p>If we look at the monadic program, though, we can see that the only
+useful threading is between the first and second cases of the match. The
+stuff after the right-paren gets passed out to the left-paren context.
+Why not just implement that &#8220;piping&#8221; to the calling context directly as
+a feature?</p>
+
+<p>The final code will look like this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;pipe-list&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="nv">i</span><span class="err">] [</span><span class="nv">inside?</span><span class="err"> </span><span class="no">#f</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">i</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="sc">#\(</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">more-p</span><span class="err"> </span><span class="nv">pipe-in</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">pipe</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="no">#t</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-in</span><span class="err"> </span><span class="nv">empty</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more-p</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="sc">#\)</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">pipe-out</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching right paren&quot;</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching left paren&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">empty</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The crucial point is that when we recur, looking for the right-paren, we
+use the pipe form, which allows the body to communicate with the
+context. The body then calls pipe-out, which returns a value to the
+context. The context receives the value (more-p) as well as a function
+to call when it should communicate back (pipe-in). The context then
+sends back the empty list, which the body will return at the end of the
+list it constructed, the call to pipe-in returns with the final answer
+from the body&#8230; the inner list.</p>
+
+<p>It is fairly simple to imagine implementing such a piping-system with
+concurrency: every call to pipe creates a new thread with a line of
+communication back to the calling context, which waits for
+communication. This is easy to realize in code, but there are some gross
+details, especially with getting exceptions to throw in the parent:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;pipes-as-threads&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define-syntax-rule</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">pipe*</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">pipe-channel</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">make-parameter</span><span class="err"> </span><span class="no">#f</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe*</span><span class="err"> </span><span class="nv">f</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="p">(</span><span class="nf">make-channel</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">thread</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">parameterize</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">pipe-channel</span><span class="err"> </span><span class="nv">c</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">channel-put</span><span class="err"> </span><span class="nv">c</span>
+</span><span class='line'>  <span class="err">                    </span><span class="p">(</span><span class="nf">with-handlers</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">exn?</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">                      </span><span class="p">(</span><span class="nf">f</span><span class="p">))))))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">intermediate</span><span class="err"> </span><span class="p">(</span><span class="nf">channel-get*</span><span class="err"> </span><span class="nv">c</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="nv">intermediate</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">response</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">channel-put</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="nv">response</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">channel-get*</span><span class="err"> </span><span class="nv">c</span><span class="p">))))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">channel-get*</span><span class="err"> </span><span class="nv">c</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="p">(</span><span class="nf">channel-get</span><span class="err"> </span><span class="nv">c</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">exn?</span><span class="err"> </span><span class="nv">v</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">raise</span><span class="err"> </span><span class="nv">v</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="nv">v</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-out</span><span class="err"> </span><span class="nv">v</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-channel</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">channel-put</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="nv">v</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">channel-get</span><span class="err"> </span><span class="nv">c</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Of course, this has many hidden effects, much more than the original
+port-based code! So it’s not exactly an advisable way of solving the
+problem.</p>
+
+<p>Luckily we can get the same feature in a tiny amount of
+continuation-based code:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;pipes-as-conts&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">pipe-tag</span><span class="err"> </span><span class="p">(</span><span class="nf">make-continuation-prompt-tag</span><span class="err"> </span><span class="ss">&#39;pipe</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe*</span><span class="err"> </span><span class="nv">f</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let/ec</span><span class="err"> </span><span class="nv">esc</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">call-with-continuation-prompt</span><span class="err"> </span><span class="nv">f</span><span class="err"> </span><span class="nv">pipe-tag</span><span class="err"> </span><span class="nv">esc</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;pipe</span><span class="err"> </span><span class="s">&quot;did not pipe-out&quot;</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define-syntax-rule</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">pipe*</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-out</span><span class="err"> </span><span class="nv">v</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">call-with-composable-continuation</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">come-back</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">abort-current-continuation</span><span class="err"> </span><span class="nv">pipe-tag</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">come-back</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">pipe-tag</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The basic idea is to turn the call to pipe into a new continuation
+prompt, then pipe-out captures the continuation back to that point, and
+then aborts back to the prompt, delivering an intermediate value and
+then the continuation which resumes the computation from outside the
+calling context. This system is particularly beautiful because it allows
+the inside to be resumed multiple times.</p>
+
+<p>In my opinion this is the perfect example of the power of first-class
+continuations: we are able to seamlessly implement a powerful new
+feature that no other language supports in 12 simple lines. And, there’s
+no mutation anywhere!</p>
+
+<p>The only objection to continuations I feel reason to accept is that it
+can be difficult to reason about contexts. If you’re not sure that you
+agree with that statement, try to figure what this returns, without
+evaluating it:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;puzzle&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="mi">5</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">&lt;=</span><span class="err"> </span><span class="nv">i</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="nv">empty</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">j</span><span class="err"> </span><span class="nv">pipe-in</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">pipe</span><span class="err"> </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-out</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">i</span><span class="p">))))))</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">j</span>
+</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">append</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-in</span><span class="err"> </span><span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="nv">j</span><span class="err"> </span><span class="mi">1</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">                    </span><span class="p">(</span><span class="nf">pipe-in</span><span class="err"> </span><span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="nv">j</span><span class="err"> </span><span class="mi">2</span><span class="p">))))</span><span class="err">]</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">tests/eli-tester</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">racket/list</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">racket/match</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">test</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;obvious&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="p">(</span><span class="nf">open-input-string</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;tests&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;obvious-list&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;tests&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;monad-list&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">this</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">     </span><span class="nv">this</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;tests&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;pipes-as-threads&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;pipe-list&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;tests&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;pipes-as-conts&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;pipe-list&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;tests&gt;</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;The answer to the puzzle is... ~a\n&quot;</span>
+</span><span class='line'>  <span class="err">           </span><span class="nv">&lt;puzzle&gt;</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://jeapostrophe.github.com/downloads/code/2012-06-18-pipe.rkt">Download</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[LaTeX and Word Counts]]></title>

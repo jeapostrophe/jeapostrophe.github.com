@@ -9,9 +9,9 @@
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="A few years ago, a proposal came to a committee I was on to limit the
-documents we evaluated based on their word count, rather than their page
-length &hellip;">
+  <meta name="description" content="I love continuations. We couldn’t do much of anything on a computer
+without them. But, I love first-class access to continuations (i.e.
+call/cc) even &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,62 @@ length &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/18/pipe/">Delimited Pipes</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-18T00:00:00-06:00" pubdate data-updated="true">Jun 18<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/06/18/pipe/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I love continuations. We couldn’t do much of anything on a computer
+without them. But, I love first-class access to continuations (i.e.
+call/cc) even more.</p>
+
+<p>The standard reason is that call/cc allows you to express things that
+are not possible at the user-level without it. For example, generators,
+implicit back-tracking search, threads, etc.</p>
+
+<p>However, many of these use-cases for call/cc use mutation in an
+essential way and have let some to criticize useful uses of call/cc to
+be necessarily tied to mutation.</p>
+
+<p>In this post, I’ll show how call/cc saves use from mutation and produces
+something pretty elegant.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/06/18/pipe/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -514,6 +570,10 @@ commentary.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/18/pipe/">Delimited Pipes</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/05/word-count/">LaTeX and Word Counts</a>
       </li>
     
@@ -527,10 +587,6 @@ commentary.</p>
     
       <li class="post">
         <a href="/blog/2012/05/14/boggle/">A Boggle Solver</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/07/quilt-colouring/">Quilt Colouring</a>
       </li>
     
   </ul>
