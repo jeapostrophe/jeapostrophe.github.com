@@ -98,7 +98,7 @@ Unfortunately, the obvious stream-based solution is broken:
 The problem is that after the matching right-paren is found for a
 given left-paren, you must "skip" the interleaving characters on the
 recursion. In the code, the problem is the first case of the match,
-where @racket[more] is used in two recursion.
+where @racket[more] is used in two recursive calls.
 
 The correct version is written monadically:
 

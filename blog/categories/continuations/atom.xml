@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Continuations | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/continuations/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-06-18T15:41:57-06:00</updated>
+  <updated>2012-06-18T17:25:19-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -184,7 +184,7 @@ represent the input.</p>
 <p>The problem is that after the matching right-paren is found for a given
 left-paren, you must "skip" the interleaving characters on the
 recursion. In the code, the problem is the first case of the match,
-where more is used in two recursion.</p>
+where more is used in two recursive calls.</p>
 
 <p>The correct version is written monadically:</p>
 
