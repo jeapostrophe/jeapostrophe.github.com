@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Racket | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/racket/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-06-18T17:25:19-06:00</updated>
+  <updated>2012-06-19T12:29:22-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -440,10 +440,10 @@ continuations: we are able to seamlessly implement a powerful new
 feature that no other language supports in 12 simple lines. And, there’s
 no mutation anywhere!</p>
 
-<p>The only objection to continuations I feel reason to accept is that it
-can be difficult to reason about contexts. If you’re not sure that you
-agree with that statement, try to figure what this returns, without
-evaluating it:</p>
+<p>The only objection to first-class continuations I feel is reasonable is
+that it can be difficult to reason about contexts. If you’re not sure
+that you agree with that statement, try to figure what this returns,
+without evaluating it:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>

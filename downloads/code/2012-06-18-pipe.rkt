@@ -234,10 +234,10 @@ continuations: we are able to seamlessly implement a powerful new
 feature that no other language supports in 12 simple lines. And,
 there's no mutation anywhere!
 
-The only objection to continuations I feel reason to accept is that it
-can be difficult to reason about contexts. If you're not sure that you
-agree with that statement, try to figure what this returns, without
-evaluating it:
+The only objection to first-class continuations I feel is reasonable
+is that it can be difficult to reason about contexts. If you're not
+sure that you agree with that statement, try to figure what this
+returns, without evaluating it:
 
 @chunky[<puzzle>
         (let loop ([i 5])
