@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Continuations | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/continuations/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-06-19T12:29:22-06:00</updated>
+  <updated>2012-06-23T10:35:16-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -27,7 +27,7 @@ are not possible at the user-level without it. For example, generators,
 implicit back-tracking search, threads, etc.</p>
 
 <p>However, many of these use-cases for call/cc use mutation in an
-essential way and have let some to criticize useful uses of call/cc to
+essential way and have led some to criticize useful uses of call/cc to
 be necessarily tied to mutation.</p>
 
 <p>In this post, I’ll show how call/cc saves use from mutation and produces

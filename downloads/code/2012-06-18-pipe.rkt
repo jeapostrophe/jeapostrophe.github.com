@@ -22,7 +22,7 @@ are not possible at the user-level without it. For example,
 generators, implicit back-tracking search, threads, etc.
 
 However, many of these use-cases for call/cc use mutation in an
-essential way and have let some to criticize useful uses of call/cc to
+essential way and have led some to criticize useful uses of call/cc to
 be necessarily tied to mutation.
 
 In this post, I'll show how call/cc saves use from mutation and
