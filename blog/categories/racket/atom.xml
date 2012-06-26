@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Racket | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/racket/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-06-26T11:45:01-06:00</updated>
+  <updated>2012-06-26T15:41:43-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -68,7 +68,7 @@ classic uses of them: implementing threads in user-space.</p>
 </span><span class='line'><span class="nv">&lt;p&gt;</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>In this thread system, there’s a few things to notice:</p>
+<p>In this thread system, there are a few things to notice:</p>
 
 <ul>
 <li><p>You define a main function that starts off the computation.</p></li>
@@ -222,7 +222,7 @@ immoral.</p>
 <p>What we really need is something like yield but that doesn’t add the
 current context back on the queue, something that does a context switch
 but exits the current context. For convenience, we shouldn’t require the
-programmer to every call this (although they may if they want), so we’ll
+programmer to ever call this (although they may if they want), so we’ll
 implicitly add it to the end of every thread, including the main
 program.</p>
 

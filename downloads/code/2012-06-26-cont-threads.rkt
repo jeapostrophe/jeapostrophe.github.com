@@ -38,7 +38,7 @@ Let's look at an example program first:
                (yield)
                (+ i sum)))))]
 
-In this thread system, there's a few things to notice:
+In this thread system, there are a few things to notice:
 
 - You define a @racket[main] function that starts off the computation.
 
@@ -130,7 +130,7 @@ absurd, obviously brittle, and immoral.
 What we really need is something like @racket[yield] but that doesn't
 add the current context back on the queue, something that does a
 context switch but @racket[exit]s the current context. For
-convenience, we shouldn't require the programmer to every call
+convenience, we shouldn't require the programmer to ever call
 this (although they may if they want), so we'll implicitly add it to
 the end of every thread, including the main program.
 
