@@ -194,7 +194,7 @@ continuation that aborts its invoking context.
 @racket[void] inside the first case of the @racket[exit]), it returns
 back to its initial continuation, or the second round of the adder.
 
-In order to fix this, we could make the final call to abort the
+In order to fix this, we could make the final call abort the
 current context, so that code wasn't run, but it would be better to
 ensure that it wasn't there in the first place.
 
