@@ -4,7 +4,7 @@
   <title><![CDATA[Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-02T20:12:20-06:00</updated>
+  <updated>2012-07-02T20:13:42-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -64,8 +64,6 @@ calls to printf.</p>
 
 <p>Recall that this program has the following output:</p>
 
-<p>;;;;</p>
-
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -78,20 +76,18 @@ calls to printf.</p>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>adder: 0             
-</span><span class='line'>iter: 0              
-</span><span class='line'>adder: 1             
-</span><span class='line'>iter: 1              
-</span><span class='line'>adder: 3             
-</span><span class='line'>iter: 2              
-</span><span class='line'>adder: 6             
-</span><span class='line'>iter: 3              
-</span><span class='line'>adder: 10            
-</span><span class='line'>iter: 4              
-</span><span class='line'>iter: 5              
-</span><span class='line'>iter: 6              
-</span><span class='line'>;;;</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>adder: 0          
+</span><span class='line'>iter: 0           
+</span><span class='line'>adder: 1          
+</span><span class='line'>iter: 1           
+</span><span class='line'>adder: 3          
+</span><span class='line'>iter: 2           
+</span><span class='line'>adder: 6          
+</span><span class='line'>iter: 3           
+</span><span class='line'>adder: 10         
+</span><span class='line'>iter: 4           
+</span><span class='line'>iter: 5           
+</span><span class='line'>iter: 6</span></code></pre></td></tr></table></div></figure>
 
 
 <p>We’ll also be using the same basic threading system:</p>
@@ -184,7 +180,7 @@ without their permission, periodically.</p>
 
 <p>The simplest way to realize this is to choose a set of &#8220;primitive&#8221;
 functions provided by the OS and have them call yield on behalf of the
-process. For example, printf is a naturaly choice.</p>
+process. For example, printf is a naturally choice.</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -243,8 +239,6 @@ can realize this in the printf code:</p>
 <p>In this example I used a fuel of two, which renders the following
 output:</p>
 
-<p>;;;;</p>
-
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -257,20 +251,18 @@ output:</p>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>adder: 0             
-</span><span class='line'>adder: 1             
-</span><span class='line'>iter: 0              
-</span><span class='line'>iter: 1              
-</span><span class='line'>adder: 3             
-</span><span class='line'>adder: 6             
-</span><span class='line'>iter: 2              
-</span><span class='line'>iter: 3              
-</span><span class='line'>adder: 10            
-</span><span class='line'>iter: 4              
-</span><span class='line'>iter: 5              
-</span><span class='line'>iter: 6              
-</span><span class='line'>;;;</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>adder: 0          
+</span><span class='line'>adder: 1          
+</span><span class='line'>iter: 0           
+</span><span class='line'>iter: 1           
+</span><span class='line'>adder: 3          
+</span><span class='line'>adder: 6          
+</span><span class='line'>iter: 2           
+</span><span class='line'>iter: 3           
+</span><span class='line'>adder: 10         
+</span><span class='line'>iter: 4           
+</span><span class='line'>iter: 5           
+</span><span class='line'>iter: 6</span></code></pre></td></tr></table></div></figure>
 
 
 <p>A nice side-effect of a fuel system like this is that you can give

@@ -44,7 +44,7 @@ after the calls to @racket[printf].
 Recall that this program has the following output:
 
 @verbatim{
-;;;;{% codeblock %}
+{% codeblock %}
 adder: 0
 iter: 0
 adder: 1
@@ -57,7 +57,7 @@ adder: 10
 iter: 4
 iter: 5
 iter: 6
-;;;{% endcodeblock %}
+{% endcodeblock %}
 }
 
 We'll also be using the same basic threading system:
@@ -115,7 +115,7 @@ permission, periodically.
 
 The simplest way to realize this is to choose a set of "primitive"
 functions provided by the OS and have them call @racket[yield] on
-behalf of the process. For example, @racket[printf] is a naturaly
+behalf of the process. For example, @racket[printf] is a naturally
 choice.
 
 @chunky[<primitive-printf>
@@ -156,7 +156,7 @@ In this example I used a fuel of two, which renders the following
 output:
 
 @verbatim{
-;;;;{% codeblock %}
+{% codeblock %}
 adder: 0
 adder: 1
 iter: 0
@@ -169,7 +169,7 @@ adder: 10
 iter: 4
 iter: 5
 iter: 6
-;;;{% endcodeblock %}
+{% endcodeblock %}
 }
 
 A nice side-effect of a fuel system like this is that you can give
