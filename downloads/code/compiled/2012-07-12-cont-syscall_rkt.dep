@@ -1,0 +1,1 @@
+("5.3.0.14" ("3a45ee6292e62595de7b729faad93c271b266693" . "d4211f58eebdd44c56e5442e2e39355d9d2b9db9") (collects #"racket" #"base.rkt") (collects #"racket" #"match.rkt") (collects #"scribble" #"lp" #"lang" #"lang.rkt") (collects #"racket" #"list.rkt") (collects #"scribble" #"lp" #"lang" #"reader.rkt"))

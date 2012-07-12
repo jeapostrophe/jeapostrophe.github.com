@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Concurrency | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/concurrency/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-02T20:13:42-06:00</updated>
+  <updated>2012-07-12T13:08:35-04:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -14,9 +14,514 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Domain-Specific Operating Systems: Threads, System Calls, and Continuations]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall/"/>
+    <updated>2012-07-12T00:00:00-04:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall</id>
+    <content type="html"><![CDATA[<p>In the past few posts I’ve been writing about threading system that are
+based on continuations in user-land. This post I’ll extend that system
+to provide system calls that control access to sensitive resources, such
+as files and the thread pool.</p>
+
+<!-- more -->
+
+
+<p>We’ll be working from the same example program as last week, except that
+we’ll be changing printf from a "primitive" function to a system call.
+Here’s the program:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;example&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">main</span><span class="p">)</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">N</span><span class="err"> </span><span class="mi">5</span><span class="p">)</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">thread</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>                             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">N</span><span class="err"> </span><span class="mi">2</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;iter: ~a\n&quot;</span><span class="err"> </span><span class="nv">i</span><span class="p">))))</span>    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">thread</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>                             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">for/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">sum</span><span class="err"> </span><span class="mi">0</span><span class="err">]</span><span class="p">)</span>             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">N</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;adder: ~a\n&quot;</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">i</span><span class="err"> </span><span class="nv">sum</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">i</span><span class="err"> </span><span class="nv">sum</span><span class="p">)))))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Recall that this program has the following output:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;br/>
+</span><span class='line'>adder: 0        &lt;br/>
+</span><span class='line'>iter: 0         &lt;br/>
+</span><span class='line'>adder: 1        &lt;br/>
+</span><span class='line'>iter: 1         &lt;br/>
+</span><span class='line'>adder: 3        &lt;br/>
+</span><span class='line'>iter: 2         &lt;br/>
+</span><span class='line'>adder: 6        &lt;br/>
+</span><span class='line'>iter: 3         &lt;br/>
+</span><span class='line'>adder: 10       &lt;br/>
+</span><span class='line'>iter: 4         &lt;br/>
+</span><span class='line'>iter: 5         &lt;br/>
+</span><span class='line'>iter: 6         &lt;br/></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>In the original threading system, global mutable variables were used to
+handle the state of the threading system:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;basic-threading-system&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="nv">empty</span><span class="p">)</span>                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">yield</span><span class="p">)</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">ts</span>                                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>                                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">void</span><span class="p">)</span><span class="err">]</span>                                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">next</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">let/cc</span><span class="err"> </span><span class="nv">k</span>                                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="p">(</span><span class="nf">snoc</span><span class="err"> </span><span class="nv">rest</span><span class="err"> </span><span class="nv">k</span><span class="p">))</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">next</span><span class="p">))</span><span class="err">]</span><span class="p">))</span>                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">thread</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>                              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>                             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                </span><span class="p">(</span><span class="nf">abort-current-continuation</span>     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                 </span><span class="p">(</span><span class="nf">default-continuation-prompt-tag</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">                 </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                   </span><span class="p">(</span><span class="nf">t</span><span class="p">)</span>                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">                   </span><span class="p">(</span><span class="nf">exit</span><span class="p">))))</span>                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">              </span><span class="nv">ts</span><span class="p">)))</span>                             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">exit</span><span class="p">)</span>                                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">ts</span>                                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>                                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">void</span><span class="p">)</span><span class="err">]</span>                                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">next</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>                             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">next</span><span class="p">)</span><span class="err">]</span><span class="p">))</span>                                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="o">.</span> <span class="nv">args</span><span class="p">)</span>                         <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">begin0</span><span class="err"> </span><span class="p">(</span><span class="nf">apply</span><span class="err"> </span><span class="nv">racket:printf</span><span class="err"> </span><span class="nv">args</span><span class="p">)</span>            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">yield</span><span class="p">)))</span>                             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">call-with-continuation-prompt</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>                                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">main</span><span class="p">)</span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">exit</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Notice that the "logical" system calls—thread, exit, yield and
+printf—all mutate the thread system’s state (ts). This makes the system
+difficult to test and analyze.</p>
+
+<p>Our goal is to tease out all this code into a single "kernel" that
+actually /is/ the threading system and exists independently from the
+state of the various threads. Here’s a sketch of the kernel:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;kernel&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">kernel</span><span class="err"> </span><span class="p">(</span><span class="nf">threads</span><span class="p">))</span>             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">boot</span><span class="err"> </span><span class="nv">main</span><span class="p">)</span>                   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">initial</span><span class="err"> </span><span class="p">(</span><span class="nf">kernel</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="nv">main</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">ks</span><span class="err"> </span><span class="nv">initial</span><span class="err">]</span><span class="p">)</span>            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">unless</span><span class="err"> </span><span class="p">(</span><span class="nf">empty?</span><span class="err"> </span><span class="p">(</span><span class="nf">kernel-threads</span><span class="err"> </span><span class="nv">ks</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">step-one-thread</span><span class="err"> </span><span class="nv">ks</span><span class="p">)))))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The state of the kernel will simply be the list of threads and all the
+kernel really does is continuously call step-one-thread to advance the
+state of the kernel until all the threads exit. All the work will, of
+course, take place in step-one-thread:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;step-one-thread&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">step-one-thread</span><span class="err"> </span><span class="nv">ks</span><span class="p">)</span>                              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match-define</span><span class="err"> </span><span class="p">(</span><span class="nf">kernel</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">top-thread</span><span class="err"> </span><span class="nv">other-threads</span><span class="p">))</span><span class="err"> </span><span class="nv">ks</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">syscall</span><span class="err"> </span><span class="p">(</span><span class="nf">run-thread-until-syscall</span><span class="err"> </span><span class="nv">top-thread</span><span class="p">))</span>  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">execute-syscall</span><span class="err"> </span><span class="nv">syscall</span><span class="err"> </span><span class="p">(</span><span class="nf">kernel</span><span class="err"> </span><span class="nv">other-threads</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Its job is simply to select the first thread, run it until it reaches a
+system call and then deal with the system call.</p>
+
+<p>Let’s represent each system call as structure:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;syscalls&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">syscall</span><span class="err"> </span><span class="p">(</span><span class="nf">user-context</span><span class="p">))</span>            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">syscall:thread</span><span class="err"> </span><span class="nv">syscall</span><span class="err"> </span><span class="p">(</span><span class="nf">child-thunk</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">syscall:exit</span><span class="err"> </span><span class="nv">syscall</span><span class="err"> </span><span class="p">())</span>           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">syscall:printf</span><span class="err"> </span><span class="nv">syscall</span><span class="err"> </span><span class="p">(</span><span class="nf">fmt</span><span class="err"> </span><span class="nv">arg</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The thing that all system calls have in common is that the context of
+the user program is preserved, but other than that, each is distinct in
+the data that it carries.</p>
+
+<p>Once this is in place, we can pretty easily write the code to handle the
+system calls and update the kernel’s state:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;execute-syscall&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">execute-syscall</span><span class="err"> </span><span class="nv">call</span><span class="err"> </span><span class="nv">kernel-state</span><span class="p">)</span>   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match-define</span><span class="err"> </span><span class="p">(</span><span class="nf">kernel</span><span class="err"> </span><span class="nv">threads</span><span class="p">)</span><span class="err"> </span><span class="nv">kernel-state</span><span class="p">)</span><span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">call</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">syscall:thread</span><span class="err"> </span><span class="nv">user-ctxt</span><span class="err"> </span><span class="nv">child-t</span><span class="p">)</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">kernel</span><span class="err"> </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">user-ctxt</span><span class="err"> </span><span class="nv">child-t</span><span class="err"> </span><span class="nv">threads</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">syscall:exit</span><span class="err"> </span><span class="nv">user-ctxt</span><span class="p">)</span>                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">kernel</span><span class="err"> </span><span class="nv">threads</span><span class="p">)</span><span class="err">]</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">syscall:printf</span><span class="err"> </span><span class="nv">user-ctxt</span><span class="err"> </span><span class="nv">fmt</span><span class="err"> </span><span class="nv">arg</span><span class="p">)</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">racket:printf</span><span class="err"> </span><span class="nv">fmt</span><span class="err"> </span><span class="nv">arg</span><span class="p">)</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">kernel</span><span class="err"> </span><span class="p">(</span><span class="nf">snoc</span><span class="err"> </span><span class="nv">threads</span><span class="err"> </span><span class="nv">user-ctxt</span><span class="p">))</span><span class="err">]</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>A new thread just needs to push both contexts (the parent and the child)
+onto the thread queue. (We add them to the top of the queue to preserve
+compatibility with the previous versions of this code.) When a thread
+exits, the user context is thrown away. When a printf occurs, the string
+is displayed and the user context is placed back on the queue, at the
+end.</p>
+
+<p>We only need to do two more things: implement run-thread-until-syscall
+and implement the code that the user programs call to return system call
+structures to the kernel. These are tightly intertwined.</p>
+
+<p>The second is actually simpler, so we’ll do that first. The basic idea
+is to capture the continuation going back to the kernel and throw it
+back to the kernel as something like an exception (really, an abort,
+which you can think of as an exception that can only be caught by
+privileged code.)</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&amp;lt</span><span class="c1">;syscall-throw:thread&gt; ::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">thread</span><span class="err"> </span><span class="nv">child-t</span><span class="p">)</span>                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">call-with-composable-continuation</span>    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">user-ctxt</span><span class="p">)</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">abort-current-continuation</span>        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="nv">kernel-prompt-tag</span>                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">syscall:thread</span><span class="err"> </span><span class="nv">user-ctxt</span><span class="err"> </span><span class="nv">child-t</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">kernel-prompt-tag</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The other code will be very similar to this, so we’ll write a macro to
+simplify it:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;syscall-throw&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define-syntax-rule</span>                              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define-syscall-throw</span><span class="err"> </span><span class="nv">user-id</span><span class="err"> </span><span class="nv">syscall-id</span><span class="p">)</span>      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">user-id</span><span class="err"> </span><span class="o">.</span> <span class="nv">syscall-args</span><span class="p">)</span>               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">call-with-composable-continuation</span>           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">user-ctxt</span><span class="p">)</span>                              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">abort-current-continuation</span>               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="nv">kernel-prompt-tag</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">apply</span><span class="err"> </span><span class="nv">syscall-id</span><span class="err"> </span><span class="nv">user-ctxt</span><span class="err"> </span><span class="nv">syscall-args</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">     </span><span class="nv">kernel-prompt-tag</span><span class="p">)))</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define-syscall-throw</span><span class="err"> </span><span class="nv">thread</span><span class="err"> </span><span class="nv">syscall:thread</span><span class="p">)</span>     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define-syscall-throw</span><span class="err"> </span><span class="nv">exit</span><span class="err"> </span><span class="nv">syscall:exit</span><span class="p">)</span>         <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define-syscall-throw</span><span class="err"> </span><span class="nv">printf</span><span class="err"> </span><span class="nv">syscall:printf</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now that we know how the "thrower" works, we can easily implement the
+"catcher":</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;syscall-catch&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">kernel-prompt-tag</span>                   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">make-continuation-prompt-tag</span><span class="err"> </span><span class="ss">&#39;kernel</span><span class="p">))</span>   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">run-thread-until-syscall</span><span class="err"> </span><span class="nv">thread-ctxt</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">call-with-continuation-prompt</span>            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>                                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">thread-ctxt</span><span class="p">)</span>                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">exit</span><span class="p">))</span>                                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">kernel-prompt-tag</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   </span><span class="nv">values</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This code says that you just invoke the thread context like a function,
+but you wrap it in a new prompt. When the code inside aborts with a
+value, then it is returned to the caller of run-thread-until-syscall
+(that’s what the values means). We always put in call to exit, in case
+the code just ends.</p>
+
+<p>I love this code because it so elegantly separates all the different
+features of an operating system: capturing system calls and program
+contexts, evaluating the impact on the kernel state for the call, and
+running the OS itself. From this foundation you could add other system
+calls and scheduling behavior. I call this a "domain-specific operating
+system."</p>
+
+<p>One of my pet projects is to build video games in Racket. In that
+project, I’m using this idea to implement each agent in the game world
+(the enemies, the player, etc) as processes with custom system calls to
+interact with each other and the audio/video resources. The kernel there
+maintains two separate lists of threads: ones that need to do more work
+on this frame and ones that are done until the next frame needs to be
+rendered, with a system call to indicate to the OS that all work for a
+frame is done. It’s really quite beautiful. Maybe I’ll write more about
+it in the future.</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&amp;lt</span><span class="c1">;*&gt; ::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/list</span>                   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">         </span><span class="nv">racket/match</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">prefix-in</span><span class="err"> </span><span class="nv">racket:</span><span class="err"> </span><span class="nv">racket/base</span><span class="p">))</span>
+</span><span class='line'>  <span class="err"> </span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">snoc</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">append</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="nv">x</span><span class="p">)))</span>                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;kernel&gt;</span>                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;step-one-thread&gt;</span>                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;syscalls&gt;</span>                             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;execute-syscall&gt;</span>                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;syscall-throw&gt;</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;syscall-catch&gt;</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;example&gt;</span>                              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">boot</span><span class="err"> </span><span class="nv">main</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><a href="/downloads/code/2012-07-12-cont-syscall.rkt">Download</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Preemptive Threads with Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt/"/>
-    <updated>2012-07-02T00:00:00-06:00</updated>
+    <updated>2012-07-02T00:00:00-04:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt</id>
     <content type="html"><![CDATA[<p>Last week, we covered cooperative threading with continuations. This
 week we’ll change the infrastructure to mimic preemption.</p>
@@ -350,7 +855,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Cooperative Threads with Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/06/26/cont-threads/"/>
-    <updated>2012-06-26T00:00:00-06:00</updated>
+    <updated>2012-06-26T00:00:00-04:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/06/26/cont-threads</id>
     <content type="html"><![CDATA[<p>After the last post about continuations, I wanted to show one of the
 classic uses of them: implementing threads in user-space.</p>

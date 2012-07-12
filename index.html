@@ -9,8 +9,9 @@
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="Last week, we covered cooperative threading with continuations. This
-week we’ll change the infrastructure to mimic preemption. ">
+  <meta name="description" content="In the past few posts I’ve been writing about threading system that are
+based on continuations in user-land. This post I’ll extend that system
+to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +85,52 @@ week we’ll change the infrastructure to mimic preemption. ">
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2012/07/12/cont-syscall/">Domain-Specific Operating Systems: Threads, System Calls, and Continuations</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-12T00:00:00-04:00" pubdate data-updated="true">Jul 12<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/07/12/cont-syscall/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In the past few posts I’ve been writing about threading system that are
+based on continuations in user-land. This post I’ll extend that system
+to provide system calls that control access to sensitive resources, such
+as files and the thread pool.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/07/12/cont-syscall/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2012/07/02/cont-preempt/">Preemptive Threads With Continuations</a></h1>
     
     
@@ -100,7 +147,7 @@ week we’ll change the infrastructure to mimic preemption. ">
   
 
 
-<time datetime="2012-07-02T00:00:00-06:00" pubdate data-updated="true">Jul 2<span>nd</span>, 2012</time>
+<time datetime="2012-07-02T00:00:00-04:00" pubdate data-updated="true">Jul 2<span>nd</span>, 2012</time>
         
          | <a href="/blog/2012/07/02/cont-preempt/#disqus_thread">Comments</a>
         
@@ -144,7 +191,7 @@ week we’ll change the infrastructure to mimic preemption.</p>
   
 
 
-<time datetime="2012-06-26T00:00:00-06:00" pubdate data-updated="true">Jun 26<span>th</span>, 2012</time>
+<time datetime="2012-06-26T00:00:00-04:00" pubdate data-updated="true">Jun 26<span>th</span>, 2012</time>
         
          | <a href="/blog/2012/06/26/cont-threads/#disqus_thread">Comments</a>
         
@@ -188,7 +235,7 @@ classic uses of them: implementing threads in user-space.</p>
   
 
 
-<time datetime="2012-06-18T00:00:00-06:00" pubdate data-updated="true">Jun 18<span>th</span>, 2012</time>
+<time datetime="2012-06-18T00:00:00-04:00" pubdate data-updated="true">Jun 18<span>th</span>, 2012</time>
         
          | <a href="/blog/2012/06/18/pipe/#disqus_thread">Comments</a>
         
@@ -244,7 +291,7 @@ something pretty elegant.</p>
   
 
 
-<time datetime="2012-06-05T00:00:00-06:00" pubdate data-updated="true">Jun 5<span>th</span>, 2012</time>
+<time datetime="2012-06-05T00:00:00-04:00" pubdate data-updated="true">Jun 5<span>th</span>, 2012</time>
         
          | <a href="/blog/2012/06/05/word-count/#disqus_thread">Comments</a>
         
@@ -295,7 +342,7 @@ word count.</p>
   
 
 
-<time datetime="2012-05-28T00:00:00-06:00" pubdate data-updated="true">May 28<span>th</span>, 2012</time>
+<time datetime="2012-05-28T00:00:00-04:00" pubdate data-updated="true">May 28<span>th</span>, 2012</time>
         
          | <a href="/blog/2012/05/28/exec-vs-system/#disqus_thread">Comments</a>
         
@@ -340,7 +387,7 @@ relate it to tail-call optimization.</p>
   
 
 
-<time datetime="2012-05-22T00:00:00-06:00" pubdate data-updated="true">May 22<span>nd</span>, 2012</time>
+<time datetime="2012-05-22T00:00:00-04:00" pubdate data-updated="true">May 22<span>nd</span>, 2012</time>
         
          | <a href="/blog/2012/05/22/lz78/#disqus_thread">Comments</a>
         
@@ -390,7 +437,7 @@ before. I sought to rectify that situation.</p>
   
 
 
-<time datetime="2012-05-14T00:00:00-06:00" pubdate data-updated="true">May 14<span>th</span>, 2012</time>
+<time datetime="2012-05-14T00:00:00-04:00" pubdate data-updated="true">May 14<span>th</span>, 2012</time>
         
          | <a href="/blog/2012/05/14/boggle/#disqus_thread">Comments</a>
         
@@ -438,7 +485,7 @@ the 24 to set up the data-structures. Let’s see how it goes&#8230;</p>
   
 
 
-<time datetime="2012-05-07T00:00:00-06:00" pubdate data-updated="true">May 7<span>th</span>, 2012</time>
+<time datetime="2012-05-07T00:00:00-04:00" pubdate data-updated="true">May 7<span>th</span>, 2012</time>
         
          | <a href="/blog/2012/05/07/quilt-colouring/#disqus_thread">Comments</a>
         
@@ -499,7 +546,7 @@ manually anyways.</p>
   
 
 
-<time datetime="2012-05-07T00:00:00-06:00" pubdate data-updated="true">May 7<span>th</span>, 2012</time>
+<time datetime="2012-05-07T00:00:00-04:00" pubdate data-updated="true">May 7<span>th</span>, 2012</time>
         
          | <a href="/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146/#disqus_thread">Comments</a>
         
@@ -533,61 +580,6 @@ taking?</p></blockquote>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/31/siq-reverse-dll/">Stupid Interview Questions - Introduction + Reversing a Doubly Linked List</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-31T00:00:00-06:00" pubdate data-updated="true">Mar 31<span>st</span>, 2012</time>
-        
-         | <a href="/blog/2012/03/31/siq-reverse-dll/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Stupid interviews ask applicants to write programs on whiteboards or
-pieces of paper without the resources that are normally available when
-programming. These questions purport to be able understanding the
-applicant’s algorithmic design process, but the problems in question are
-almost always so trivial that no interesting thinking is necessary.
-Worse, many of these questions are really more about knowing inane
-tricks than having good design abilities.</p>
-
-<p>Some students in my lab are always talking and worrying about such
-problems. I like to provide unnecessarily silly solutions to some of the
-questions. In this introduction to the series:</p>
-
-<p>How do you reverse a doubly linked list?</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/03/31/siq-reverse-dll/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -610,6 +602,10 @@ questions. In this introduction to the series:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/12/cont-syscall/">Domain-Specific Operating Systems: Threads, System Calls, and Continuations</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/07/02/cont-preempt/">Preemptive Threads with Continuations</a>
       </li>
     
@@ -623,10 +619,6 @@ questions. In this introduction to the series:</p>
     
       <li class="post">
         <a href="/blog/2012/06/05/word-count/">LaTeX and Word Counts</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/28/exec-vs-system/">exec and Tail-call Optimization</a>
       </li>
     
   </ul>

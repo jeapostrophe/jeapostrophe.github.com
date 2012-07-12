@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Systems | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/systems/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-02T20:13:42-06:00</updated>
+  <updated>2012-07-12T13:08:35-04:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[exec and Tail-call Optimization]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/28/exec-vs-system/"/>
-    <updated>2012-05-28T00:00:00-06:00</updated>
+    <updated>2012-05-28T00:00:00-04:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/28/exec-vs-system</id>
     <content type="html"><![CDATA[<p>I’m often bothered by programs that fail to use exec properly and
 instead use system. In this article, we’ll review the difference and

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mathematics | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/mathematics/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-02T20:13:42-06:00</updated>
+  <updated>2012-07-12T13:08:35-04:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[LaTeX and Word Counts]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/06/05/word-count/"/>
-    <updated>2012-06-05T00:00:00-06:00</updated>
+    <updated>2012-06-05T00:00:00-04:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/06/05/word-count</id>
     <content type="html"><![CDATA[<p>A few years ago, a proposal came to a committee I was on to limit the
 documents we evaluated based on their word count, rather than their page

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Compression | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/compression/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-02T20:13:42-06:00</updated>
+  <updated>2012-07-12T13:08:35-04:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[An LZ78 Implementation]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/22/lz78/"/>
-    <updated>2012-05-22T00:00:00-06:00</updated>
+    <updated>2012-05-22T00:00:00-04:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/22/lz78</id>
     <content type="html"><![CDATA[<p>For a long time I’ve known about and relied on the LZ77/78 compression
 algorithms. Once when I was in middle school, I told a friend an idea I
