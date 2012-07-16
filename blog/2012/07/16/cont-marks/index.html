@@ -1,0 +1,934 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Continuation Marks, part I: Dynamic Wind - Jay McCarthy</title>
+  <meta name="author" content="Jay McCarthy">
+
+  
+  <meta name="description" content="One of my favourite features of Racket is also one of its most unique
+features: continuation marks. Continuation marks allow you to annotate the &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/07/16/cont-marks">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Jay McCarthy" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30131476-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Jay McCarthy</a></h1>
+  
+    <h2>'Cowards die many times before their deaths, The valiant never taste of death but once.'</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jeapostrophe.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="http://faculty.cs.byu.edu/~jay/home/">Publications</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Continuation Marks, Part I: Dynamic Wind</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-16T00:00:00-04:00" pubdate data-updated="true">Jul 16<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>One of my favourite features of Racket is also one of its most unique
+features: continuation marks.</p>
+
+<p>Continuation marks allow you to annotate the dynamic context of a
+running program and later observe it to respond differently to your
+context.</p>
+
+<p>In the next few posts, I’ll talk about continuation marks. But first, we
+need to cover a different feature of Racket called dynamic-wind. (Most
+people pronounce it like winding a winch, but I like to pronounce it
+like a gust of wind and say &#8220;Dynaaamic WIND!&#8221; as if it was a Street
+Fighter move.)</p>
+
+</div>
+  
+  
+    <div style="text-align: center;">
+  <script type="text/javascript"><!--
+   google_ad_client = "ca-pub-8940021471694041";
+   /* jeapostrophe - body */
+   google_ad_slot = "2685812826";
+   google_ad_width = 728;
+   google_ad_height = 90;
+   //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</div>
+
+    <div class="entry-content" style="margin-top: 1em;">
+
+
+<p>The classic example of continuation marks is a flow-sensitive variable,
+like the current indentation level of debugging printfs.</p>
+
+<p>For example, suppose you have this program:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;show-structure&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">show-structure</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match-lambda</span>
+</span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">with-indentation</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">for-each</span><span class="err"> </span><span class="nv">show-structure</span><span class="err"> </span><span class="nv">e</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">?</span><span class="err"> </span><span class="nv">number?</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span><span class="err">]</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And with this example</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;example1&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">show-structure</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="mi">2</span><span class="p">)</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">4</span><span class="err"> </span><span class="mi">5</span><span class="p">)</span><span class="err"> </span><span class="mi">6</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">7</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">8</span><span class="p">)</span><span class="err"> </span><span class="mi">9</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You want it to print as:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>  1               
+</span><span class='line'>  2               
+</span><span class='line'> 3                
+</span><span class='line'>  4               
+</span><span class='line'>  5               
+</span><span class='line'> 6                
+</span><span class='line'>  7               
+</span><span class='line'>   8              
+</span><span class='line'>  9</span></code></pre></td></tr></table></div></figure>
+
+
+<p>One obvious way is to use a global variable:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;mutation&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="nv">originally</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The key is to reset the indentation level after the thunk returns.</p>
+
+<p>However, this is not a robust technique in the presence of control
+effects. For example, if the code throws an exception than the reset
+will not occur.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;example2&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">with-handlers</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">exn:misc:match?</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span><span class="err"> </span><span class="ss">&#39;failed</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">show-structure</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="ss">&#39;error!</span><span class="p">)))))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">show-structure</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">3</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So it prints as:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> 1                
+</span><span class='line'>  2               
+</span><span class='line'>   3              
+</span><span class='line'>'failed           
+</span><span class='line'>    1             
+</span><span class='line'>     2            
+</span><span class='line'>      3</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And every subsequent is off by three. The same problem occurs when
+continuations are captured and invoked.</p>
+
+<p>Racket provides a feature called dynamic-wind that helps you write this
+mutation code safely with respect to control effects:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;mutation-control-safe&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nb">dynamic-wind </span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">t</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="nv">originally</span><span class="p">))))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>dynamic-wind takes three functions. The first gets called whenever the
+body is &#8220;entered&#8221;, the second is the body and is just called once at the
+start, and the third is called whenever the body is exited. In normal
+situations, it is just like a sequence of three calls.</p>
+
+<p>But, when control leaves the body somehow—like through an exception,
+abort, or continuation invocation—then the third function is called to
+&#8220;undo&#8221; whatever state changes were made when the body was entered.</p>
+
+<p>Similarly, when control enters the body somehow—like when a continuation
+is captured inside the body and is invoked after the body has already
+returned—then the first function is called again to &#8220;redo&#8221; whatever
+state changes the body relies on.</p>
+
+<p>Try to predict the output of these programs:</p>
+
+<p>Example 1: Just a sequence of printfs.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dw-1&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="k">begin </span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;In\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Body\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Out\n&quot;</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Example 2: An equivalent sequence, but within dynamic-wind.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dw-2&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="k">begin </span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nb">dynamic-wind </span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;In\n&quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Body\n&quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Out\n&quot;</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Example 3: An almost identical sequence, but now with an exception.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dw-3&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">with-handlers</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="err">[</span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span><span class="err"> </span><span class="no">#t</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nb">dynamic-wind </span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;In\n&quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Body Pre\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">raise</span><span class="err"> </span><span class="ss">&#39;error</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Body Post\n&quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Out\n&quot;</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Example 4: Now we replace the raise with continuation capture and invoke
+the continuation.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dw-4&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="k">begin </span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">the-k</span><span class="err"> </span><span class="no">#f</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">when</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nb">dynamic-wind </span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;In\n&quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Body Pre\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">begin0</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">let/cc</span><span class="err"> </span><span class="nv">k</span>
+</span><span class='line'>  <span class="err">                </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">the-k</span><span class="err"> </span><span class="nv">k</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Body Post\n&quot;</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Out\n&quot;</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">the-k</span><span class="err"> </span><span class="no">#f</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Bonus question: Why doesn’t this code infinite loop?</p>
+
+<p>Example 5: Now rather than using mutation, we communicate the
+continuation with an exception.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dw-5&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="k">begin </span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">with-handlers</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">continuation?</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">k</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">k</span><span class="err"> </span><span class="mi">0</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nb">dynamic-wind </span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;In\n&quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Body Pre\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">let/cc</span><span class="err"> </span><span class="nv">k</span>
+</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">raise</span><span class="err"> </span><span class="nv">k</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Body Post\n&quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Out\n&quot;</span><span class="p">)))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Example 6: Invoking the continuation repeatedly inside the exception
+handler.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dw-6&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="k">begin </span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">with-handlers</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">pair?</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">k*n</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Pong\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">((</span><span class="nf">car</span><span class="err"> </span><span class="nv">k*n</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="p">(</span><span class="nf">cdr</span><span class="err"> </span><span class="nv">k*n</span><span class="p">))))</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nb">dynamic-wind </span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;In\n&quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Body Pre\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="mi">0</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">unless</span><span class="err"> </span><span class="p">(</span><span class="nf">=</span><span class="err"> </span><span class="nv">i</span><span class="err"> </span><span class="mi">3</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Ping ~a\n&quot;</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">loop</span>
+</span><span class='line'>  <span class="err">               </span><span class="p">(</span><span class="nf">let/cc</span><span class="err"> </span><span class="nv">k</span>
+</span><span class='line'>  <span class="err">                 </span><span class="p">(</span><span class="nf">raise</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">k</span><span class="err"> </span><span class="nv">i</span><span class="p">))))))</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Body Post\n&quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Out\n&quot;</span><span class="p">)))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next week we’ll go on to how dynamic-wind relates to continuation marks.</p>
+
+<p>And here is the expected output, by the way:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Example 1         
+</span><span class='line'>In                
+</span><span class='line'>Body              
+</span><span class='line'>Out               
+</span><span class='line'>                  
+</span><span class='line'>Example 2         
+</span><span class='line'>In                
+</span><span class='line'>Body              
+</span><span class='line'>Out               
+</span><span class='line'>                  
+</span><span class='line'>Example 3         
+</span><span class='line'>In                
+</span><span class='line'>Body Pre          
+</span><span class='line'>Out               
+</span><span class='line'>'error            
+</span><span class='line'>                  
+</span><span class='line'>Example 4         
+</span><span class='line'>In                
+</span><span class='line'>Body Pre          
+</span><span class='line'>Body Post         
+</span><span class='line'>Out               
+</span><span class='line'>In                
+</span><span class='line'>Body Post         
+</span><span class='line'>Out               
+</span><span class='line'>                  
+</span><span class='line'>Example 5         
+</span><span class='line'>In                
+</span><span class='line'>Body Pre          
+</span><span class='line'>Out               
+</span><span class='line'>In                
+</span><span class='line'>Body Post         
+</span><span class='line'>Out               
+</span><span class='line'>                  
+</span><span class='line'>Example 6         
+</span><span class='line'>In                
+</span><span class='line'>Body Pre          
+</span><span class='line'>Ping 0            
+</span><span class='line'>Out               
+</span><span class='line'>Pong              
+</span><span class='line'>In                
+</span><span class='line'>Ping 1            
+</span><span class='line'>Out               
+</span><span class='line'>Pong              
+</span><span class='line'>In                
+</span><span class='line'>Ping 2            
+</span><span class='line'>Out               
+</span><span class='line'>Pong              
+</span><span class='line'>In                
+</span><span class='line'>Body Post         
+</span><span class='line'>Out</span></code></pre></td></tr></table></div></figure>
+
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/match</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Control un-Safe\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;mutation&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;show-structure&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example1&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example2&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Control Safe\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;mutation-control-safe&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;show-structure&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example1&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example2&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;\nExample 1\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="nv">&lt;dw-1&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;\nExample 2\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="nv">&lt;dw-2&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;\nExample 3\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="nv">&lt;dw-3&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;\nExample 4\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="nv">&lt;dw-4&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;\nExample 5\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="nv">&lt;dw-5&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;\nExample 6\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="nv">&lt;dw-6&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="/downloads/code/2012-07-16-cont-marks.rkt">Download</a></p>
+</div>
+  
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jay McCarthy</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-16T00:00:00-04:00" pubdate data-updated="true">Jul 16<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/continuation-marks/'>Continuation Marks</a>, <a class='category' href='/blog/categories/continuations/'>Continuations</a>, <a class='category' href='/blog/categories/racket/'>Racket</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/07/16/cont-marks/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/07/16/cont-marks/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/07/12/cont-syscall/" title="Previous Post: Domain-Specific Operating Systems: Threads, System Calls, and Continuations">&laquo; Domain-Specific Operating Systems: Threads, System Calls, and Continuations</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+<div style="text-align: center;">
+  <script type="text/javascript"><!--
+   google_ad_client = "ca-pub-8940021471694041";
+   /* jeapostrophe - body */
+   google_ad_slot = "2685812826";
+   google_ad_width = 728;
+   google_ad_height = 90;
+   //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</div>
+
+
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>I am an assistant professor at <a href="http://byu.edu">Brigham Young University</a> in the
+  <a href="http://cs.byu.edu">Computer Science department</a>. I work
+  on the <a href="http://racket-lang.org/">Racket</a> programming
+  language</a>.</p>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/07/16/cont-marks/">Continuation Marks, part I: Dynamic Wind</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/12/cont-syscall/">Domain-Specific Operating Systems: Threads, System Calls, and Continuations</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/02/cont-preempt/">Preemptive Threads with Continuations</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/26/cont-threads/">Cooperative Threads with Continuations</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/18/pipe/">Delimited Pipes</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("jeapostrophe", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/jeapostrophe" class="twitter-follow-button" data-show-count="false">Follow @jeapostrophe</a>
+  
+</section>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/101670206687664104937?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+<section style="text-align: center;">
+  <script type="text/javascript"><!--
+    google_ad_client = "ca-pub-8940021471694041";
+    /* jeapostrophe - side */
+    google_ad_slot = "3412706495";
+    google_ad_width = 200;
+    google_ad_height = 200;
+    //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/jeapostrophe">@jeapostrophe</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'jeapostrophe',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Jay McCarthy -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jaymccarthy';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
