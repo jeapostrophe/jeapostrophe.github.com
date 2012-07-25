@@ -4,7 +4,7 @@
   <title><![CDATA[Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-16T11:12:33-04:00</updated>
+  <updated>2012-07-25T15:20:58-05:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -14,9 +14,336 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Continuation Marks, part II: Parameters]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/07/25/cont-marks2/"/>
+    <updated>2012-07-25T00:00:00-05:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/07/25/cont-marks2</id>
+    <content type="html"><![CDATA[<p>Last week I started discussing continuation marks with a medium-sized
+diversion into dynamic-wind as a way to delimited the effects of a
+mutation to the body of a dynamic context so a program’s context can
+affect its behavior indirectly.</p>
+
+<p>The pattern we used in the last post is so common that a slightly
+improved form of it is integrated into Racket as the concept of
+parameters.</p>
+
+<!-- more -->
+
+
+<p>As a reminder, suppose we have this program:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;show-structure&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">show-structure</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match-lambda</span>
+</span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">with-indentation</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">for-each</span><span class="err"> </span><span class="nv">show-structure</span><span class="err"> </span><span class="nv">e</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">?</span><span class="err"> </span><span class="nv">number?</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span><span class="err">]</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And with this example</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;example1&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">show-structure</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="mi">2</span><span class="p">)</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">4</span><span class="err"> </span><span class="mi">5</span><span class="p">)</span><span class="err"> </span><span class="mi">6</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">7</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">8</span><span class="p">)</span><span class="err"> </span><span class="mi">9</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We want it to print as:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>  1               
+</span><span class='line'>  2               
+</span><span class='line'> 3                
+</span><span class='line'>  4               
+</span><span class='line'>  5               
+</span><span class='line'> 6                
+</span><span class='line'>  7               
+</span><span class='line'>   8              
+</span><span class='line'>  9</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Last week, we implemented this with</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;mutation-control-dw&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nb">dynamic-wind </span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">t</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="nv">originally</span><span class="p">))))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This code is practically equivalent to the Racket feature of a
+parameter.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;mutation-control-params&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">make-parameter</span><span class="err"> </span><span class="mi">0</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">parameterize</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">t</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Parameters would like this. The make-parameter function takes the
+initial value of a parameter and returns a function that returns the
+&#8220;current&#8221; value of the parameter in whatever dynamic context it is
+inside. The parameterize form wraps its context with a new value for the
+the parameter. The wrapping takes place in a way safe with respect to
+control, just like dynamic wind.</p>
+
+<p>(Parameters also have special behavior with respect to threads: when you
+start a thread, it inherits its parent context’s values for all
+parameters, whereas the mutation behind dynamic-wind would completely
+ignore the fact that a new thread was around&#8230; the mutations in the
+finally part would happen even if the thread was still live when the
+rest of the dynamic-wind body completed.)</p>
+
+<p>(Parameters also provide the ability to capture a /parameterization/
+which captures the current values of <em>all</em> parameters. Such a value can
+later be installed to restore a captured context. The Racket Web server
+uses this to restore parameters for Web programs after user
+interactions.)</p>
+
+<p>Parameters and dynamic-wind with mutation have slightly different
+performance strengths and weaknesses. Namely, parameters are better for
+space, whereas dynamic-wind is better for speed.</p>
+
+<p>We’ll first show the space difference by increasing the indentation one
+hundred times and then measuring how much memory was used to store the
+changes (and the rests to the changes.)</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;memory-test&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">before</span><span class="err"> </span><span class="p">(</span><span class="nf">current-memory-use*</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="mi">100</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="p">(</span><span class="nf">current-memory-use*</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;~a MBs\n&quot;</span>
+</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">real-&gt;decimal-string</span><span class="err"> </span><span class="p">(</span><span class="nf">/</span><span class="err"> </span><span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="nv">before</span><span class="p">)</span><span class="err"> </span><span class="mi">1024</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-indentation</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">i</span><span class="p">))))</span><span class="err">]</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this program, parameters use about 2.30 MBs, whereas dynamic-wind
+uses 6.61 MBs, on average. The reason is that parameterize is safe for
+space—it does not leave residue on the stack when called in
+tail-position, as it is here. In contrast, the dynamic-wind finally
+handlers are all called to unwind the state change, as so they must be
+recorded on the stack.</p>
+
+<p>This reveals, and the threading issue, reveal that dynamic-wind doesn’t
+/really/ make a scoped variable change, it actually makes a global
+variable and undoes it properly. In contrast, parameterize really is a
+local change and when the context that change is active for is gone,
+such as when another parameterize overwrites and the call was in
+tail-position, it’s no longer necessary to &#8220;remember&#8221; the intermediate
+value.</p>
+
+<p>Next, let’s see the difference in speed by checking the current
+indentation level one hundred thousand times.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;speed-test&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">before</span><span class="err"> </span><span class="p">(</span><span class="nf">current-inexact-milliseconds</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">il</span><span class="err"> </span><span class="mi">0</span><span class="err">] [</span><span class="nv">i</span><span class="err"> </span><span class="mi">100000</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="p">(</span><span class="nf">current-inexact-milliseconds</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;~a in ~a ms\n&quot;</span>
+</span><span class='line'>  <span class="err">             </span><span class="nv">il</span>
+</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">real-&gt;decimal-string</span><span class="err"> </span><span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="nv">before</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">il</span><span class="err"> </span><span class="p">(</span><span class="nf">get-indent-level</span><span class="p">))</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">i</span><span class="p">))</span><span class="err">]</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this program, dynamic-wind uses just 0.98 milliseconds, whereas
+parameterize uses 16.35 milliseconds: a major difference in speed.
+That’s because the mutation-based version just embeds a reference to a
+global variable and can easily look it up, whereas the parameter-based
+version has to consult the context.</p>
+
+<p>In general, the parameter-based version is much better for typical use
+and it’s easier to use. But, sometimes when you have tight loops that
+would consult a parameter, it is important to cache the value. This is
+most relevant for code that does input or output in a tight loop,
+because those functions consult parameters for the default input/output
+ports.</p>
+
+<p>Continuation marks are a lower-level feature than parameters, but
+understanding parameters is really useful for understanding marks. Next
+time, we’ll finally see what marks are all about.</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/match</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">current-memory-use*</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">current-memory-use</span><span class="p">))</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Dynamic Wind\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;mutation-control-dw&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;show-structure&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example1&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;memory-test&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">get-indent-level</span><span class="p">)</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;speed-test&gt;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Parameters\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;mutation-control-params&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;show-structure&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example1&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;memory-test&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">get-indent-level</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;speed-test&gt;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Done\n&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://jeapostrophe.github.com/downloads/code/2012-07-25-cont-marks2.rkt">Download</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Continuation Marks, part I: Dynamic Wind]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/16/cont-marks/"/>
-    <updated>2012-07-16T00:00:00-04:00</updated>
+    <updated>2012-07-16T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/16/cont-marks</id>
     <content type="html"><![CDATA[<p>One of my favourite features of Racket is also one of its most unique
 features: continuation marks.</p>
@@ -584,7 +911,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Domain-Specific Operating Systems: Threads, System Calls, and Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall/"/>
-    <updated>2012-07-12T00:00:00-04:00</updated>
+    <updated>2012-07-12T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall</id>
     <content type="html"><![CDATA[<p>In the past few posts I’ve been writing about threading system that are
 based on continuations in user-land. This post I’ll extend that system
@@ -1018,7 +1345,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Preemptive Threads with Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt/"/>
-    <updated>2012-07-02T00:00:00-04:00</updated>
+    <updated>2012-07-02T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt</id>
     <content type="html"><![CDATA[<p>Last week, we covered cooperative threading with continuations. This
 week we’ll change the infrastructure to mimic preemption.</p>
@@ -1315,7 +1642,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Cooperative Threads with Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/06/26/cont-threads/"/>
-    <updated>2012-06-26T00:00:00-04:00</updated>
+    <updated>2012-06-26T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/06/26/cont-threads</id>
     <content type="html"><![CDATA[<p>After the last post about continuations, I wanted to show one of the
 classic uses of them: implementing threads in user-space.</p>
@@ -1707,7 +2034,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Delimited Pipes]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/06/18/pipe/"/>
-    <updated>2012-06-18T00:00:00-04:00</updated>
+    <updated>2012-06-18T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/06/18/pipe</id>
     <content type="html"><![CDATA[<p>I love continuations. We couldn’t do much of anything on a computer
 without them. But, I love first-class access to continuations (i.e.
@@ -2211,7 +2538,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[LaTeX and Word Counts]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/06/05/word-count/"/>
-    <updated>2012-06-05T00:00:00-04:00</updated>
+    <updated>2012-06-05T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/06/05/word-count</id>
     <content type="html"><![CDATA[<p>A few years ago, a proposal came to a committee I was on to limit the
 documents we evaluated based on their word count, rather than their page
@@ -2414,7 +2741,7 @@ documents like this are much easier to write.)</p>
   <entry>
     <title type="html"><![CDATA[exec and Tail-call Optimization]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/28/exec-vs-system/"/>
-    <updated>2012-05-28T00:00:00-04:00</updated>
+    <updated>2012-05-28T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/28/exec-vs-system</id>
     <content type="html"><![CDATA[<p>I’m often bothered by programs that fail to use exec properly and
 instead use system. In this article, we’ll review the difference and
@@ -2576,7 +2903,7 @@ tail-position!&#8221;</p>
   <entry>
     <title type="html"><![CDATA[An LZ78 Implementation]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/22/lz78/"/>
-    <updated>2012-05-22T00:00:00-04:00</updated>
+    <updated>2012-05-22T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/22/lz78</id>
     <content type="html"><![CDATA[<p>For a long time I’ve known about and relied on the LZ77/78 compression
 algorithms. Once when I was in middle school, I told a friend an idea I
@@ -2979,7 +3306,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[A Boggle Solver]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/14/boggle/"/>
-    <updated>2012-05-14T00:00:00-04:00</updated>
+    <updated>2012-05-14T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/14/boggle</id>
     <content type="html"><![CDATA[<p>Boggle is a classic word game that lends itself well to algorithmic
 attacks. A student of mine wanted to show me his solution (as it is an
@@ -3397,7 +3724,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Quilt Colouring]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/07/quilt-colouring/"/>
-    <updated>2012-05-07T00:00:00-04:00</updated>
+    <updated>2012-05-07T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/07/quilt-colouring</id>
     <content type="html"><![CDATA[<p>I got this email from my wife:</p>
 
@@ -3952,7 +4279,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Professor Layton and the Last Specter, Puzzle #146]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146/"/>
-    <updated>2012-05-07T00:00:00-04:00</updated>
+    <updated>2012-05-07T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146</id>
     <content type="html"><![CDATA[<p>This is for <a href="http://tinyurl.com/7yefk76">Puzzle 146</a>. Here is the
 puzzle:</p>
@@ -4154,7 +4481,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Stupid Interview Questions - Introduction + Reversing a Doubly Linked List]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/03/31/siq-reverse-dll/"/>
-    <updated>2012-03-31T00:00:00-04:00</updated>
+    <updated>2012-03-31T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/03/31/siq-reverse-dll</id>
     <content type="html"><![CDATA[<p>Stupid interviews ask applicants to write programs on whiteboards or
 pieces of paper without the resources that are normally available when
@@ -4493,7 +4820,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Professor Layton and the Diabolical Box, Puzzle #132]]></title>
     <link href="http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132/"/>
-    <updated>2011-06-30T00:00:00-04:00</updated>
+    <updated>2011-06-30T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132</id>
     <content type="html"><![CDATA[<p>I try to solve a puzzle of some kind every morning. I use
 <a href="https://en.wikipedia.org/wiki/Sudoku">Sudoku</a>,

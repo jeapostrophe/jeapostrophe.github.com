@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Puzzles | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/puzzles/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-16T11:12:33-04:00</updated>
+  <updated>2012-07-25T15:20:58-05:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[A Boggle Solver]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/14/boggle/"/>
-    <updated>2012-05-14T00:00:00-04:00</updated>
+    <updated>2012-05-14T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/14/boggle</id>
     <content type="html"><![CDATA[<p>Boggle is a classic word game that lends itself well to algorithmic
 attacks. A student of mine wanted to show me his solution (as it is an
@@ -518,7 +518,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Quilt Colouring]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/07/quilt-colouring/"/>
-    <updated>2012-05-07T00:00:00-04:00</updated>
+    <updated>2012-05-07T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/07/quilt-colouring</id>
     <content type="html"><![CDATA[<p>I got this email from my wife:</p>
 
@@ -1171,7 +1171,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Professor Layton and the Last Specter, Puzzle #146]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146/"/>
-    <updated>2012-05-07T00:00:00-04:00</updated>
+    <updated>2012-05-07T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146</id>
     <content type="html"><![CDATA[<p>This is for <a href="http://tinyurl.com/7yefk76">Puzzle 146</a>. Here is the
 puzzle:</p>
@@ -1422,7 +1422,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Professor Layton and the Diabolical Box, Puzzle #132]]></title>
     <link href="http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132/"/>
-    <updated>2011-06-30T00:00:00-04:00</updated>
+    <updated>2011-06-30T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132</id>
     <content type="html"><![CDATA[<p>I try to solve a puzzle of some kind every morning. I use
 <a href="https://en.wikipedia.org/wiki/Sudoku">Sudoku</a>,

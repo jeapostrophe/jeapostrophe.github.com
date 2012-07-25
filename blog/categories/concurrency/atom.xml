@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Concurrency | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/concurrency/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-16T11:12:33-04:00</updated>
+  <updated>2012-07-25T15:20:58-05:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Domain-Specific Operating Systems: Threads, System Calls, and Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall/"/>
-    <updated>2012-07-12T00:00:00-04:00</updated>
+    <updated>2012-07-12T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall</id>
     <content type="html"><![CDATA[<p>In the past few posts I’ve been writing about threading system that are
 based on continuations in user-land. This post I’ll extend that system
@@ -521,7 +521,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Preemptive Threads with Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt/"/>
-    <updated>2012-07-02T00:00:00-04:00</updated>
+    <updated>2012-07-02T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt</id>
     <content type="html"><![CDATA[<p>Last week, we covered cooperative threading with continuations. This
 week we’ll change the infrastructure to mimic preemption.</p>
@@ -855,7 +855,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Cooperative Threads with Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/06/26/cont-threads/"/>
-    <updated>2012-06-26T00:00:00-04:00</updated>
+    <updated>2012-06-26T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/06/26/cont-threads</id>
     <content type="html"><![CDATA[<p>After the last post about continuations, I wanted to show one of the
 classic uses of them: implementing threads in user-space.</p>

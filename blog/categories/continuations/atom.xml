@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Continuations | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/continuations/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-16T11:12:33-04:00</updated>
+  <updated>2012-07-25T15:20:58-05:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -14,9 +14,386 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Continuation Marks, part II: Parameters]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/07/25/cont-marks2/"/>
+    <updated>2012-07-25T00:00:00-05:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/07/25/cont-marks2</id>
+    <content type="html"><![CDATA[<p>Last week I started discussing continuation marks with a medium-sized
+diversion into dynamic-wind as a way to delimited the effects of a
+mutation to the body of a dynamic context so a program’s context can
+affect its behavior indirectly.</p>
+
+<p>The pattern we used in the last post is so common that a slightly
+improved form of it is integrated into Racket as the concept of
+parameters.</p>
+
+<!-- more -->
+
+
+<p>As a reminder, suppose we have this program:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;show-structure&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">show-structure</span>                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match-lambda</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">with-indentation</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">for-each</span><span class="err"> </span><span class="nv">show-structure</span><span class="err"> </span><span class="nv">e</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">?</span><span class="err"> </span><span class="nv">number?</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span><span class="err">]</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And with this example</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;example1&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">show-structure</span>                                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="mi">2</span><span class="p">)</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">4</span><span class="err"> </span><span class="mi">5</span><span class="p">)</span><span class="err"> </span><span class="mi">6</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">7</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">8</span><span class="p">)</span><span class="err"> </span><span class="mi">9</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>We want it to print as:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;br/>
+</span><span class='line'>  1             &lt;br/>
+</span><span class='line'>  2             &lt;br/>
+</span><span class='line'> 3              &lt;br/>
+</span><span class='line'>  4             &lt;br/>
+</span><span class='line'>  5             &lt;br/>
+</span><span class='line'> 6              &lt;br/>
+</span><span class='line'>  7             &lt;br/>
+</span><span class='line'>   8            &lt;br/>
+</span><span class='line'>  9             &lt;br/></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Last week, we implemented this with</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;mutation-control-dw&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span>                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span>          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nb">dynamic-wind </span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">t</span><span class="p">))</span>                                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="nv">originally</span><span class="p">))))</span>   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This code is practically equivalent to the Racket feature of a
+parameter.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;mutation-control-params&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">make-parameter</span><span class="err"> </span><span class="mi">0</span><span class="p">))</span>        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span>            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">parameterize</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">t</span><span class="p">)))</span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>                              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Parameters would like this. The make-parameter function takes the
+initial value of a parameter and returns a function that returns the
+"current" value of the parameter in whatever dynamic context it is
+inside. The parameterize form wraps its context with a new value for the
+the parameter. The wrapping takes place in a way safe with respect to
+control, just like dynamic wind.</p>
+
+<p>(Parameters also have special behavior with respect to threads: when you
+start a thread, it inherits its parent context’s values for all
+parameters, whereas the mutation behind dynamic-wind would completely
+ignore the fact that a new thread was around... the mutations in the
+finally part would happen even if the thread was still live when the
+rest of the dynamic-wind body completed.)</p>
+
+<p>(Parameters also provide the ability to capture a /parameterization/
+which captures the current values of <em>all</em> parameters. Such a value can
+later be installed to restore a captured context. The Racket Web server
+uses this to restore parameters for Web programs after user
+interactions.)</p>
+
+<p>Parameters and dynamic-wind with mutation have slightly different
+performance strengths and weaknesses. Namely, parameters are better for
+space, whereas dynamic-wind is better for speed.</p>
+
+<p>We’ll first show the space difference by increasing the indentation one
+hundred times and then measuring how much memory was used to store the
+changes (and the rests to the changes.)</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;memory-test&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">before</span><span class="err"> </span><span class="p">(</span><span class="nf">current-memory-use&lt;em&gt;</span><span class="p">))</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="mi">100</span><span class="err">]</span><span class="p">)</span>                                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>                                                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>                                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="p">(</span><span class="nf">current-memory-use&lt;/em&gt;</span><span class="p">))</span>                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;~a MBs\n&quot;</span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">real-&gt;decimal-string</span><span class="err"> </span><span class="p">(</span><span class="nf">/</span><span class="err"> </span><span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="nv">before</span><span class="p">)</span><span class="err"> </span><span class="mi">1024</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>                                                   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-indentation</span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">i</span><span class="p">))))</span><span class="err">]</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>In this program, parameters use about 2.30 MBs, whereas dynamic-wind
+uses 6.61 MBs, on average. The reason is that parameterize is safe for
+space—it does not leave residue on the stack when called in
+tail-position, as it is here. In contrast, the dynamic-wind finally
+handlers are all called to unwind the state change, as so they must be
+recorded on the stack.</p>
+
+<p>This reveals, and the threading issue, reveal that dynamic-wind doesn’t
+/really/ make a scoped variable change, it actually makes a global
+variable and undoes it properly. In contrast, parameterize really is a
+local change and when the context that change is active for is gone,
+such as when another parameterize overwrites and the call was in
+tail-position, it’s no longer necessary to "remember" the intermediate
+value.</p>
+
+<p>Next, let’s see the difference in speed by checking the current
+indentation level one hundred thousand times.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;speed-test&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">before</span><span class="err"> </span><span class="p">(</span><span class="nf">current-inexact-milliseconds</span><span class="p">))</span>      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">il</span><span class="err"> </span><span class="mi">0</span><span class="err">] [</span><span class="nv">i</span><span class="err"> </span><span class="mi">100000</span><span class="err">]</span><span class="p">)</span>                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>                                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="p">(</span><span class="nf">current-inexact-milliseconds</span><span class="p">))</span>  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;~a in ~a ms\n&quot;</span>                        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">             </span><span class="nv">il</span>                                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">real-&gt;decimal-string</span><span class="err"> </span><span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="nv">before</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>                                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">il</span><span class="err"> </span><span class="p">(</span><span class="nf">get-indent-level</span><span class="p">))</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">i</span><span class="p">))</span><span class="err">]</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>In this program, dynamic-wind uses just 0.98 milliseconds, whereas
+parameterize uses 16.35 milliseconds: a major difference in speed.
+That’s because the mutation-based version just embeds a reference to a
+global variable and can easily look it up, whereas the parameter-based
+version has to consult the context.</p>
+
+<p>In general, the parameter-based version is much better for typical use
+and it’s easier to use. But, sometimes when you have tight loops that
+would consult a parameter, it is important to cache the value. This is
+most relevant for code that does input or output in a tight loop,
+because those functions consult parameters for the default input/output
+ports.</p>
+
+<p>Continuation marks are a lower-level feature than parameters, but
+understanding parameters is really useful for understanding marks. Next
+time, we’ll finally see what marks are all about.</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&amp;lt</span><span class="c1">;*&gt; ::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/match</span><span class="p">)</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">current-memory-use*</span><span class="p">)</span>           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span>                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span>                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">current-memory-use</span><span class="p">))</span>                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Dynamic Wind\n&quot;</span><span class="p">)</span>             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;mutation-control-dw&gt;</span>                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;show-structure&gt;</span>                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example1&gt;</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;memory-test&gt;</span><span class="p">)</span>                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">get-indent-level</span><span class="p">)</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;speed-test&gt;</span><span class="p">))</span>                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span>     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Parameters\n&quot;</span><span class="p">)</span>               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;mutation-control-params&gt;</span>             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;show-structure&gt;</span>                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example1&gt;</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;memory-test&gt;</span><span class="p">)</span>                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">get-indent-level</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span><span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;speed-test&gt;</span><span class="p">))</span>                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Done\n&quot;</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><a href="/downloads/code/2012-07-25-cont-marks2.rkt">Download</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Continuation Marks, part I: Dynamic Wind]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/16/cont-marks/"/>
-    <updated>2012-07-16T00:00:00-04:00</updated>
+    <updated>2012-07-16T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/16/cont-marks</id>
     <content type="html"><![CDATA[<p>One of my favourite features of Racket is also one of its most unique
 features: continuation marks.</p>
@@ -671,7 +1048,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Domain-Specific Operating Systems: Threads, System Calls, and Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall/"/>
-    <updated>2012-07-12T00:00:00-04:00</updated>
+    <updated>2012-07-12T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall</id>
     <content type="html"><![CDATA[<p>In the past few posts I’ve been writing about threading system that are
 based on continuations in user-land. This post I’ll extend that system
@@ -1176,7 +1553,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Preemptive Threads with Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt/"/>
-    <updated>2012-07-02T00:00:00-04:00</updated>
+    <updated>2012-07-02T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt</id>
     <content type="html"><![CDATA[<p>Last week, we covered cooperative threading with continuations. This
 week we’ll change the infrastructure to mimic preemption.</p>
@@ -1510,7 +1887,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Cooperative Threads with Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/06/26/cont-threads/"/>
-    <updated>2012-06-26T00:00:00-04:00</updated>
+    <updated>2012-06-26T00:00:00-05:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/06/26/cont-threads</id>
     <content type="html"><![CDATA[<p>After the last post about continuations, I wanted to show one of the
 classic uses of them: implementing threads in user-space.</p>
@@ -1947,573 +2324,6 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p><a href="/downloads/code/2012-06-26-cont-threads.rkt">Download</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Delimited Pipes]]></title>
-    <link href="http://jeapostrophe.github.com/blog/2012/06/18/pipe/"/>
-    <updated>2012-06-18T00:00:00-04:00</updated>
-    <id>http://jeapostrophe.github.com/blog/2012/06/18/pipe</id>
-    <content type="html"><![CDATA[<p>I love continuations. We couldn’t do much of anything on a computer
-without them. But, I love first-class access to continuations (i.e.
-call/cc) even more.</p>
-
-<p>The standard reason is that call/cc allows you to express things that
-are not possible at the user-level without it. For example, generators,
-implicit back-tracking search, threads, etc.</p>
-
-<p>However, many of these use-cases for call/cc use mutation in an
-essential way and have led some to criticize useful uses of call/cc to
-be necessarily tied to mutation.</p>
-
-<p>In this post, I’ll show how call/cc saves use from mutation and produces
-something pretty elegant.</p>
-
-<!-- more -->
-
-
-<p>Suppose you are parsing a parenthetical language (for some crazy reason)
-and you need to associate parens and then deal with the list structure
-later.</p>
-
-<p>The obvious way to do that is:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;&lt;obvious&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="nv">ip</span><span class="p">)</span>                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">inside?</span><span class="err"> </span><span class="no">#f</span><span class="err">]</span><span class="p">)</span>                       <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="p">(</span><span class="nf">read-char</span><span class="err"> </span><span class="nv">ip</span><span class="p">)</span>                        <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="o">#</span><span class="p">(</span>                                       <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list&lt;em&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="no">#t</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span>         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="o">#</span><span class="p">)</span>                                       <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">empty</span>                                   <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching right paren&quot;</span><span class="p">))</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">?</span><span class="err"> </span><span class="nv">eof-object?</span><span class="p">)</span>                           <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching left paren&quot;</span><span class="p">)</span> <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">empty</span><span class="p">)</span><span class="err">]</span>                                 <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="nv">this</span>                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list&lt;/em&gt;</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Here’s a little test suite:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;&lt;tests&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">test</span>                                                        <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;&quot;</span><span class="p">)</span>                                           <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="nv">=&gt;</span><span class="err"> </span><span class="nv">empty</span>                                                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;a&quot;</span><span class="p">)</span>                                          <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="nv">=&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\a</span><span class="p">)</span>                                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;(&quot;</span><span class="p">)</span>                                          <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="nv">=error&gt;</span><span class="err"> </span><span class="o">#</span><span class="nv">rx</span><span class="s">&quot;left paren&quot;</span>                                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;)&quot;</span><span class="p">)</span>                                          <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="nv">=error&gt;</span><span class="err"> </span><span class="o">#</span><span class="nv">rx</span><span class="s">&quot;right paren&quot;</span>                                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;b(a)c&quot;</span><span class="p">)</span>                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="nv">=&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\b</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\a</span><span class="p">)</span><span class="err"> </span><span class="sc">#\c</span><span class="p">)</span>                                <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="s">&quot;(a((a)a))b(a)c&quot;</span><span class="p">)</span>                             <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="nv">=&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\a</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\a</span><span class="p">)</span><span class="err"> </span><span class="sc">#\a</span><span class="p">))</span><span class="err"> </span><span class="sc">#\b</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="sc">#\a</span><span class="p">)</span><span class="err"> </span><span class="sc">#\c</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The problem with this solution is that it uses side-effects! Each call
-to read-char is mutation of the input-port data-structure’s
-next-position-to-read field. It would be more elegant to use a stream to
-represent the input.</p>
-
-<p>Unfortunately, the obvious stream-based solution is broken:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;&lt;obvious-list&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>                                <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="nv">i</span><span class="err">] [</span><span class="nv">inside?</span><span class="err"> </span><span class="no">#f</span><span class="err">]</span><span class="p">)</span>                 <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">i</span>                                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list&lt;em&gt;</span><span class="err"> </span><span class="o">#</span><span class="p">(</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                          <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list&lt;/em&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="no">#t</span><span class="p">)</span>                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span>              <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list&lt;em&gt;</span><span class="err"> </span><span class="o">#</span><span class="p">)</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                          <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">empty</span>                                   <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching right paren&quot;</span><span class="p">))</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>                                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching left paren&quot;</span><span class="p">)</span> <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">empty</span><span class="p">)</span><span class="err">]</span>                                 <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list&lt;/em&gt;</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The problem is that after the matching right-paren is found for a given
-left-paren, you must "skip" the interleaving characters on the
-recursion. In the code, the problem is the first case of the match,
-where more is used in two recursive calls.</p>
-
-<p>The correct version is written monadically:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;&lt;monad-list&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>                                        <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="nv">i</span><span class="err">] [</span><span class="nv">inside?</span><span class="err"> </span><span class="no">#f</span><span class="err">]</span><span class="p">)</span>                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">i</span>                                             <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list&lt;em&gt;</span><span class="err"> </span><span class="o">#</span><span class="p">(</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                                  <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">this</span><span class="err"> </span><span class="nv">more-p</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="no">#t</span><span class="p">))</span>      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">that</span><span class="err"> </span><span class="nv">more-pp</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more-p</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="p">(</span><span class="nf">list&lt;/em&gt;</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="nv">that</span><span class="p">)</span>                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">               </span><span class="nv">more-pp</span><span class="p">)</span><span class="err">]</span>                                 <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list&lt;em&gt;</span><span class="err"> </span><span class="o">#</span><span class="p">)</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                                  <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>                                       <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                             <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching right paren&quot;</span><span class="p">))</span><span class="err">]</span>      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>                                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>                                       <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching left paren&quot;</span><span class="p">)</span>         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="nv">empty</span><span class="err"> </span><span class="nv">empty</span><span class="p">))</span><span class="err">]</span>                          <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list&lt;/em&gt;</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                                 <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">that</span><span class="err"> </span><span class="nv">more-p</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span> <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="nv">that</span><span class="p">)</span><span class="err"> </span><span class="nv">more-p</span><span class="p">)</span><span class="err">]</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Unfortunately, monadic programming is effectful programming, just with
-more pain, because you have to do the plumbing yourself or contaminate
-the rest of your program with the effectful type sewage.</p>
-
-<p>If we look at the monadic program, though, we can see that the only
-useful threading is between the first and second cases of the match. The
-stuff after the right-paren gets passed out to the left-paren context.
-Why not just implement that "piping" to the calling context directly as
-a feature?</p>
-
-<p>The final code will look like this:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;&lt;pipe-list&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>                                <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="nv">i</span><span class="err">] [</span><span class="nv">inside?</span><span class="err"> </span><span class="no">#f</span><span class="err">]</span><span class="p">)</span>                 <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">i</span>                                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list&lt;em&gt;</span><span class="err"> </span><span class="o">#</span><span class="p">(</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                          <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">more-p</span><span class="err"> </span><span class="nv">pipe-in</span><span class="p">)</span>           <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">pipe</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="no">#t</span><span class="p">)))</span>                  <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list&lt;/em&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-in</span><span class="err"> </span><span class="nv">empty</span><span class="p">)</span>                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more-p</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span>            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list&lt;em&gt;</span><span class="err"> </span><span class="o">#</span><span class="p">)</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                          <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">pipe-out</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching right paren&quot;</span><span class="p">))</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>                                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">inside?</span>                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;parse</span><span class="err"> </span><span class="s">&quot;Mismatching left paren&quot;</span><span class="p">)</span> <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">empty</span><span class="p">)</span><span class="err">]</span>                                 <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">list&lt;/em&gt;</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span>                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">list*</span><span class="err"> </span><span class="nv">this</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">more</span><span class="err"> </span><span class="nv">inside?</span><span class="p">))</span><span class="err">]</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The crucial point is that when we recur, looking for the right-paren, we
-use the pipe form, which allows the body to communicate with the
-context. The body then calls pipe-out, which returns a value to the
-context. The context receives the value (more-p) as well as a function
-to call when it should communicate back (pipe-in). The context then
-sends back the empty list, which the body will return at the end of the
-list it constructed, the call to pipe-in returns with the final answer
-from the body... the inner list.</p>
-
-<p>It is fairly simple to imagine implementing such a piping-system with
-concurrency: every call to pipe creates a new thread with a line of
-communication back to the calling context, which waits for
-communication. This is easy to realize in code, but there are some gross
-details, especially with getting exceptions to throw in the parent:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;&lt;pipes-as-threads&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define-syntax-rule</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)</span>                   <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">pipe&lt;em&gt;</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)))</span>                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">pipe-channel</span>                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">make-parameter</span><span class="err"> </span><span class="no">#f</span><span class="p">))</span>                             <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe&lt;/em&gt;</span><span class="err"> </span><span class="nv">f</span><span class="p">)</span>                                  <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="p">(</span><span class="nf">make-channel</span><span class="p">))</span>                        <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">thread</span>                                          <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>                                           <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">parameterize</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">pipe-channel</span><span class="err"> </span><span class="nv">c</span><span class="err">]</span><span class="p">)</span>              <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">channel-put</span><span class="err"> </span><span class="nv">c</span>                              <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">                    </span><span class="p">(</span><span class="nf">with-handlers</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">exn?</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">                      </span><span class="p">(</span><span class="nf">f</span><span class="p">))))))</span>                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">intermediate</span><span class="err"> </span><span class="p">(</span><span class="nf">channel-get&lt;em&gt;</span><span class="err"> </span><span class="nv">c</span><span class="p">))</span>           <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="nv">intermediate</span>                             <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">response</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">channel-put</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="nv">response</span><span class="p">)</span>               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">channel-get&lt;/em&gt;</span><span class="err"> </span><span class="nv">c</span><span class="p">))))</span>                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">channel-get*</span><span class="err"> </span><span class="nv">c</span><span class="p">)</span>                           <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="p">(</span><span class="nf">channel-get</span><span class="err"> </span><span class="nv">c</span><span class="p">))</span>                       <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">exn?</span><span class="err"> </span><span class="nv">v</span><span class="p">)</span>                                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">raise</span><span class="err"> </span><span class="nv">v</span><span class="p">)</span>                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    </span><span class="nv">v</span><span class="p">))</span>                                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-out</span><span class="err"> </span><span class="nv">v</span><span class="p">)</span>                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-channel</span><span class="p">))</span>                        <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">channel-put</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="nv">v</span><span class="p">)</span>                                <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">channel-get</span><span class="err"> </span><span class="nv">c</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Of course, this has many hidden effects, much more than the original
-port-based code! So it’s not exactly an advisable way of solving the
-problem.</p>
-
-<p>Luckily we can get the same feature in a tiny amount of
-continuation-based code:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;&lt;pipes-as-conts&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">pipe-tag</span><span class="err"> </span><span class="p">(</span><span class="nf">make-continuation-prompt-tag</span><span class="err"> </span><span class="ss">&#39;pipe</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe&lt;em&gt;</span><span class="err"> </span><span class="nv">f</span><span class="p">)</span>                                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let/ec</span><span class="err"> </span><span class="nv">esc</span>                                        <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">call-with-continuation-prompt</span><span class="err"> </span><span class="nv">f</span><span class="err"> </span><span class="nv">pipe-tag</span><span class="err"> </span><span class="nv">esc</span><span class="p">)</span>   <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">error</span><span class="err"> </span><span class="ss">&#39;pipe</span><span class="err"> </span><span class="s">&quot;did not pipe-out&quot;</span><span class="p">)))</span>               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define-syntax-rule</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)</span>                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">pipe&lt;/em&gt;</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)))</span>                              <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-out</span><span class="err"> </span><span class="nv">v</span><span class="p">)</span>                                 <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">call-with-composable-continuation</span>                 <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">come-back</span><span class="p">)</span>                                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">abort-current-continuation</span><span class="err"> </span><span class="nv">pipe-tag</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">come-back</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">pipe-tag</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The basic idea is to turn the call to pipe into a new continuation
-prompt, then pipe-out captures the continuation back to that point, and
-then aborts back to the prompt, delivering an intermediate value and
-then the continuation which resumes the computation from outside the
-calling context. This system is particularly beautiful because it allows
-the inside to be resumed multiple times.</p>
-
-<p>In my opinion this is the perfect example of the power of first-class
-continuations: we are able to seamlessly implement a powerful new
-feature that no other language supports in 12 simple lines. And, there’s
-no mutation anywhere!</p>
-
-<p>The only objection to first-class continuations I feel is reasonable is
-that it can be difficult to reason about contexts. If you’re not sure
-that you agree with that statement, try to figure what this returns,
-without evaluating it:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;&lt;puzzle&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="mi">5</span><span class="err">]</span><span class="p">)</span>                                <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>                                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">&amp;lt</span><span class="c1">;= i 0)                                    &lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="nv">empty</span><span class="err">]</span>                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>                                       <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">j</span><span class="err"> </span><span class="nv">pipe-in</span><span class="p">)</span>                  <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">pipe</span><span class="err"> </span><span class="p">(</span><span class="nf">list&lt;em&gt;</span><span class="err"> </span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-out</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">i</span><span class="p">))))))</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">list&lt;/em&gt;</span><span class="err"> </span><span class="nv">j</span>                                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">append</span><span class="err"> </span><span class="p">(</span><span class="nf">pipe-in</span><span class="err"> </span><span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="nv">j</span><span class="err"> </span><span class="mi">1</span><span class="p">))</span>            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">                    </span><span class="p">(</span><span class="nf">pipe-in</span><span class="err"> </span><span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="nv">j</span><span class="err"> </span><span class="mi">2</span><span class="p">))))</span><span class="err">]</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>By the way, if you use this code at home, make sure you put the code in
-this order:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;&amp;lt</span><span class="c1">;*&gt; ::=&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">tests/eli-tester</span>                              <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">racket/list</span>                                   <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">racket/match</span><span class="p">)</span>                                 <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span>                                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">test</span>                                                  <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>                                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;obvious&gt;</span>                                           <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="p">(</span><span class="nf">open-input-string</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;tests&gt;</span><span class="p">)</span>                                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span>                                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>                                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;obvious-list&gt;</span>                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;tests&gt;</span><span class="p">)</span>                                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span>                                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>                                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;monad-list&gt;</span>                                        <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">define-values</span><span class="err"> </span><span class="p">(</span><span class="nf">this</span><span class="err"> </span><span class="nv">more</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>
-</span><span class='line'>  <span class="err">     </span><span class="nv">this</span><span class="p">)</span>                                             <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;tests&gt;</span><span class="p">)</span>                                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span>                                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>                                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;pipes-as-threads&gt;</span>                                  <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;pipe-list&gt;</span>                                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;tests&gt;</span><span class="p">)</span>                                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span>                                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>                                               <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;pipes-as-conts&gt;</span>                                    <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;pipe-list&gt;</span>                                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">parse/string</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">parse</span><span class="err"> </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="nv">&lt;tests&gt;</span>                                             <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err"> </span>                                                      <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;The answer to the puzzle is... ~a\n&quot;</span>       <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">           </span><span class="nv">&lt;puzzle&gt;</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p><a href="/downloads/code/2012-06-18-pipe.rkt">Download</a></p>
 ]]></content>
   </entry>
   
