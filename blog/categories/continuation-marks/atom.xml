@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Continuation Marks | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/continuation-marks/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-30T15:11:06-06:00</updated>
+  <updated>2012-07-30T15:12:52-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -199,19 +199,23 @@ arguments:</p>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
 </pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="nv">&lt;p&gt;&lt;fac&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>                                                                  <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>                                                                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>                                                                   <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list&lt;em&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
-</span><span class='line'>  <span class="err">     </span><span class="mi">1</span><span class="err">]</span>                                                                          <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>                                                                       <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-continuation-mark</span>                                                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      </span><span class="ss">&#39;fac</span><span class="err"> </span><span class="nv">n</span>                                                                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">&lt;/em&gt;</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">n</span><span class="p">))))</span><span class="err">]</span><span class="p">))</span>                                                   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>                                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span>                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list&lt;em&gt;</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">     </span><span class="mi">1</span><span class="err">]</span>                                   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>                                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-continuation-mark</span>              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="ss">&#39;fac</span><span class="err"> </span><span class="nv">n</span>                              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">&lt;/em&gt;</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">n</span><span class="p">))))</span><span class="err">]</span><span class="p">))</span>            <span class="nv">&lt;br/&gt;</span>
 </span><span class='line'>  <span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="mi">3</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="nv">&lt;p&gt;</span>
@@ -248,19 +252,23 @@ tail-recursive version of factorial demonstrates the difference:</p>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
 </pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="nv">&lt;p&gt;&lt;fac-tr&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="nv">acc</span><span class="p">)</span>                                                           <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>                                                                         <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>                                                                   <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list&lt;em&gt;</span><span class="err"> </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
-</span><span class='line'>  <span class="err">     </span><span class="nv">acc</span><span class="err">]</span>                                                                        <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>                                                                       <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-continuation-mark</span>                                                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      </span><span class="ss">&#39;fac</span><span class="err"> </span><span class="nv">n</span>                                                                     <span class="nv">&lt;br/&gt;</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">&lt;/em&gt;</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="nv">acc</span><span class="p">)))</span><span class="err">]</span><span class="p">))</span>                                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="nv">acc</span><span class="p">)</span>                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>                                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>                            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span>                           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list&lt;em&gt;</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">     </span><span class="nv">acc</span><span class="err">]</span>                                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>                                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-continuation-mark</span>              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="ss">&#39;fac</span><span class="err"> </span><span class="nv">n</span>                              <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">&lt;/em&gt;</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="nv">acc</span><span class="p">)))</span><span class="err">]</span><span class="p">))</span>     <span class="nv">&lt;br/&gt;</span>
 </span><span class='line'>  <span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="mi">1</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="nv">&lt;p&gt;</span>

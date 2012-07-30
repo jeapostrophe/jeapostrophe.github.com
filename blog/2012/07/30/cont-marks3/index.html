@@ -280,12 +280,16 @@ arguments:</p>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
 </pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;fac&gt;</span> <span class="nv">::=</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>
 </span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>
 </span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list*</span><span class="err"> </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list*</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
 </span><span class='line'>  <span class="err">     </span><span class="mi">1</span><span class="err">]</span>
 </span><span class='line'>  <span class="err">    [</span><span class="k">else </span>
 </span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-continuation-mark</span>
@@ -322,12 +326,16 @@ tail-recursive version of factorial demonstrates the difference:</p>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
 </pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;fac-tr&gt;</span> <span class="nv">::=</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="nv">acc</span><span class="p">)</span>
 </span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>
 </span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list*</span><span class="err"> </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list*</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
 </span><span class='line'>  <span class="err">     </span><span class="nv">acc</span><span class="err">]</span>
 </span><span class='line'>  <span class="err">    [</span><span class="k">else </span>
 </span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-continuation-mark</span>

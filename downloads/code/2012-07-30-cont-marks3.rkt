@@ -106,7 +106,9 @@ arguments:
         (define (fac n)
           (cond
             [(zero? n)
-             (displayln (continuation-mark-set->list* (current-continuation-marks) '(fac)))
+             (displayln
+              (continuation-mark-set->list*
+               (current-continuation-marks) '(fac)))
              1]
             [else
              (with-continuation-mark
@@ -134,7 +136,9 @@ demonstrates the difference:
         (define (fac-tr n acc)
           (cond
             [(zero? n)
-             (displayln (continuation-mark-set->list* (current-continuation-marks) '(fac)))
+             (displayln
+              (continuation-mark-set->list*
+               (current-continuation-marks) '(fac)))
              acc]
             [else
              (with-continuation-mark
