@@ -4,7 +4,7 @@
   <title><![CDATA[Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-25T15:20:58-05:00</updated>
+  <updated>2012-07-30T15:11:06-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -14,9 +14,289 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Continuation Marks, part III: Marks themselves]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/07/30/cont-marks3/"/>
+    <updated>2012-07-30T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/07/30/cont-marks3</id>
+    <content type="html"><![CDATA[<p>The last two weeks we’ve seen the basic ideas behind continuation marks,
+but we’ve never actually used them. This week we show the actual
+feature.</p>
+
+<!-- more -->
+
+
+<p>As usual, we’ll return to the example from last time:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;example&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">show-structure</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match-lambda</span>
+</span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="nv">e</span><span class="err"> </span><span class="o">...</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">with-indentation</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">for-each</span><span class="err"> </span><span class="nv">show-structure</span><span class="err"> </span><span class="nv">e</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">?</span><span class="err"> </span><span class="nv">number?</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span><span class="err">]</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">show-structure</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="mi">2</span><span class="p">)</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">4</span><span class="err"> </span><span class="mi">5</span><span class="p">)</span><span class="err"> </span><span class="mi">6</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">7</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">8</span><span class="p">)</span><span class="err"> </span><span class="mi">9</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>which prints as:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> 1                  
+</span><span class='line'> 2                  
+</span><span class='line'>3                   
+</span><span class='line'> 4                  
+</span><span class='line'> 5                  
+</span><span class='line'>6                   
+</span><span class='line'> 7                  
+</span><span class='line'>  8                 
+</span><span class='line'> 9</span></code></pre></td></tr></table></div></figure>
+
+
+<p> </p>
+
+<p>where we relied on the parameter feature of Racket to implement the
+indentation tracking:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;params&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">make-parameter</span><span class="err"> </span><span class="mi">0</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">parameterize</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">t</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can read parameterize as annotating the context of the t evaluation
+with information that says &#8220;the indentation level is now 3&#8221; (or
+whatever.) But parameters wrap that annotation in a convenient
+interface.</p>
+
+<p>The annotation could be expressed directly by &#8220;marking&#8221; (annotating) the
+&#8220;continuation&#8221; (context):</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;marks&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">continuation-mark-set-first</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">   </span><span class="ss">&#39;indent-level</span>
+</span><span class='line'>  <span class="err">   </span><span class="mi">0</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">with-continuation-mark</span>
+</span><span class='line'>  <span class="err">   </span><span class="ss">&#39;indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">t</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The only apparent differences are that we use with-continuation-mark
+rather than parameterize, use the symbol &#8216;indent-level, and have to
+write the accessor function ourselves. Indeed, you can almost imagine
+that parameters are little more than these differences macro-ized. (As
+mentioned before, there are other differences with parameters and
+concurrency that this leaves out.)</p>
+
+<p>One crucial difference between parameters and continuation marks,
+however, is that with parameters you can only observe the <em>last</em> value,
+whereas with marks you can observe <em>all</em> values. Our example only looks
+at the last one, so we’ll have to change something else to see them all.</p>
+
+<p>Here’s a factorial function, with continuation marks annotating its
+arguments:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;fac&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list*</span><span class="err"> </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">     </span><span class="mi">1</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-continuation-mark</span>
+</span><span class='line'>  <span class="err">      </span><span class="ss">&#39;fac</span><span class="err"> </span><span class="nv">n</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">*</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">n</span><span class="p">))))</span><span class="err">]</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="mi">3</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you run this code, it prints out a list containing 1, 2, and 3—the
+annotations around the call to (fac 0). This is similar to the
+indentation program, except in that case we’d only be able to observe 1,
+the last annotation.</p>
+
+<p>Continuation marks like this (noting the name of the function and its
+arguments) are the majority of stack traces. Other kinds of marks could
+be used for other runtime inspection purposes.</p>
+
+<p>Continuation marks behave specially when the annotation is in tail
+position. (Recall that this is why parameterize is more efficient than
+dynamic-wind.) Since in tail position there is not a /new/ continuation,
+there is only space for one mark, so any new marks destroy old marks. A
+tail-recursive version of factorial demonstrates the difference:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;fac-tr&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="nv">acc</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list*</span><span class="err"> </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">     </span><span class="nv">acc</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="k">else </span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-continuation-mark</span>
+</span><span class='line'>  <span class="err">      </span><span class="ss">&#39;fac</span><span class="err"> </span><span class="nv">n</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">*</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="nv">acc</span><span class="p">)))</span><span class="err">]</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This program only prints out 1, because the single continuation only has
+space for one mark and each recursion annihilates it.</p>
+
+<p>This property preserve the Safe-for-Space guarantees of Racket in the
+presence of continuation marks.</p>
+
+<p>I find continuation marks very useful when a program must observe the
+path that led to it. For example, it can be a convenient way to detect
+cycles in a search space. Sometimes I will write a &#8220;custom&#8221; stack trace
+like this just for experimenting purposes to track the evaluation of the
+program better.</p>
+
+<p>Continuation marks are also the basis of the stateless
+continuation-based Web server that comes with Racket, but that’s another
+story.</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/match</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Params\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;params&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Marks\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;marks&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="nv">&lt;fac&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;fac-tr&gt;</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Done\n&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://jeapostrophe.github.com/downloads/code/2012-07-30-cont-marks3.rkt">Download</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Continuation Marks, part II: Parameters]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/25/cont-marks2/"/>
-    <updated>2012-07-25T00:00:00-05:00</updated>
+    <updated>2012-07-25T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/25/cont-marks2</id>
     <content type="html"><![CDATA[<p>Last week I started discussing continuation marks with a medium-sized
 diversion into dynamic-wind as a way to delimited the effects of a
@@ -343,7 +623,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Continuation Marks, part I: Dynamic Wind]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/16/cont-marks/"/>
-    <updated>2012-07-16T00:00:00-05:00</updated>
+    <updated>2012-07-16T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/16/cont-marks</id>
     <content type="html"><![CDATA[<p>One of my favourite features of Racket is also one of its most unique
 features: continuation marks.</p>
@@ -911,7 +1191,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Domain-Specific Operating Systems: Threads, System Calls, and Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall/"/>
-    <updated>2012-07-12T00:00:00-05:00</updated>
+    <updated>2012-07-12T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall</id>
     <content type="html"><![CDATA[<p>In the past few posts I’ve been writing about threading system that are
 based on continuations in user-land. This post I’ll extend that system
@@ -1345,7 +1625,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Preemptive Threads with Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt/"/>
-    <updated>2012-07-02T00:00:00-05:00</updated>
+    <updated>2012-07-02T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt</id>
     <content type="html"><![CDATA[<p>Last week, we covered cooperative threading with continuations. This
 week we’ll change the infrastructure to mimic preemption.</p>
@@ -1642,7 +1922,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Cooperative Threads with Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/06/26/cont-threads/"/>
-    <updated>2012-06-26T00:00:00-05:00</updated>
+    <updated>2012-06-26T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/06/26/cont-threads</id>
     <content type="html"><![CDATA[<p>After the last post about continuations, I wanted to show one of the
 classic uses of them: implementing threads in user-space.</p>
@@ -2034,7 +2314,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Delimited Pipes]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/06/18/pipe/"/>
-    <updated>2012-06-18T00:00:00-05:00</updated>
+    <updated>2012-06-18T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/06/18/pipe</id>
     <content type="html"><![CDATA[<p>I love continuations. We couldn’t do much of anything on a computer
 without them. But, I love first-class access to continuations (i.e.
@@ -2538,7 +2818,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[LaTeX and Word Counts]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/06/05/word-count/"/>
-    <updated>2012-06-05T00:00:00-05:00</updated>
+    <updated>2012-06-05T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/06/05/word-count</id>
     <content type="html"><![CDATA[<p>A few years ago, a proposal came to a committee I was on to limit the
 documents we evaluated based on their word count, rather than their page
@@ -2741,7 +3021,7 @@ documents like this are much easier to write.)</p>
   <entry>
     <title type="html"><![CDATA[exec and Tail-call Optimization]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/28/exec-vs-system/"/>
-    <updated>2012-05-28T00:00:00-05:00</updated>
+    <updated>2012-05-28T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/28/exec-vs-system</id>
     <content type="html"><![CDATA[<p>I’m often bothered by programs that fail to use exec properly and
 instead use system. In this article, we’ll review the difference and
@@ -2903,7 +3183,7 @@ tail-position!&#8221;</p>
   <entry>
     <title type="html"><![CDATA[An LZ78 Implementation]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/22/lz78/"/>
-    <updated>2012-05-22T00:00:00-05:00</updated>
+    <updated>2012-05-22T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/22/lz78</id>
     <content type="html"><![CDATA[<p>For a long time I’ve known about and relied on the LZ77/78 compression
 algorithms. Once when I was in middle school, I told a friend an idea I
@@ -3306,7 +3586,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[A Boggle Solver]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/14/boggle/"/>
-    <updated>2012-05-14T00:00:00-05:00</updated>
+    <updated>2012-05-14T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/14/boggle</id>
     <content type="html"><![CDATA[<p>Boggle is a classic word game that lends itself well to algorithmic
 attacks. A student of mine wanted to show me his solution (as it is an
@@ -3724,7 +4004,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Quilt Colouring]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/07/quilt-colouring/"/>
-    <updated>2012-05-07T00:00:00-05:00</updated>
+    <updated>2012-05-07T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/07/quilt-colouring</id>
     <content type="html"><![CDATA[<p>I got this email from my wife:</p>
 
@@ -4279,7 +4559,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Professor Layton and the Last Specter, Puzzle #146]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146/"/>
-    <updated>2012-05-07T00:00:00-05:00</updated>
+    <updated>2012-05-07T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146</id>
     <content type="html"><![CDATA[<p>This is for <a href="http://tinyurl.com/7yefk76">Puzzle 146</a>. Here is the
 puzzle:</p>
@@ -4481,7 +4761,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Stupid Interview Questions - Introduction + Reversing a Doubly Linked List]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/03/31/siq-reverse-dll/"/>
-    <updated>2012-03-31T00:00:00-05:00</updated>
+    <updated>2012-03-31T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/03/31/siq-reverse-dll</id>
     <content type="html"><![CDATA[<p>Stupid interviews ask applicants to write programs on whiteboards or
 pieces of paper without the resources that are normally available when
@@ -4820,7 +5100,7 @@ this order:</p>
   <entry>
     <title type="html"><![CDATA[Professor Layton and the Diabolical Box, Puzzle #132]]></title>
     <link href="http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132/"/>
-    <updated>2011-06-30T00:00:00-05:00</updated>
+    <updated>2011-06-30T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132</id>
     <content type="html"><![CDATA[<p>I try to solve a puzzle of some kind every morning. I use
 <a href="https://en.wikipedia.org/wiki/Sudoku">Sudoku</a>,

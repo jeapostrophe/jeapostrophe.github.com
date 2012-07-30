@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Domain-Specific Operating Systems | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/domain-specific-operating-systems/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-07-25T15:20:58-05:00</updated>
+  <updated>2012-07-30T15:11:06-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Domain-Specific Operating Systems: Threads, System Calls, and Continuations]]></title>
     <link href="http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall/"/>
-    <updated>2012-07-12T00:00:00-05:00</updated>
+    <updated>2012-07-12T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/07/12/cont-syscall</id>
     <content type="html"><![CDATA[<p>In the past few posts I’ve been writing about threading system that are
 based on continuations in user-land. This post I’ll extend that system

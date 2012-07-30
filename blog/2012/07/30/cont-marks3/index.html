@@ -5,13 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Continuation Marks, part II: Parameters - Jay McCarthy</title>
+  <title>Continuation Marks, part III: Marks themselves - Jay McCarthy</title>
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="Last week I started discussing continuation marks with a medium-sized
-diversion into dynamic-wind as a way to delimited the effects of a
-mutation to &hellip;">
+  <meta name="description" content="The last two weeks we’ve seen the basic ideas behind continuation marks,
+but we’ve never actually used them. This week we show the actual
+feature &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +20,7 @@ mutation to &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/07/25/cont-marks2">
+  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/07/30/cont-marks3">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -82,7 +82,7 @@ mutation to &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Continuation Marks, Part II: Parameters</h1>
+      <h1 class="entry-title">Continuation Marks, Part III: Marks Themselves</h1>
     
     
       <p class="meta">
@@ -98,7 +98,7 @@ mutation to &hellip;">
   
 
 
-<time datetime="2012-07-25T00:00:00-06:00" pubdate data-updated="true">Jul 25<span>th</span>, 2012</time>
+<time datetime="2012-07-30T00:00:00-06:00" pubdate data-updated="true">Jul 30<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -107,14 +107,9 @@ mutation to &hellip;">
   </header>
 
 
-  <div class="entry-content"><p>Last week I started discussing continuation marks with a medium-sized
-diversion into dynamic-wind as a way to delimited the effects of a
-mutation to the body of a dynamic context so a program’s context can
-affect its behavior indirectly.</p>
-
-<p>The pattern we used in the last post is so common that a slightly
-improved form of it is integrated into Racket as the concept of
-parameters.</p>
+  <div class="entry-content"><p>The last two weeks we’ve seen the basic ideas behind continuation marks,
+but we’ve never actually used them. This week we show the actual
+feature.</p>
 
 </div>
   
@@ -136,7 +131,7 @@ parameters.</p>
     <div class="entry-content" style="margin-top: 1em;">
 
 
-<p>As a reminder, suppose we have this program:</p>
+<p>As usual, we’ll return to the example from last time:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -147,7 +142,9 @@ parameters.</p>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;show-structure&gt;</span> <span class="nv">::=</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;example&gt;</span> <span class="nv">::=</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">show-structure</span>
 </span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match-lambda</span>
@@ -156,23 +153,12 @@ parameters.</p>
 </span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">for-each</span><span class="err"> </span><span class="nv">show-structure</span><span class="err"> </span><span class="nv">e</span><span class="p">)))</span><span class="err">]</span>
 </span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">?</span><span class="err"> </span><span class="nv">number?</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
 </span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span><span class="err">]</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And with this example</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;example1&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
 </span><span class='line'>  <span class="p">(</span><span class="nf">show-structure</span>
 </span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="mi">2</span><span class="p">)</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">4</span><span class="err"> </span><span class="mi">5</span><span class="p">)</span><span class="err"> </span><span class="mi">6</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">7</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="mi">8</span><span class="p">)</span><span class="err"> </span><span class="mi">9</span><span class="p">)))</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>We want it to print as:</p>
+<p>which prints as:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -183,18 +169,54 @@ parameters.</p>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>  1               
-</span><span class='line'>  2               
-</span><span class='line'> 3                
-</span><span class='line'>  4               
-</span><span class='line'>  5               
-</span><span class='line'> 6                
-</span><span class='line'>  7               
-</span><span class='line'>   8              
-</span><span class='line'>  9</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'> 1                  
+</span><span class='line'> 2                  
+</span><span class='line'>3                   
+</span><span class='line'> 4                  
+</span><span class='line'> 5                  
+</span><span class='line'>6                   
+</span><span class='line'> 7                  
+</span><span class='line'>  8                 
+</span><span class='line'> 9</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Last week, we implemented this with</p>
+<p> </p>
+
+<p>where we relied on the parameter feature of Racket to implement the
+indentation tracking:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;params&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">make-parameter</span><span class="err"> </span><span class="mi">0</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">parameterize</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">t</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can read parameterize as annotating the context of the t evaluation
+with information that says &#8220;the indentation level is now 3&#8221; (or
+whatever.) But parameters wrap that annotation in a convenient
+interface.</p>
+
+<p>The annotation could be expressed directly by &#8220;marking&#8221; (annotating) the
+&#8220;continuation&#8221; (context):</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -212,46 +234,18 @@ parameters.</p>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;mutation-control-dw&gt;</span> <span class="nv">::=</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;marks&gt;</span> <span class="nv">::=</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nb">dynamic-wind </span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)))</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">t</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="nv">originally</span><span class="p">))))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This code is practically equivalent to the Racket feature of a
-parameter.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;mutation-control-params&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">make-parameter</span><span class="err"> </span><span class="mi">0</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">continuation-mark-set-first</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">   </span><span class="ss">&#39;indent-level</span>
+</span><span class='line'>  <span class="err">   </span><span class="mi">0</span><span class="p">))</span>
 </span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">with-indentation</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
 </span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">originally</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">parameterize</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">t</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">with-continuation-mark</span>
+</span><span class='line'>  <span class="err">   </span><span class="ss">&#39;indent-level</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">originally</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">t</span><span class="p">)))</span>
 </span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">displayln/indent</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
 </span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">indent-level</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
 </span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="s">&quot; &quot;</span><span class="p">))</span>
@@ -259,33 +253,20 @@ parameter.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Parameters would like this. The make-parameter function takes the
-initial value of a parameter and returns a function that returns the
-&#8220;current&#8221; value of the parameter in whatever dynamic context it is
-inside. The parameterize form wraps its context with a new value for the
-the parameter. The wrapping takes place in a way safe with respect to
-control, just like dynamic wind.</p>
+<p>The only apparent differences are that we use with-continuation-mark
+rather than parameterize, use the symbol &#8216;indent-level, and have to
+write the accessor function ourselves. Indeed, you can almost imagine
+that parameters are little more than these differences macro-ized. (As
+mentioned before, there are other differences with parameters and
+concurrency that this leaves out.)</p>
 
-<p>(Parameters also have special behavior with respect to threads: when you
-start a thread, it inherits its parent context’s values for all
-parameters, whereas the mutation behind dynamic-wind would completely
-ignore the fact that a new thread was around&#8230; the mutations in the
-finally part would happen even if the thread was still live when the
-rest of the dynamic-wind body completed.)</p>
+<p>One crucial difference between parameters and continuation marks,
+however, is that with parameters you can only observe the <em>last</em> value,
+whereas with marks you can observe <em>all</em> values. Our example only looks
+at the last one, so we’ll have to change something else to see them all.</p>
 
-<p>(Parameters also provide the ability to capture a /parameterization/
-which captures the current values of <em>all</em> parameters. Such a value can
-later be installed to restore a captured context. The Racket Web server
-uses this to restore parameters for Web programs after user
-interactions.)</p>
-
-<p>Parameters and dynamic-wind with mutation have slightly different
-performance strengths and weaknesses. Namely, parameters are better for
-space, whereas dynamic-wind is better for speed.</p>
-
-<p>We’ll first show the space difference by increasing the indentation one
-hundred times and then measuring how much memory was used to store the
-changes (and the rests to the changes.)</p>
+<p>Here’s a factorial function, with continuation marks annotating its
+arguments:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -299,38 +280,35 @@ changes (and the rests to the changes.)</p>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;memory-test&gt;</span> <span class="nv">::=</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;fac&gt;</span> <span class="nv">::=</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">before</span><span class="err"> </span><span class="p">(</span><span class="nf">current-memory-use*</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="mi">100</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>
 </span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="p">(</span><span class="nf">current-memory-use*</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;~a MBs\n&quot;</span>
-</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">real-&gt;decimal-string</span><span class="err"> </span><span class="p">(</span><span class="nf">/</span><span class="err"> </span><span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="nv">before</span><span class="p">)</span><span class="err"> </span><span class="mi">1024</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list*</span><span class="err"> </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">     </span><span class="mi">1</span><span class="err">]</span>
 </span><span class='line'>  <span class="err">    [</span><span class="k">else </span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-indentation</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">i</span><span class="p">))))</span><span class="err">]</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-continuation-mark</span>
+</span><span class='line'>  <span class="err">      </span><span class="ss">&#39;fac</span><span class="err"> </span><span class="nv">n</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">*</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">n</span><span class="p">))))</span><span class="err">]</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">fac</span><span class="err"> </span><span class="mi">3</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>In this program, parameters use about 2.30 MBs, whereas dynamic-wind
-uses 6.61 MBs, on average. The reason is that parameterize is safe for
-space—it does not leave residue on the stack when called in
-tail-position, as it is here. In contrast, the dynamic-wind finally
-handlers are all called to unwind the state change, as so they must be
-recorded on the stack.</p>
+<p>If you run this code, it prints out a list containing 1, 2, and 3—the
+annotations around the call to (fac 0). This is similar to the
+indentation program, except in that case we’d only be able to observe 1,
+the last annotation.</p>
 
-<p>This reveals, and the threading issue, reveal that dynamic-wind doesn’t
-/really/ make a scoped variable change, it actually makes a global
-variable and undoes it properly. In contrast, parameterize really is a
-local change and when the context that change is active for is gone,
-such as when another parameterize overwrites and the call was in
-tail-position, it’s no longer necessary to &#8220;remember&#8221; the intermediate
-value.</p>
+<p>Continuation marks like this (noting the name of the function and its
+arguments) are the majority of stack traces. Other kinds of marks could
+be used for other runtime inspection purposes.</p>
 
-<p>Next, let’s see the difference in speed by checking the current
-indentation level one hundred thousand times.</p>
+<p>Continuation marks behave specially when the annotation is in tail
+position. (Recall that this is why parameterize is more efficient than
+dynamic-wind.) Since in tail position there is not a /new/ continuation,
+there is only space for one mark, so any new marks destroy old marks. A
+tail-recursive version of factorial demonstrates the difference:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -344,37 +322,36 @@ indentation level one hundred thousand times.</p>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;speed-test&gt;</span> <span class="nv">::=</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;fac-tr&gt;</span> <span class="nv">::=</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">before</span><span class="err"> </span><span class="p">(</span><span class="nf">current-inexact-milliseconds</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="nv">loop</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">il</span><span class="err"> </span><span class="mi">0</span><span class="err">] [</span><span class="nv">i</span><span class="err"> </span><span class="mi">100000</span><span class="err">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="nv">acc</span><span class="p">)</span>
 </span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="k">cond </span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="p">(</span><span class="nf">current-inexact-milliseconds</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;~a in ~a ms\n&quot;</span>
-</span><span class='line'>  <span class="err">             </span><span class="nv">il</span>
-</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">real-&gt;decimal-string</span><span class="err"> </span><span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="nv">after</span><span class="err"> </span><span class="nv">before</span><span class="p">)))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="p">(</span><span class="nf">continuation-mark-set-&gt;list*</span><span class="err"> </span><span class="p">(</span><span class="nf">current-continuation-marks</span><span class="p">)</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="nv">fac</span><span class="p">)))</span>
+</span><span class='line'>  <span class="err">     </span><span class="nv">acc</span><span class="err">]</span>
 </span><span class='line'>  <span class="err">    [</span><span class="k">else </span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">il</span><span class="err"> </span><span class="p">(</span><span class="nf">get-indent-level</span><span class="p">))</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">i</span><span class="p">))</span><span class="err">]</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">with-continuation-mark</span>
+</span><span class='line'>  <span class="err">      </span><span class="ss">&#39;fac</span><span class="err"> </span><span class="nv">n</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">*</span><span class="err"> </span><span class="nv">n</span><span class="err"> </span><span class="nv">acc</span><span class="p">)))</span><span class="err">]</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">fac-tr</span><span class="err"> </span><span class="mi">3</span><span class="err"> </span><span class="mi">1</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>In this program, dynamic-wind uses just 0.98 milliseconds, whereas
-parameterize uses 16.35 milliseconds: a major difference in speed.
-That’s because the mutation-based version just embeds a reference to a
-global variable and can easily look it up, whereas the parameter-based
-version has to consult the context.</p>
+<p>This program only prints out 1, because the single continuation only has
+space for one mark and each recursion annihilates it.</p>
 
-<p>In general, the parameter-based version is much better for typical use
-and it’s easier to use. But, sometimes when you have tight loops that
-would consult a parameter, it is important to cache the value. This is
-most relevant for code that does input or output in a tight loop,
-because those functions consult parameters for the default input/output
-ports.</p>
+<p>This property preserve the Safe-for-Space guarantees of Racket in the
+presence of continuation marks.</p>
 
-<p>Continuation marks are a lower-level feature than parameters, but
-understanding parameters is really useful for understanding marks. Next
-time, we’ll finally see what marks are all about.</p>
+<p>I find continuation marks very useful when a program must observe the
+path that led to it. For example, it can be a convenient way to detect
+cycles in a search space. Sometimes I will write a &#8220;custom&#8221; stack trace
+like this just for experimenting purposes to track the evaluation of the
+program better.</p>
+
+<p>Continuation marks are also the basis of the stateless
+continuation-based Web server that comes with Racket, but that’s another
+story.</p>
 
 <p>By the way, if you use this code at home, make sure you put the code in
 this order:</p>
@@ -397,52 +374,28 @@ this order:</p>
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
 <span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
 </pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/match</span><span class="p">)</span>
 </span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">current-memory-use*</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">current-memory-use</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Params\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;params&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example&gt;</span><span class="p">)</span>
 </span><span class='line'>  <span class="err"> </span>
 </span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Dynamic Wind\n&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;mutation-control-dw&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;show-structure&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example1&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;memory-test&gt;</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">get-indent-level</span><span class="p">)</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;speed-test&gt;</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Marks\n&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;marks&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example&gt;</span><span class="p">)</span>
 </span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">collect-garbage</span><span class="p">)</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Parameters\n&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;mutation-control-params&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;show-structure&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;example1&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;memory-test&gt;</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">get-indent-level</span><span class="err"> </span><span class="nv">indent-level</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">let</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="nv">&lt;speed-test&gt;</span><span class="p">))</span>
+</span><span class='line'>  <span class="nv">&lt;fac&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;fac-tr&gt;</span>
 </span><span class='line'>  <span class="err"> </span>
 </span><span class='line'>  <span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;Done\n&quot;</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="/downloads/code/2012-07-25-cont-marks2.rkt">Download</a></p>
+<p><a href="/downloads/code/2012-07-30-cont-marks3.rkt">Download</a></p>
 </div>
   
 
@@ -466,7 +419,7 @@ this order:</p>
   
 
 
-<time datetime="2012-07-25T00:00:00-06:00" pubdate data-updated="true">Jul 25<span>th</span>, 2012</time>
+<time datetime="2012-07-30T00:00:00-06:00" pubdate data-updated="true">Jul 30<span>th</span>, 2012</time>
       
 
 <span class="categories">
@@ -480,7 +433,7 @@ this order:</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/07/25/cont-marks2/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/07/25/cont-marks2/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/07/30/cont-marks3/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/07/30/cont-marks3/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -493,10 +446,8 @@ this order:</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/07/16/cont-marks/" title="Previous Post: Continuation Marks, part I: Dynamic Wind">&laquo; Continuation Marks, part I: Dynamic Wind</a>
+        <a class="basic-alignment left" href="/blog/2012/07/25/cont-marks2/" title="Previous Post: Continuation Marks, part II: Parameters">&laquo; Continuation Marks, part II: Parameters</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/07/30/cont-marks3/" title="Next Post: Continuation Marks, part III: Marks themselves">Continuation Marks, part III: Marks themselves &raquo;</a>
       
     </p>
   </footer>
