@@ -5,12 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>The Optimal Shower - Jay McCarthy</title>
+  <title>DrDr and its archives - Jay McCarthy</title>
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="One of my goals in life is to do things very efficiently and get a lot
-done. But throughout my whole five-year marriage, my wife has always &hellip;">
+  <meta name="description" content="After I developed DrDr, it was running
+smoothly for a couple hundred revisions, when suddenly it stopped
+working. I investigated and found that I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +20,7 @@ done. But throughout my whole five-year marriage, my wife has always &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/08/06/shower">
+  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/08/13/drdr-archive">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -81,7 +82,7 @@ done. But throughout my whole five-year marriage, my wife has always &hellip;">
   
   <header>
     
-      <h1 class="entry-title">The Optimal Shower</h1>
+      <h1 class="entry-title">DrDr and Its Archives</h1>
     
     
       <p class="meta">
@@ -97,7 +98,7 @@ done. But throughout my whole five-year marriage, my wife has always &hellip;">
   
 
 
-<time datetime="2012-08-06T00:00:00-06:00" pubdate data-updated="true">Aug 6<span>th</span>, 2012</time>
+<time datetime="2012-08-13T00:00:00-06:00" pubdate data-updated="true">Aug 13<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -106,14 +107,12 @@ done. But throughout my whole five-year marriage, my wife has always &hellip;">
   </header>
 
 
-  <div class="entry-content"><p>One of my goals in life is to do things very efficiently and get a lot
-done. But throughout my whole five-year marriage, my wife has always
-complained about my long showers, which to her were a waste of time and
-valuable water.</p>
+  <div class="entry-content"><p>After I developed <a href="http://drdr.racket-lang.org">DrDr</a>, it was running
+smoothly for a couple hundred revisions, when suddenly it stopped
+working. I investigated and found that I couldn’t create any files&#8230;
+had I really run out of space on the 220G hard drive?</p>
 
-<p>As a computer scientist and programmer, I try to use technology to
-optimize my life whenever possible. In this article, I discuss how I
-improved my shower times and my marriage.</p>
+<p>In this post, I discuss how I found and fixed the problem.</p>
 
 </div>
   
@@ -135,93 +134,136 @@ improved my shower times and my marriage.</p>
     <div class="entry-content" style="margin-top: 1em;">
 
 
-<p>Before I start, two pieces of background information.</p>
+<h1>Background on DrDr</h1>
 
-<p>First, in the first two weeks or so of knowing my wife, she happened to
-see me brush my teeth. I left on the water while I brushed and then
-rinsed off with the same stream of water. She was horrified. She told me
-how it was bad to do that and referenced a Public Service Announcement
-from her childhood talking about that which called it out as &#8220;wasting
-Utah.&#8221; (Utah is a desert with very little rain: most places where people
-live get about 15 inches per year.) Based on this, I repented and have
-never left on the water since. (Marriage advice: Do whatever your wife
-says.)</p>
+<p>DrDr is an continuous integration system for Racket. Every time a push
+is made to our repository, DrDr will download it, compile it, and &#8220;test&#8221;
+every single file in the code base. In this case, &#8220;test&#8221; just means
+compile, load, and run. Some files, such as
+<code>collects/tests/web-server/run-all-tests.rkt</code> are test suites that run a
+huge number of tests, whereas others, like <code>collects/xml/xml.rkt</code> are
+simply implementations that have no run-time behavior. DrDr records data
+about every file’s run—how long it took, what the output was, what the
+exit code was, etc—and reports it to the Racket community. (This has
+turned out to be a really good idea because DrDr needs virtually no
+cooperation with the files being tested. Racket developers are free to
+write tests of any kind with any library. They just have to ensure that
+failures are written to STDERR and/or the file exits with a code other
+than 0.)</p>
 
-<p>Second, I’ve heard of people who take EXTREMELY long showers, like 30
-minutes to an hour. I was more in the 15 minute to 30 minute boat,
-probably averaging around 20 minutes.</p>
+<p>In all, DrDr tests about 8,700 different files and runs for about an
+hour and ten minutes per push. (It’s a 12-core machine and gets about 4x
+parallel speed-up from that.)</p>
 
-<p>Once we lived together, my wonderful wife started making little comments
-about how long my showers were. I made a few attempts to speed them up.
-The first was to play a set of a few albums during the shower so I’d
-know how long it was taking. Another was to always do the same thing so
-I would have a regular order of operations and thus go a bit faster.
-These didn’t really make a significant difference. I was probably
-consistently at 20 minutes and never more.</p>
+<p>DrDr is designed to be extremely efficient and crash-resistant. It uses
+the filesystem as a database and associated two data files with every
+source file (and directory). The first is a log of the recorded
+information and the second is an &#8220;analysis&#8221; of the log that determines
+how many changes, unclean exits, timeouts, etc there were in the file
+(or directory.) This allows the Web view to simply read one file and
+print out the analysis data without doing any search. (The
+crash-resistance comes from it using these files (or rather their lack)
+as a work list of things to do. It’s almost like a giant Makefile that
+creates and records these files as it goes. So when there’s a crash,
+there’s no in-memory state that needs to be saved or recovered&#8230; it’s
+all written to the filesystem immediately.)</p>
 
-<p>Next, I decided that I would &#8220;time&#8221; myself, in a sense, while in the
-shower. I would just count (out loud or in my head) as I was in there.
-This cut off about 5 minutes on average, probably, down to about 15
-minutes.</p>
+<h1>Running out of space&#8230;</h1>
 
-<p>Next, I went a bit further. I would count out each shower
-&#8220;activity&#8221;—such as washing my left arm, etc. I’d give myself to the
-count of five. (But when I counted to five, it probably really lasted
-between 10 and 15 seconds.) This was very effective and dropped me down
-to about 10 minutes per shower.</p>
+<p>This means that on every push to our repository, DrDr creates about
+18,000 files. Every file is very small, typically less than 50 bytes,
+because most &#8220;tests&#8221; have no errors and no output. There’s no danger of
+running out of space like that&#8230; right?</p>
 
-<p>But I knew I could do better. I just needed some technological help to
-keep me focused.</p>
+<p>If you know anything about file-systems, you should know that there’s a
+thing called on &#8220;inode&#8221;. When I explain it to students, I say this: your
+file-system is like a giant filing cabinet, it has a finite amount of
+volume it can organize and a finite number of folders to put things in,
+you can run out of either and your file-system won’t be usable. The
+volume is the space (220G) and the folders are the inodes—the names for
+file blocks. On my ext4 partition, I have 14M inodes for that 220G
+space.</p>
 
-<p>Here’s the concept:</p>
+<p>After a few hundred revisions, I had run out of inodes and was in
+trouble.</p>
+
+<h1>Saving space</h1>
+
+<p>Most archive and compression formats are designed for saving space. They
+normally also save inodes&#8230; because 10,000 files can be put into 1 zip
+file&#8230; but that’s not normally their primary purpose. (Naturally, Unix
+tradition has done a great job of separating these tasks: tar turns many
+files into one that can be compressed independently.)</p>
+
+<p>Based on that, I thought of just tarring the files and reading the tar
+file to find the file data when the Web application requested it.
+Unfortunately, tar was not designed for easy access to arbitrary files.</p>
+
+<p>A tar file is basically a linked list where one file’s header contains a
+link to the next file (actually the file size, but that’s also a pointer
+to the next block.) So if you are looking for a particular file in the
+archive, you have to do an O(n) search. In DrDr’s case, n is 18,000.</p>
+
+<p>Other popular formats, such as zip or DAR, are just a little bit better.
+They have a single catalog for the entire archive—a list of the files
+with pointers to their location in the archive. Still an O(n) search,
+but at least it plays better with the block cache by limiting seeking,
+etc.</p>
+
+<p>After a brief investigation of other formats and failing to find any
+efficient format, I decided to write my own. Essentially, I needed
+something more like a filesystem.</p>
+
+<h1>DrDr’s Archive Format</h1>
+
+<p>The <a href="https://github.com/plt/racket/blob/master/collects/meta/drdr/archive.rkt">entire archive
+code</a>
+is a mere 150 lines of code.</p>
+
+<p>I had the advantage of not needing to keep track of permission or any
+UNIX attributes. In addition, I didn’t need to deal with modifying the
+files, just recording them.</p>
+
+<p>The entire process of turning a directory into an archive is 28 lines.
+Here’s how it works:</p>
 
 <ul>
-<li><p>Plan out every activity that you’re going to do. I came up with 22
-things on days I washed my hair and 15 for other days.</p></li>
-<li><p>Give yourself 10 seconds per activity.</p></li>
-<li><p>Have a music file that &#8220;announces&#8221; what activity you should be doing
-at each time.</p></li>
-<li><p>Make it exciting by playing intense music (different music for each
-activity) during the activity.</p></li>
-<li><p>End with a horrible alarm so you will get /out/ of the shower
-immediately.</p></li>
+<li><p>Think of the file as a heap of values in some order</p></li>
+<li><p>Go through all files and directories and append them one after another
+in this heap.</p></li>
+<li><p>Encode directories as hash tables that map their contents’ paths to
+where they start and how long they are.</p></li>
+<li><p>Ensure that you write directories after their contents (so you
+actually know where the files will start)</p></li>
+<li><p>Write out the root directory hash as the first thing</p></li>
 </ul>
 
 
-<p>With this concept in mind, I created two MP3s:</p>
+<p>And that’s it. It’s a very obvious encoding of a filesystem. It gives us
+O(log n) number of accesses to find the file. All but one of those will
+be the reading of a Racket hash table that has another O(log n) (where n
+is the number of files in that directory) number of operations until we
+find the sub-directory.</p>
 
-<ul>
-<li><p><a href="/downloads/code/tmp/2012-08-06-shower.mp3">The Shower
-Song</a></p></li>
-<li><p><a href="/downloads/code/tmp/2012-08-06-shower-hair.mp3">The Shower
-Song (w/ hair)</a></p></li>
-</ul>
+<p>The code that does the lookup is a bit longer—47 lines—because it has
+quite a lot of error handling in case there’s some sort of problem.</p>
 
+<h1>The outcome</h1>
 
-<p>As my background music, I used the soundtrack for Mega Man 2 for the
-NES, by Capcom. For the announcer, I used the espeak system. For the
-alarm, I found a horrible alarm on freesound.org.</p>
+<p>After implementing this, it was a simple matter to write a script to
+archive everything that had been produced. (I deleted the last revision
+to give me enough inodes to work with.) I decided to only use this
+archive format for pushes other than the first one hundred.</p>
 
-<p>With this in place, my showers are now either 2:43 (including alarm) or
-3:51 (including alarm), depending on whether I am washing my hair on
-that day. Normally I have about 10 seconds of alarm while I’m drying
-off, though.</p>
+<p>This worked really nice. (Although, unfortunately, about a year ago I
+had a hard-drive crash and couldn’t recover the data. Not super
+important, but a little annoying.)</p>
 
-<p>Whereas before, a shower would keep me comfortable and lull me back to
-sleep a little, now showers are a frenetic rush as I try to get
-everything done in about 10 seconds. It is exhilarating and extremely
-satisfying to have so much more free time as part of my morning.</p>
+<p>In the past year, we’ve had 2,111 pushes, generated 75 G of data, with
+about 31 M per archived push and 150 M per non-archived push.</p>
 
-<p>You can see the program I used to generate the audio here:</p>
-
-<p><a
-href="https://github.com/jeapostrophe/exp/blob/master/shower.rkt">shower.rkt</a></p>
-
-<p>I highly recommend trying this out.</p>
-
-<p>You may be wondering what my wife thinks about this. When I first told
-her my plan, I don’t think she believed me. But then after I used it for
-the first time, she just laughed at me for a while.</p>
+<p>It’s experiences with beautiful, simple code like this, that make me
+say: I love Racket.</p>
 </div>
   
 
@@ -245,12 +287,12 @@ the first time, she just laughed at me for a while.</p>
   
 
 
-<time datetime="2012-08-06T00:00:00-06:00" pubdate data-updated="true">Aug 6<span>th</span>, 2012</time>
+<time datetime="2012-08-13T00:00:00-06:00" pubdate data-updated="true">Aug 13<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/efficiency/'>Efficiency</a>
+    <a class='category' href='/blog/categories/racket/'>Racket</a>, <a class='category' href='/blog/categories/systems/'>Systems</a>
   
 </span>
 
@@ -259,7 +301,7 @@ the first time, she just laughed at me for a while.</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/08/06/shower/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/08/06/shower/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/08/13/drdr-archive/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/08/13/drdr-archive/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -272,10 +314,8 @@ the first time, she just laughed at me for a while.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/07/30/cont-marks3/" title="Previous Post: Continuation Marks, part III: Marks themselves">&laquo; Continuation Marks, part III: Marks themselves</a>
+        <a class="basic-alignment left" href="/blog/2012/08/06/shower/" title="Previous Post: The Optimal Shower">&laquo; The Optimal Shower</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/08/13/drdr-archive/" title="Next Post: DrDr and its archives">DrDr and its archives &raquo;</a>
       
     </p>
   </footer>
