@@ -4,7 +4,7 @@
   <title><![CDATA[Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-08-20T11:00:06-06:00</updated>
+  <updated>2012-08-20T11:52:14-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -282,7 +282,7 @@ natural numbers is induction.</p>
 
 <p>Isn’t that awesome?</p>
 
-<p>As an aside, Church Encoding is Ur-Object-Oriented programming. For more
+<p>As an aside, Church Encoding is Ur-Object-Oriented Programming. For more
 on this, read William Cook’s great paper: <a href="http://www.cs.utexas.edu/~wcook/Drafts/2009/essay.pdf">On understanding data
 abstraction,
 revisited</a>.</p>

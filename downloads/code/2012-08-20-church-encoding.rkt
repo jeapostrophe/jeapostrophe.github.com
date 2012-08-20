@@ -179,7 +179,7 @@ natural numbers is induction.
 
 Isn't that awesome?
 
-As an aside, Church Encoding is Ur-Object-Oriented programming. For
+As an aside, Church Encoding is Ur-Object-Oriented Programming. For
 more on this, read William Cook's great paper: [On understanding data abstraction, revisited](http://www.cs.utexas.edu/~wcook/Drafts/2009/essay.pdf).
 
 By the way, if you use this code at home, make sure you put the code
