@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Racket | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/racket/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-08-20T10:49:36-06:00</updated>
+  <updated>2012-08-20T11:00:06-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -39,22 +39,108 @@ data-structures: the boolean.</p>
 what do we do with them? We decide whether to launch the missiles or to
 bake a cake:</p>
 
-<p>Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;boolean-example&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="nv">&lt;some-boolean&gt;</span>   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">launch-the-missiles</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">bake-a-cake</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>The essence of being a boolean is being able to decide between two
 choices. We can represent this idea in Lambda simply:</p>
 
-<p>Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;booleans&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">TRUE</span>        <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">first-choice</span><span class="p">)</span> <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">second-choice</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      </span><span class="nv">first-choice</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">FALSE</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">first-choice</span><span class="p">)</span> <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">second-choice</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      </span><span class="nv">second-choice</span><span class="p">)))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>The booleans are just functions that when given two choices, return one
 or the other. These values can easily be used with if:</p>
 
-<p>Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;if&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">IF</span>                                                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">condition</span><span class="p">)</span>                                               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">true-side-thunk</span><span class="p">)</span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">false-side-thunk</span><span class="p">)</span>                                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(((</span><span class="nf">condition</span><span class="err"> </span><span class="nv">true-side-thunk</span><span class="p">)</span><span class="err"> </span><span class="nv">false-side-thunk</span><span class="p">)</span><span class="err"> </span><span class="nv">UNIT</span><span class="p">)))))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>IF simply takes a boolean, deliver the thunks, and calls the one that
 the condition selects. This example makes the right choice:</p>
 
-<p>Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;real-boolean-example&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(((</span><span class="nf">IF</span><span class="err"> </span><span class="nv">FALSE</span><span class="p">)</span>                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span><span class="err"> </span><span class="ss">&#39;launch-the-missiles</span><span class="p">))</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span><span class="err"> </span><span class="ss">&#39;bake-a-cake</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Booleans are a microcosm of the idea of Church Encoding: represent data
 by what it /does/ rather than "is". Other to put it another way, data
@@ -65,7 +151,39 @@ encode them as functions that make choices.</p>
 normally an obvious way and clever way. Here are two implementations of
 and:</p>
 
-<p>Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;and&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">AND-OBVIOUS</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">left-side</span><span class="p">)</span>                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">right-side</span><span class="p">)</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(((</span><span class="nf">IF</span><span class="err"> </span><span class="nv">left-side</span><span class="p">)</span>               <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span><span class="err"> </span><span class="nv">right-side</span><span class="p">))</span>          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">       </span><span class="nv">FALSE</span><span class="p">))))</span>                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">AND-CLEVER</span>                   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">left-side</span><span class="p">)</span>                     <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">right-side</span><span class="p">)</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">((</span><span class="nf">left-side</span><span class="err"> </span><span class="nv">right-side</span><span class="p">)</span><span class="err"> </span><span class="nv">FALSE</span><span class="p">))))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>The "obvious" way is based on the traditional understanding of data
 where we must use functions like IF, whereas the "clever" way is based
@@ -79,12 +197,56 @@ it.</p>
 <p>The traditional Church Encoding of numbers all starts with two things:
 zero and the "plus one"—or successor—function.</p>
 
-<p>Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;numbers&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">ZERO</span>                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">f</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">z</span><span class="p">)</span><span class="err"> </span><span class="nv">z</span><span class="p">)))</span>                  <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">SUCC</span>                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">n</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">f</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">z</span><span class="p">)</span><span class="err"> </span><span class="p">((</span><span class="nf">n</span><span class="err"> </span><span class="nv">f</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">f</span><span class="err"> </span><span class="nv">z</span><span class="p">))))))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Using these definitions you can implement stuff like addition and derive
 other numbers, like one and two:</p>
 
-<p>Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;addition&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">ONE</span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">f</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">z</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">f</span><span class="err"> </span><span class="nv">z</span><span class="p">))))</span>                          <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">TWO</span>                                       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">f</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">z</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">f</span><span class="err"> </span><span class="p">(</span><span class="nf">f</span><span class="err"> </span><span class="nv">z</span><span class="p">)))))</span>                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">PLUS</span>                                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">n</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">m</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">f</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">z</span><span class="p">)</span><span class="err"> </span><span class="p">((</span><span class="nf">n</span><span class="err"> </span><span class="nv">f</span><span class="p">)</span><span class="err"> </span><span class="p">((</span><span class="nf">m</span><span class="err"> </span><span class="nv">f</span><span class="p">)</span><span class="err"> </span><span class="nv">z</span><span class="p">)))))))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>But what do these functions even mean? If Church Encoding is about
 representing data with what it <em>does</em>... what do numbers <em>do</em>?</p>
@@ -111,7 +273,31 @@ that property for zero, then give a way of taking a proof about m and
 returning a proof about m + 1, then for any number n, you can have a
 proof about n. How could this function be implemented?</p>
 
-<p>Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;nat_ind&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">nat_ind</span><span class="err"> </span><span class="nv">Pz</span><span class="err"> </span><span class="nv">Pm2PSm</span><span class="p">)</span>   <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>             <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="nv">Pz</span>                      <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">Pm2PSm</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">n</span><span class="p">)))))</span>
+</span><span class='line'>  <span class="err">  </span><span class="nv">loop</span><span class="p">)</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Natural number induction’s type suggests that it would do interesting
 work, but really it was you that did all the work. You gave the proof
@@ -122,7 +308,27 @@ functions you gave it.</p>
 
 <p>Consider calling this with two. Here’s the trace:</p>
 
-<p>Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&lt;nat_ind_trace2&gt;</span> <span class="nv">::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="mi">2</span><span class="p">)</span>                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">Pm2PSm</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="mi">1</span><span class="p">))</span>       <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">Pm2PSm</span><span class="err"> </span><span class="p">(</span><span class="nf">Pm2PSm</span><span class="err"> </span><span class="p">(</span><span class="nf">loop</span><span class="err"> </span><span class="mi">0</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">Pm2PSm</span><span class="err"> </span><span class="p">(</span><span class="nf">Pm2PSm</span><span class="err"> </span><span class="nv">Pz</span><span class="p">))</span><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Hmm... that looks familiar.</p>
 
@@ -147,7 +353,43 @@ revisited</a>.</p>
 <p>By the way, if you use this code at home, make sure you put the code in
 this order:</p>
 
-<p>Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;&amp;lt</span><span class="c1">;*&gt; ::=&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">UNIT</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span><span class="err"> </span><span class="nv">x</span><span class="p">))</span>
+</span><span class='line'>  <span class="err"> </span>                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;booleans&gt;</span>           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;if&gt;</span>                 <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;real-boolean-example&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;and&gt;</span>                <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;numbers&gt;</span>            <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;addition&gt;</span>           <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="err"> </span>                    <span class="nv">&lt;br/&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;nat_ind&gt;&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p><a href="/downloads/code/2012-08-20-church-encoding.rkt">Download</a></p>
 ]]></content>
