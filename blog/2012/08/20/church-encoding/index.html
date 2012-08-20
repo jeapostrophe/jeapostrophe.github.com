@@ -5,13 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>DrDr and its archives - Jay McCarthy</title>
+  <title>Church Encoding - Jay McCarthy</title>
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="After I developed DrDr, it was running
-smoothly for a couple hundred revisions, when suddenly it stopped
-working. I investigated and found that I &hellip;">
+  <meta name="description" content="One of my favourite ideas in the Lambda Calculus in Church Encoding.
+This is the basis of how the Lambda Calculus, with only functions, can
+represent &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +20,7 @@ working. I investigated and found that I &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/08/13/drdr-archive">
+  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/08/20/church-encoding">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -82,7 +82,7 @@ working. I investigated and found that I &hellip;">
   
   <header>
     
-      <h1 class="entry-title">DrDr and Its Archives</h1>
+      <h1 class="entry-title">Church Encoding</h1>
     
     
       <p class="meta">
@@ -98,7 +98,7 @@ working. I investigated and found that I &hellip;">
   
 
 
-<time datetime="2012-08-13T00:00:00-06:00" pubdate data-updated="true">Aug 13<span>th</span>, 2012</time>
+<time datetime="2012-08-20T00:00:00-06:00" pubdate data-updated="true">Aug 20<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -107,12 +107,9 @@ working. I investigated and found that I &hellip;">
   </header>
 
 
-  <div class="entry-content"><p>After I developed <a href="http://drdr.racket-lang.org">DrDr</a>, it was running
-smoothly for a couple hundred revisions, when suddenly it stopped
-working. I investigated and found that I couldn’t create any files&#8230;
-had I really run out of space on the 220G hard drive?</p>
-
-<p>In this post, I discuss how I found and fixed the problem.</p>
+  <div class="entry-content"><p>One of my favourite ideas in the Lambda Calculus in Church Encoding.
+This is the basis of how the Lambda Calculus, with only functions, can
+represent other kinds of data.</p>
 
 </div>
   
@@ -134,136 +131,131 @@ had I really run out of space on the 220G hard drive?</p>
     <div class="entry-content" style="margin-top: 1em;">
 
 
-<h1>Background on DrDr</h1>
+<p>The Lambda Calculus is a very simple language. It just has variable
+references, unary functions, and unary applications. Yet, it can express
+all computations. A natural question is how this simple language can
+represent things like numbers, lists, and other complex data structures?</p>
 
-<p>DrDr is an continuous integration system for Racket. Every time a push
-is made to our repository, DrDr will download it, compile it, and &#8220;test&#8221;
-every single file in the code base. In this case, &#8220;test&#8221; just means
-compile, load, and run. Some files, such as
-<code>collects/tests/web-server/run-all-tests.rkt</code> are test suites that run a
-huge number of tests, whereas others, like <code>collects/xml/xml.rkt</code> are
-simply implementations that have no run-time behavior. DrDr records data
-about every file’s run—how long it took, what the output was, what the
-exit code was, etc—and reports it to the Racket community. (This has
-turned out to be a really good idea because DrDr needs virtually no
-cooperation with the files being tested. Racket developers are free to
-write tests of any kind with any library. They just have to ensure that
-failures are written to STDERR and/or the file exits with a code other
-than 0.)</p>
+<h1>Booleans</h1>
 
-<p>In all, DrDr tests about 8,700 different files and runs for about an
-hour and ten minutes per push. (It’s a 12-core machine and gets about 4x
-parallel speed-up from that.)</p>
+<p>I think it is actually easier to start with the most basic of
+data-structures: the boolean.</p>
 
-<p>DrDr is designed to be extremely efficient and crash-resistant. It uses
-the filesystem as a database and associated two data files with every
-source file (and directory). The first is a log of the recorded
-information and the second is an &#8220;analysis&#8221; of the log that determines
-how many changes, unclean exits, timeouts, etc there were in the file
-(or directory.) This allows the Web view to simply read one file and
-print out the analysis data without doing any search. (The
-crash-resistance comes from it using these files (or rather their lack)
-as a work list of things to do. It’s almost like a giant Makefile that
-creates and records these files as it goes. So when there’s a crash,
-there’s no in-memory state that needs to be saved or recovered&#8230; it’s
-all written to the filesystem immediately.)</p>
+<p>Everyone knows booleans. There are just two of them: true and false. And
+what do we do with them? We decide whether to launch the missiles or to
+bake a cake:</p>
 
-<h1>Running out of space&#8230;</h1>
+<p>Liquid error: Could not open library &#8216;lib.so&#8217;: lib.so: cannot open shared object file: No such file or directory</p>
 
-<p>This means that on every push to our repository, DrDr creates about
-18,000 files. Every file is very small, typically less than 50 bytes,
-because most &#8220;tests&#8221; have no errors and no output. There’s no danger of
-running out of space like that&#8230; right?</p>
+<p>The essence of being a boolean is being able to decide between two
+choices. We can represent this idea in Lambda simply:</p>
 
-<p>If you know anything about file-systems, you should know that there’s a
-thing called on &#8220;inode&#8221;. When I explain it to students, I say this: your
-file-system is like a giant filing cabinet, it has a finite amount of
-volume it can organize and a finite number of folders to put things in,
-you can run out of either and your file-system won’t be usable. The
-volume is the space (220G) and the folders are the inodes—the names for
-file blocks. On my ext4 partition, I have 14M inodes for that 220G
-space.</p>
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
 
-<p>After a few hundred revisions, I had run out of inodes and was in
-trouble.</p>
+<p>The booleans are just functions that when given two choices, return one
+or the other. These values can easily be used with if:</p>
 
-<h1>Saving space</h1>
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
 
-<p>Most archive and compression formats are designed for saving space. They
-normally also save inodes&#8230; because 10,000 files can be put into 1 zip
-file&#8230; but that’s not normally their primary purpose. (Naturally, Unix
-tradition has done a great job of separating these tasks: tar turns many
-files into one that can be compressed independently.)</p>
+<p>IF simply takes a boolean, deliver the thunks, and calls the one that
+the condition selects. This example makes the right choice:</p>
 
-<p>Based on that, I thought of just tarring the files and reading the tar
-file to find the file data when the Web application requested it.
-Unfortunately, tar was not designed for easy access to arbitrary files.</p>
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
 
-<p>A tar file is basically a linked list where one file’s header contains a
-link to the next file (actually the file size, but that’s also a pointer
-to the next block.) So if you are looking for a particular file in the
-archive, you have to do an O(n) search. In DrDr’s case, n is 18,000.</p>
+<p>Booleans are a microcosm of the idea of Church Encoding: represent data
+by what it /does/ rather than &#8220;is&#8221;. Other to put it another way, data
+&#8220;isn’t&#8221; anything, it is just what it does. Booleans make choices, so
+encode them as functions that make choices.</p>
 
-<p>Other popular formats, such as zip or DAR, are just a little bit better.
-They have a single catalog for the entire archive—a list of the files
-with pointers to their location in the archive. Still an O(n) search,
-but at least it plays better with the block cache by limiting seeking,
-etc.</p>
+<p>All boolean functions can be build with these definitions. There’s
+normally an obvious way and clever way. Here are two implementations of
+and:</p>
 
-<p>After a brief investigation of other formats and failing to find any
-efficient format, I decided to write my own. Essentially, I needed
-something more like a filesystem.</p>
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
 
-<h1>DrDr’s Archive Format</h1>
+<p>The &#8220;obvious&#8221; way is based on the traditional understanding of data
+where we must use functions like IF, whereas the &#8220;clever&#8221; way is based
+on the understanding that booleans <em>are</em> IF, so we don’t need to call
+it.</p>
 
-<p>The <a href="https://github.com/plt/racket/blob/master/collects/meta/drdr/archive.rkt">entire archive
-code</a>
-is a mere 150 lines of code.</p>
+<h1>Natural numbers</h1>
 
-<p>I had the advantage of not needing to keep track of permission or any
-UNIX attributes. In addition, I didn’t need to deal with modifying the
-files, just recording them.</p>
+<p>Let’s do something a little bit more complicated: numbers.</p>
 
-<p>The entire process of turning a directory into an archive is 28 lines.
-Here’s how it works:</p>
+<p>The traditional Church Encoding of numbers all starts with two things:
+zero and the &#8220;plus one&#8221;—or successor—function.</p>
 
-<ul>
-<li><p>Think of the file as a heap of values in some order</p></li>
-<li><p>Go through all files and directories and append them one after another
-in this heap.</p></li>
-<li><p>Encode directories as hash tables that map their contents’ paths to
-where they start and how long they are.</p></li>
-<li><p>Ensure that you write directories after their contents (so you
-actually know where the files will start)</p></li>
-<li><p>Write out the root directory hash as the first thing</p></li>
-</ul>
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p>Using these definitions you can implement stuff like addition and derive
+other numbers, like one and two:</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p>But what do these functions even mean? If Church Encoding is about
+representing data with what it <em>does</em>&#8230; what do numbers <em>do</em>?</p>
+
+<p>Let’s take a small detour in the land of my second favourite
+programming, Coq. This is the type of natural number induction:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>forall P : nat -> Prop,             
+</span><span class='line'>    P 0                             
+</span><span class='line'> -> (forall m : nat, P m -> P (S m))
+</span><span class='line'> -> forall n : nat,                 
+</span><span class='line'>     P n</span></code></pre></td></tr></table></div></figure>
 
 
-<p>And that’s it. It’s a very obvious encoding of a filesystem. It gives us
-O(log n) number of accesses to find the file. All but one of those will
-be the reading of a Racket hash table that has another O(log n) (where n
-is the number of files in that directory) number of operations until we
-find the sub-directory.</p>
+<p> </p>
 
-<p>The code that does the lookup is a bit longer—47 lines—because it has
-quite a lot of error handling in case there’s some sort of problem.</p>
+<p>This say that if you have a property about numbers, and give a proof of
+that property for zero, then give a way of taking a proof about m and
+returning a proof about m + 1, then for any number n, you can have a
+proof about n. How could this function be implemented?</p>
 
-<h1>The outcome</h1>
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
 
-<p>After implementing this, it was a simple matter to write a script to
-archive everything that had been produced. (I deleted the last revision
-to give me enough inodes to work with.) I decided to only use this
-archive format for pushes other than the first one hundred.</p>
+<p>Natural number induction’s type suggests that it would do interesting
+work, but really it was you that did all the work. You gave the proof
+about zero, which it returns to you if you call it with zero. You gave
+the proof from m to m + 1, which it just uses in case the number isn’t
+zero. All natural number induction does is do a trivial loop calling
+functions you gave it.</p>
 
-<p>This worked really nice. (Although, unfortunately, about a year ago I
-had a hard-drive crash and couldn’t recover the data. Not super
-important, but a little annoying.)</p>
+<p>Consider calling this with two. Here’s the trace:</p>
 
-<p>In the past year, we’ve had 2,111 pushes, generated 75 G of data, with
-about 31 M per archived push and 150 M per non-archived push.</p>
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
 
-<p>It’s experiences with beautiful, simple code like this, that make me
-say: I love Racket.</p>
+<p>Hmm&#8230; that looks familiar.</p>
+
+<p>Now what does all this natural number induction have to do with Church
+Encoding?</p>
+
+<p>Well, Church Encoding of natural numbers represents them as their own
+induction functions. The Church Encoding of ’two’ IS “(Pm2PSm (Pm2PSm
+Pz))“ where the proof for zero and the proof for the successor are
+passed as arguments.</p>
+
+<p>In the same way the essence of booleans is choice, the essence of
+natural numbers is induction.</p>
+
+<p>Isn’t that awesome?</p>
+
+<p>As an aside, Church Encoding is Ur-Object-Oriented programming. For more
+on this, read William Cook’s great paper: <a href="http://www.cs.utexas.edu/~wcook/Drafts/2009/essay.pdf">On understanding data
+abstraction,
+revisited</a>.</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p><a href="/downloads/code/2012-08-20-church-encoding.rkt">Download</a></p>
 </div>
   
 
@@ -287,12 +279,12 @@ say: I love Racket.</p>
   
 
 
-<time datetime="2012-08-13T00:00:00-06:00" pubdate data-updated="true">Aug 13<span>th</span>, 2012</time>
+<time datetime="2012-08-20T00:00:00-06:00" pubdate data-updated="true">Aug 20<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/racket/'>Racket</a>, <a class='category' href='/blog/categories/systems/'>Systems</a>
+    <a class='category' href='/blog/categories/coq/'>Coq</a>, <a class='category' href='/blog/categories/lambda-calculus/'>Lambda Calculus</a>, <a class='category' href='/blog/categories/racket/'>Racket</a>
   
 </span>
 
@@ -301,7 +293,7 @@ say: I love Racket.</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/08/13/drdr-archive/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/08/13/drdr-archive/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/08/20/church-encoding/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/08/20/church-encoding/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -314,10 +306,8 @@ say: I love Racket.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/08/06/shower/" title="Previous Post: The Optimal Shower">&laquo; The Optimal Shower</a>
+        <a class="basic-alignment left" href="/blog/2012/08/13/drdr-archive/" title="Previous Post: DrDr and its archives">&laquo; DrDr and its archives</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/08/20/church-encoding/" title="Next Post: Church Encoding">Church Encoding &raquo;</a>
       
     </p>
   </footer>

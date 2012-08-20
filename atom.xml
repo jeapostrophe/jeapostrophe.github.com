@@ -4,7 +4,7 @@
   <title><![CDATA[Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-08-13T23:23:29-06:00</updated>
+  <updated>2012-08-20T10:17:30-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -12,6 +12,146 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Church Encoding]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/08/20/church-encoding/"/>
+    <updated>2012-08-20T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/08/20/church-encoding</id>
+    <content type="html"><![CDATA[<p>One of my favourite ideas in the Lambda Calculus in Church Encoding.
+This is the basis of how the Lambda Calculus, with only functions, can
+represent other kinds of data.</p>
+
+<!-- more -->
+
+
+<p>The Lambda Calculus is a very simple language. It just has variable
+references, unary functions, and unary applications. Yet, it can express
+all computations. A natural question is how this simple language can
+represent things like numbers, lists, and other complex data structures?</p>
+
+<h1>Booleans</h1>
+
+<p>I think it is actually easier to start with the most basic of
+data-structures: the boolean.</p>
+
+<p>Everyone knows booleans. There are just two of them: true and false. And
+what do we do with them? We decide whether to launch the missiles or to
+bake a cake:</p>
+
+<p>Liquid error: Could not open library &#8216;lib.so&#8217;: lib.so: cannot open shared object file: No such file or directory</p>
+
+<p>The essence of being a boolean is being able to decide between two
+choices. We can represent this idea in Lambda simply:</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p>The booleans are just functions that when given two choices, return one
+or the other. These values can easily be used with if:</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p>IF simply takes a boolean, deliver the thunks, and calls the one that
+the condition selects. This example makes the right choice:</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p>Booleans are a microcosm of the idea of Church Encoding: represent data
+by what it /does/ rather than &#8220;is&#8221;. Other to put it another way, data
+&#8220;isn’t&#8221; anything, it is just what it does. Booleans make choices, so
+encode them as functions that make choices.</p>
+
+<p>All boolean functions can be build with these definitions. There’s
+normally an obvious way and clever way. Here are two implementations of
+and:</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p>The &#8220;obvious&#8221; way is based on the traditional understanding of data
+where we must use functions like IF, whereas the &#8220;clever&#8221; way is based
+on the understanding that booleans <em>are</em> IF, so we don’t need to call
+it.</p>
+
+<h1>Natural numbers</h1>
+
+<p>Let’s do something a little bit more complicated: numbers.</p>
+
+<p>The traditional Church Encoding of numbers all starts with two things:
+zero and the &#8220;plus one&#8221;—or successor—function.</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p>Using these definitions you can implement stuff like addition and derive
+other numbers, like one and two:</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p>But what do these functions even mean? If Church Encoding is about
+representing data with what it <em>does</em>&#8230; what do numbers <em>do</em>?</p>
+
+<p>Let’s take a small detour in the land of my second favourite
+programming, Coq. This is the type of natural number induction:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>forall P : nat -> Prop,             
+</span><span class='line'>    P 0                             
+</span><span class='line'> -> (forall m : nat, P m -> P (S m))
+</span><span class='line'> -> forall n : nat,                 
+</span><span class='line'>     P n</span></code></pre></td></tr></table></div></figure>
+
+
+<p> </p>
+
+<p>This say that if you have a property about numbers, and give a proof of
+that property for zero, then give a way of taking a proof about m and
+returning a proof about m + 1, then for any number n, you can have a
+proof about n. How could this function be implemented?</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p>Natural number induction’s type suggests that it would do interesting
+work, but really it was you that did all the work. You gave the proof
+about zero, which it returns to you if you call it with zero. You gave
+the proof from m to m + 1, which it just uses in case the number isn’t
+zero. All natural number induction does is do a trivial loop calling
+functions you gave it.</p>
+
+<p>Consider calling this with two. Here’s the trace:</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p>Hmm&#8230; that looks familiar.</p>
+
+<p>Now what does all this natural number induction have to do with Church
+Encoding?</p>
+
+<p>Well, Church Encoding of natural numbers represents them as their own
+induction functions. The Church Encoding of ’two’ IS “(Pm2PSm (Pm2PSm
+Pz))“ where the proof for zero and the proof for the successor are
+passed as arguments.</p>
+
+<p>In the same way the essence of booleans is choice, the essence of
+natural numbers is induction.</p>
+
+<p>Isn’t that awesome?</p>
+
+<p>As an aside, Church Encoding is Ur-Object-Oriented programming. For more
+on this, read William Cook’s great paper: <a href="http://www.cs.utexas.edu/~wcook/Drafts/2009/essay.pdf">On understanding data
+abstraction,
+revisited</a>.</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<p>Liquid error: undefined method `Py_IsInitialized&#8217; for RubyPython::Python:Module</p>
+
+<p><a href="http://jeapostrophe.github.com/downloads/code/2012-08-20-church-encoding.rkt">Download</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[DrDr and its archives]]></title>
