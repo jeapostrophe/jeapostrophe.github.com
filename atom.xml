@@ -4,7 +4,7 @@
   <title><![CDATA[Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-08-20T11:52:14-06:00</updated>
+  <updated>2012-08-28T19:15:00-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -12,6 +12,386 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[System F: Interpreter and Type Checker]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/08/28/system-f-hoas/"/>
+    <updated>2012-08-28T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/08/28/system-f-hoas</id>
+    <content type="html"><![CDATA[<p>System F is a very powerful programming and type system. It is fun to
+make an interpreter for, but I think it is even more fun to write such
+an interpreter using higher-order abstract syntax. In this post, I
+describe how a normal System F interpreter works and next week we’ll see
+the HOAS version.</p>
+
+<!-- more -->
+
+
+<p>System F is basically the same as the normal Lambda Calculus, except
+that it has first-class, explicit polymorphism.</p>
+
+<p>Its program terms are: identifiers, applications, type applications (for
+instantiating polymorphism), abstractions (value
+functions), and type abstractions (type functions, or points of
+polymorphism). For the purposes of making the code more meaningful, I’ll
+also add primitive numbers and the successor function.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;program-terms&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">ID</span><span class="err"> </span><span class="p">(</span><span class="nf">sym</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">APP</span><span class="err"> </span><span class="p">(</span><span class="nf">rator</span><span class="err"> </span><span class="nv">rand</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">TYAPP</span><span class="err"> </span><span class="p">(</span><span class="nf">rator</span><span class="err"> </span><span class="nv">rand</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">ABS</span><span class="err"> </span><span class="p">(</span><span class="nf">typ</span><span class="err"> </span><span class="nv">sym</span><span class="err"> </span><span class="nv">body</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">TYABS</span><span class="err"> </span><span class="p">(</span><span class="nf">sym</span><span class="err"> </span><span class="nv">body</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">NUM</span><span class="err"> </span><span class="p">(</span><span class="nf">val</span><span class="p">)</span><span class="err"> </span><span class="o">#</span><span class="nv">:transparent</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">SUCC</span><span class="err"> </span><span class="p">())</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Its type terms are: type identifiers, arrows and type arrows (for the
+two kinds of abstraction). I’ll also add a primitive number type.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;type-terms&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">TYID</span><span class="err"> </span><span class="p">(</span><span class="nf">sym</span><span class="p">)</span><span class="err"> </span><span class="o">#</span><span class="nv">:transparent</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">ARR</span><span class="err"> </span><span class="p">(</span><span class="nf">dom</span><span class="err"> </span><span class="nv">rng</span><span class="p">)</span><span class="err"> </span><span class="o">#</span><span class="nv">:transparent</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">TYARR</span><span class="err"> </span><span class="p">(</span><span class="nf">sym</span><span class="err"> </span><span class="nv">body</span><span class="p">)</span><span class="err"> </span><span class="o">#</span><span class="nv">:transparent</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">struct</span><span class="err"> </span><span class="nv">TYNUM</span><span class="err"> </span><span class="p">()</span><span class="err"> </span><span class="o">#</span><span class="nv">:transparent</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here’s an example function: the polymorphic doubling function that
+applies its argument twice.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;double&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">DOUBLE</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">TYABS</span><span class="err"> </span><span class="ss">&#39;X</span>
+</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">ABS</span><span class="err"> </span><span class="p">(</span><span class="nf">ARR</span><span class="err"> </span><span class="p">(</span><span class="nf">TYID</span><span class="err"> </span><span class="ss">&#39;X</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">TYID</span><span class="err"> </span><span class="ss">&#39;X</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">              </span><span class="ss">&#39;f</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">ABS</span><span class="err"> </span><span class="p">(</span><span class="nf">TYID</span><span class="err"> </span><span class="ss">&#39;X</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">                   </span><span class="ss">&#39;a</span>
+</span><span class='line'>  <span class="err">                   </span><span class="p">(</span><span class="nf">APP</span><span class="err"> </span><span class="p">(</span><span class="nf">ID</span><span class="err"> </span><span class="ss">&#39;f</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">                        </span><span class="p">(</span><span class="nf">APP</span><span class="err"> </span><span class="p">(</span><span class="nf">ID</span><span class="err"> </span><span class="ss">&#39;f</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">                             </span><span class="p">(</span><span class="nf">ID</span><span class="err"> </span><span class="ss">&#39;a</span><span class="p">)))))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And example use of the function gives it the successor function and
+calls it with the number 3.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;example&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">APP</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">APP</span><span class="err"> </span><span class="p">(</span><span class="nf">TYAPP</span><span class="err"> </span><span class="nv">DOUBLE</span><span class="err"> </span><span class="p">(</span><span class="nf">TYNUM</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">SUCC</span><span class="p">))</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">NUM</span><span class="err"> </span><span class="mi">3</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When we run this program, we would expect it to return 5.</p>
+
+<p>An interpreter for this language is fairly obvious:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;eval&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">eval</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match-lambda</span>
+</span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">APP</span><span class="err"> </span><span class="nv">rator</span><span class="err"> </span><span class="nv">rand</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="p">(</span><span class="nf">eval</span><span class="err"> </span><span class="nv">rator</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">ABS</span><span class="err"> </span><span class="nv">_</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">body</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">eval</span><span class="err"> </span><span class="p">(</span><span class="nf">subst</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="p">(</span><span class="nf">eval</span><span class="err"> </span><span class="nv">rand</span><span class="p">)</span><span class="err"> </span><span class="nv">body</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">SUCC</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="p">(</span><span class="nf">eval</span><span class="err"> </span><span class="nv">rand</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">         [</span><span class="p">(</span><span class="nf">NUM</span><span class="err"> </span><span class="nv">n</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">NUM</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="nv">n</span><span class="p">))</span><span class="err">]</span><span class="p">)</span><span class="err">]</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">   [</span><span class="p">(</span><span class="nf">TYAPP</span><span class="err"> </span><span class="nv">rator</span><span class="err"> </span><span class="nv">rand</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="p">(</span><span class="nf">eval</span><span class="err"> </span><span class="nv">rator</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">      [</span><span class="p">(</span><span class="nf">TYABS</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">body</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">eval</span><span class="err"> </span><span class="p">(</span><span class="nf">type-subst</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">rand</span><span class="err"> </span><span class="nv">body</span><span class="p">))</span><span class="err">]</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">   [</span><span class="nv">val</span>
+</span><span class='line'>  <span class="err">    </span><span class="nv">val</span><span class="err">]</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But it relies on two substitution functions: one for value abstractions
+and another for type abstractions. These functions, while not especially
+complicated, are tedious to write and only get more complicated as
+binding rules become more complex.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;subst&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">t</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">ID</span><span class="err"> </span><span class="nv">sym</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">eq?</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">sym</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="nv">v</span>
+</span><span class='line'>  <span class="err">       </span><span class="nv">t</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">SUCC</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="nv">t</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">APP</span><span class="err"> </span><span class="nv">rator</span><span class="err"> </span><span class="nv">rand</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">APP</span><span class="err"> </span><span class="p">(</span><span class="nf">subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">rator</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">rand</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">ABS</span><span class="err"> </span><span class="nv">ty</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">body</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">eq?</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="nv">t</span>
+</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">ABS</span><span class="err"> </span><span class="nv">ty</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="p">(</span><span class="nf">subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">body</span><span class="p">)))</span><span class="err">]</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">type-subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">t</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">SUCC</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="nv">t</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">TYID</span><span class="err"> </span><span class="nv">sym</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">eq?</span><span class="err"> </span><span class="nv">sym</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       </span><span class="nv">v</span>
+</span><span class='line'>  <span class="err">       </span><span class="nv">t</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">APP</span><span class="err"> </span><span class="nv">rator</span><span class="err"> </span><span class="nv">rand</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">APP</span><span class="err"> </span><span class="p">(</span><span class="nf">type-subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">rator</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">type-subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">rand</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">ABS</span><span class="err"> </span><span class="nv">ty</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">body</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">ABS</span><span class="err"> </span><span class="p">(</span><span class="nf">type-subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">ty</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">          </span><span class="nv">id</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">type-subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">body</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">ARR</span><span class="err"> </span><span class="nv">dom</span><span class="err"> </span><span class="nv">rng</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">ARR</span><span class="err"> </span><span class="p">(</span><span class="nf">type-subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">dom</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">type-subst</span><span class="err"> </span><span class="nv">x</span><span class="err"> </span><span class="nv">v</span><span class="err"> </span><span class="nv">rng</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">ID</span><span class="err"> </span><span class="nv">sym</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="nv">t</span><span class="err">]</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But, this language does not just have runtime behavior, we also need a
+type checker. As test cases, we’ll type the example and this program,
+which contains a type error:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;type-error&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">APP</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">APP</span><span class="err"> </span><span class="p">(</span><span class="nf">TYAPP</span><span class="err"> </span><span class="nv">DOUBLE</span><span class="err"> </span><span class="p">(</span><span class="nf">TYNUM</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">ABS</span><span class="err"> </span><span class="p">(</span><span class="nf">TYNUM</span><span class="p">)</span><span class="err"> </span><span class="ss">&#39;N</span>
+</span><span class='line'>  <span class="err">           </span><span class="p">(</span><span class="nf">ABS</span><span class="err"> </span><span class="p">(</span><span class="nf">TYNUM</span><span class="p">)</span><span class="err"> </span><span class="ss">&#39;U</span>
+</span><span class='line'>  <span class="err">                </span><span class="p">(</span><span class="nf">ID</span><span class="err"> </span><span class="ss">&#39;N</span><span class="p">))))</span>
+</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">NUM</span><span class="err"> </span><span class="mi">3</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The type checker is fairly straight-forward relative to the evaluator.
+We won’t do substitution for value abstraction, instead we’ll keep a
+type environment. We will need to do substitution for type applications,
+though.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;type-of&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">type-of</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">type-of/env</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="p">)</span><span class="err"> </span><span class="nv">t</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">type-of/env</span><span class="err"> </span><span class="nv">env</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">t</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">ID</span><span class="err"> </span><span class="nv">sym</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">hash-ref</span><span class="err"> </span><span class="nv">env</span><span class="err"> </span><span class="nv">sym</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">ABS</span><span class="err"> </span><span class="nv">ty</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">body</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">ARR</span><span class="err"> </span><span class="nv">ty</span><span class="err"> </span><span class="p">(</span><span class="nf">type-of/env</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-set</span><span class="err"> </span><span class="nv">env</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">ty</span><span class="p">)</span><span class="err"> </span><span class="nv">body</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">APP</span><span class="err"> </span><span class="nv">rator</span><span class="err"> </span><span class="nv">rand</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="p">(</span><span class="nf">type-of/env</span><span class="err"> </span><span class="nv">env</span><span class="err"> </span><span class="nv">rator</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       [</span><span class="p">(</span><span class="nf">ARR</span><span class="err"> </span><span class="nv">dom</span><span class="err"> </span><span class="nv">rng</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">and</span><span class="err"> </span><span class="p">(</span><span class="nf">equal?</span><span class="err"> </span><span class="nv">dom</span><span class="err"> </span><span class="p">(</span><span class="nf">type-of/env</span><span class="err"> </span><span class="nv">env</span><span class="err"> </span><span class="nv">rand</span><span class="p">))</span>
+</span><span class='line'>  <span class="err">             </span><span class="nv">rng</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">       [</span><span class="nv">_</span>
+</span><span class='line'>  <span class="err">        </span><span class="no">#f</span><span class="err">]</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">TYAPP</span><span class="err"> </span><span class="nv">rator</span><span class="err"> </span><span class="nv">rand</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="p">(</span><span class="nf">type-of/env</span><span class="err"> </span><span class="nv">env</span><span class="err"> </span><span class="nv">rator</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">       [</span><span class="p">(</span><span class="nf">TYARR</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">body</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">type-of/env</span><span class="err"> </span><span class="nv">env</span><span class="err"> </span><span class="p">(</span><span class="nf">type-subst</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">rand</span><span class="err"> </span><span class="nv">body</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">       [</span><span class="nv">_</span>
+</span><span class='line'>  <span class="err">        </span><span class="no">#f</span><span class="err">]</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">TYABS</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">body</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">TYARR</span><span class="err"> </span><span class="nv">id</span><span class="err"> </span><span class="nv">body</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">SUCC</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">ARR</span><span class="err"> </span><span class="p">(</span><span class="nf">TYNUM</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">TYNUM</span><span class="p">))</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">NUM</span><span class="err"> </span><span class="nv">_</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">TYNUM</span><span class="p">)</span><span class="err">]</span>
+</span><span class='line'>  <span class="err">    [</span><span class="nv">_</span>
+</span><span class='line'>  <span class="err">     </span><span class="no">#f</span><span class="err">]</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At this point, we have a basic and obvious implementation of System F.
+There are a few things annoying about it though, mainly to do with how
+we have to deal with identifiers through the tedious substitution
+function and the ugly use of a type environment.</p>
+
+<p>In the next post, we’ll see how to remedy this through the use of
+higher-order abstract syntax.</p>
+
+<p>By the way, if you use this code at home, make sure you put the code in
+this order:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/match</span><span class="p">)</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="nv">&lt;program-terms&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;type-terms&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;double&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;eval&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;subst&gt;</span>
+</span><span class='line'>  <span class="nv">&lt;type-of&gt;</span>
+</span><span class='line'>  <span class="err"> </span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">rackunit</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">check-equal?</span><span class="err"> </span><span class="p">(</span><span class="nf">eval</span><span class="err"> </span><span class="nv">&lt;example&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">NUM</span><span class="err"> </span><span class="mi">5</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">check-equal?</span><span class="err"> </span><span class="p">(</span><span class="nf">type-of</span><span class="err"> </span><span class="nv">&lt;example&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">TYNUM</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">check-equal?</span><span class="err"> </span><span class="p">(</span><span class="nf">type-of</span><span class="err"> </span><span class="nv">&lt;type-error&gt;</span><span class="p">)</span>
+</span><span class='line'>  <span class="err">              </span><span class="no">#f</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://jeapostrophe.github.com/downloads/code/2012-08-28-system-f-hoas.rkt">Download</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Church Encoding]]></title>

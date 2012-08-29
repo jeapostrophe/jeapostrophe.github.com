@@ -9,9 +9,9 @@
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="One of my favourite ideas in the Lambda Calculus in Church Encoding.
-This is the basis of how the Lambda Calculus, with only functions, can
-represent &hellip;">
+  <meta name="description" content="System F is a very powerful programming and type system. It is fun to
+make an interpreter for, but I think it is even more fun to write such
+an &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,53 @@ represent &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/28/system-f-hoas/">System F: Interpreter and Type Checker</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-28T00:00:00-06:00" pubdate data-updated="true">Aug 28<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/28/system-f-hoas/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>System F is a very powerful programming and type system. It is fun to
+make an interpreter for, but I think it is even more fun to write such
+an interpreter using higher-order abstract syntax. In this post, I
+describe how a normal System F interpreter works and next week we’ll see
+the HOAS version.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/08/28/system-f-hoas/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -506,62 +553,6 @@ classic uses of them: implementing threads in user-space.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/18/pipe/">Delimited Pipes</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-18T00:00:00-06:00" pubdate data-updated="true">Jun 18<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/06/18/pipe/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I love continuations. We couldn’t do much of anything on a computer
-without them. But, I love first-class access to continuations (i.e.
-call/cc) even more.</p>
-
-<p>The standard reason is that call/cc allows you to express things that
-are not possible at the user-level without it. For example, generators,
-implicit back-tracking search, threads, etc.</p>
-
-<p>However, many of these use-cases for call/cc use mutation in an
-essential way and have led some to criticize useful uses of call/cc to
-be necessarily tied to mutation.</p>
-
-<p>In this post, I’ll show how call/cc saves use from mutation and produces
-something pretty elegant.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/06/18/pipe/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -584,6 +575,10 @@ something pretty elegant.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/28/system-f-hoas/">System F: Interpreter and Type Checker</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/20/church-encoding/">Church Encoding</a>
       </li>
     
@@ -597,10 +592,6 @@ something pretty elegant.</p>
     
       <li class="post">
         <a href="/blog/2012/07/30/cont-marks3/">Continuation Marks, part III: Marks themselves</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/25/cont-marks2/">Continuation Marks, part II: Parameters</a>
       </li>
     
   </ul>
