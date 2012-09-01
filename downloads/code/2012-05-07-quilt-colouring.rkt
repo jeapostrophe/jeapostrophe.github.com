@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "Quilt Colouring"
+comments: true
 categories:
 - Puzzles
 - Racket

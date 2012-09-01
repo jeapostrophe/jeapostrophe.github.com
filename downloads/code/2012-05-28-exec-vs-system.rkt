@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "exec and Tail-call Optimization"
+comments: true
 categories:
 - Systems
 ---

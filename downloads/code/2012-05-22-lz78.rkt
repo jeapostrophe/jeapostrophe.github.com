@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "An LZ78 Implementation"
+comments: true
 categories:
 - Compression
 - Racket

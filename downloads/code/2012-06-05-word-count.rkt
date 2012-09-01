@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "LaTeX and Word Counts"
+comments: true
 categories:
 - LaTeX
 - Mathematics

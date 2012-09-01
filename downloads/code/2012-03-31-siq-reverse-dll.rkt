@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "Stupid Interview Questions - Introduction + Reversing a Doubly Linked List"
+comments: true
 categories: 
 - Stupid Interview Questions
 - Racket

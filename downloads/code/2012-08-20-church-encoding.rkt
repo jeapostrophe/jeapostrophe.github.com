@@ -7,6 +7,7 @@
       ---
       layout: post
       title: "Church Encoding"
+      comments: true
       categories:
       - Racket
       - Lambda Calculus

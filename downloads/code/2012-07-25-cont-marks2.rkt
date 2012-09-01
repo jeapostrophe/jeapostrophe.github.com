@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "Continuation Marks, part II: Parameters"
+comments: true
 categories:
 - Racket
 - Continuations

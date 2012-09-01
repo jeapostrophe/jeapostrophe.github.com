@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "Professor Layton and the Last Specter, Puzzle #146"
+comments: true
 categories:
 - Puzzles
 - Racket

@@ -7,6 +7,7 @@
       ---
       layout: post
       title: "System F: Interpreter and Type Checker"
+      comments: true
       categories:
       - Racket
       - Lambda Calculus

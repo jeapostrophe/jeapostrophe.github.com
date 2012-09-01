@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "Preemptive Threads with Continuations"
+comments: true
 categories:
 - Racket
 - Continuations

@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "Continuation Marks, part I: Dynamic Wind"
+comments: true
 categories:
 - Racket
 - Continuations

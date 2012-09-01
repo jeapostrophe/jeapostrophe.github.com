@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "Delimited Pipes"
+comments: true
 categories:
 - Racket
 - Continuations

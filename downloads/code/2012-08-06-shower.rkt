@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "The Optimal Shower"
+comments: true
 categories:
 - Efficiency
 ---

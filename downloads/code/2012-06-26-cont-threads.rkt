@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "Cooperative Threads with Continuations"
+comments: true
 categories:
 - Racket
 - Continuations

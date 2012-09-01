@@ -7,6 +7,7 @@
       ---
       layout: post
       title: "DrDr and its archives"
+      comments: true
       categories:
       - Racket
       - Systems

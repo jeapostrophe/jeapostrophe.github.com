@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "Professor Layton and the Diabolical Box, Puzzle #132"
+comments: true
 categories:
 - Puzzles
 - Racket

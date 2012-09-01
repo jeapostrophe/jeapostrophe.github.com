@@ -7,6 +7,7 @@
       ---
       layout: post
       title: "Continuation Marks, part III: Marks themselves"
+      comments: true
       categories:
       - Racket
       - Continuations

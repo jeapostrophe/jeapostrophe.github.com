@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "Domain-Specific Operating Systems: Threads, System Calls, and Continuations"
+comments: true
 categories:
 - Racket
 - Continuations

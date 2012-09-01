@@ -7,6 +7,7 @@
 ---
 layout: post
 title: "A Boggle Solver"
+comments: true
 categories:
 - Puzzles
 - Racket
