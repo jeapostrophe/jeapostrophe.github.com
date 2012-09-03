@@ -9,9 +9,9 @@
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="System F is a very powerful programming and type system. It is fun to
-make an interpreter for, but I think it is even more fun to write such
-an &hellip;">
+  <meta name="description" content="Last time we implemented the obvious version of a System F interpreter
+and type-checker. But, it was annoying to have to implement substitution
+and a &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,54 @@ an &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/03/system-f-hoas-2/">System F: Interpreter and Type Checker, HOAS Style</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-03T00:00:00-06:00" pubdate data-updated="true">Sep 3<span>rd</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/03/system-f-hoas-2/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last time we implemented the obvious version of a System F interpreter
+and type-checker. But, it was annoying to have to implement substitution
+and a type environment, because they are tedious and error-prone
+(especially w.r.t renaming free variables.) This week, we’ll re-present
+them using the binding technique, higher-order abstract syntax, or HOAS
+(which has a bit of an unsightly pronunciation.)</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/09/03/system-f-hoas-2/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -509,50 +557,6 @@ week we’ll change the infrastructure to mimic preemption.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/26/cont-threads/">Cooperative Threads With Continuations</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-26T00:00:00-06:00" pubdate data-updated="true">Jun 26<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/06/26/cont-threads/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>After the last post about continuations, I wanted to show one of the
-classic uses of them: implementing threads in user-space.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/06/26/cont-threads/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -575,6 +579,10 @@ classic uses of them: implementing threads in user-space.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/09/03/system-f-hoas-2/">System F: Interpreter and Type Checker, HOAS style</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/28/system-f-hoas/">System F: Interpreter and Type Checker</a>
       </li>
     
@@ -588,10 +596,6 @@ classic uses of them: implementing threads in user-space.</p>
     
       <li class="post">
         <a href="/blog/2012/08/06/shower/">The Optimal Shower</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/30/cont-marks3/">Continuation Marks, part III: Marks themselves</a>
       </li>
     
   </ul>
