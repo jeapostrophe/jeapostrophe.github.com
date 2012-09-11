@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>The Optimal Shower - Jay McCarthy</title>
+  <title>Linux on a MacBook Air and Nvidia Projector Woes - Jay McCarthy</title>
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="One of my goals in life is to do things very efficiently and get a lot
-done. But throughout my whole five-year marriage, my wife has always &hellip;">
+  <meta name="description" content="When I was quite young, in middle school, I switched from Windows to
+Linux. I initially used Red Hat, but fairly quickly converted to Debian. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ done. But throughout my whole five-year marriage, my wife has always &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/08/06/shower">
+  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/09/10/nvidia-macbook-air-linux">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -81,7 +81,7 @@ done. But throughout my whole five-year marriage, my wife has always &hellip;">
   
   <header>
     
-      <h1 class="entry-title">The Optimal Shower</h1>
+      <h1 class="entry-title">Linux on a MacBook Air and Nvidia Projector Woes</h1>
     
     
       <p class="meta">
@@ -97,7 +97,7 @@ done. But throughout my whole five-year marriage, my wife has always &hellip;">
   
 
 
-<time datetime="2012-08-06T00:00:00-06:00" pubdate data-updated="true">Aug 6<span>th</span>, 2012</time>
+<time datetime="2012-09-10T00:00:00-06:00" pubdate data-updated="true">Sep 10<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -106,14 +106,20 @@ done. But throughout my whole five-year marriage, my wife has always &hellip;">
   </header>
 
 
-  <div class="entry-content"><p>One of my goals in life is to do things very efficiently and get a lot
-done. But throughout my whole five-year marriage, my wife has always
-complained about my long showers, which to her were a waste of time and
-valuable water.</p>
+  <div class="entry-content"><p>When I was quite young, in middle school, I switched from Windows to
+Linux. I initially used Red Hat, but fairly quickly converted to Debian.
+Eventually, when OS X first came out I was very excited and switched to
+the Mac for my personal machines.</p>
 
-<p>As a computer scientist and programmer, I try to use technology to
-optimize my life whenever possible. In this article, I discuss how I
-improved my shower times and my marriage.</p>
+<p>However, more recently, OS X has been becoming less and less Unix-like
+and my tastes for Apple-ism having been reduce, so in December (after
+classes were over), I switched back to Linux. First, I used Ubuntu and
+then I switched to Arch.</p>
+
+<p>However, running Linux on a laptop can be exciting, and a MacBook Air
+with an Nvidia graphics card is particularly exciting. I had a brutal
+problem with my projector setup, but I found the solution. In this post,
+I lay out my tale of woe.</p>
 
 </div>
   
@@ -135,93 +141,120 @@ improved my shower times and my marriage.</p>
     <div class="entry-content" style="margin-top: 1em;">
 
 
-<p>Before I start, two pieces of background information.</p>
+<p>Since it’s September again, it is time to teach class and I need to
+project from my laptop. I’d been using multiple displays for a long time
+with my Mac (I have an external screen in my office), so I presumed that
+I had everything working correctly.</p>
 
-<p>First, in the first two weeks or so of knowing my wife, she happened to
-see me brush my teeth. I left on the water while I brushed and then
-rinsed off with the same stream of water. She was horrified. She told me
-how it was bad to do that and referenced a Public Service Announcement
-from her childhood talking about that which called it out as &#8220;wasting
-Utah.&#8221; (Utah is a desert with very little rain: most places where people
-live get about 15 inches per year.) Based on this, I repented and have
-never left on the water since. (Marriage advice: Do whatever your wife
-says.)</p>
+<p>I use <a href="http://willem.engen.nl/projects/disper/">disper</a> to
+manage my display configurations. From Linux’s perspective, my Air has
+three displays: DFP-0 (the external display when it is connected with
+DVI), DFP-1 (the external display when it is connected with VGA), and
+DFP-2 (the built-in screen.) So I assumed it would be as simple as
+typing <code>disper -c</code> after connecting to clone my desktop across the two
+displays.</p>
 
-<p>Second, I’ve heard of people who take EXTREMELY long showers, like 30
-minutes to an hour. I was more in the 15 minute to 30 minute boat,
-probably averaging around 20 minutes.</p>
+<p>Unfortunately, I got the error message: &#8220;Displays do not share a common
+resolution&#8221;. That’s strange, I think, I distinctly remember using these
+projectors last year, on OS X and getting a decently sized screen
+(1024x768, I believe.) A quick <code>disper -l</code> reveals that my DFP-1 only
+has one resolution: &#8220;640x480&#8221;.</p>
 
-<p>Once we lived together, my wonderful wife started making little comments
-about how long my showers were. I made a few attempts to speed them up.
-The first was to play a set of a few albums during the shower so I’d
-know how long it was taking. Another was to always do the same thing so
-I would have a regular order of operations and thus go a bit faster.
-These didn’t really make a significant difference. I was probably
-consistently at 20 minutes and never more.</p>
+<p>This was right before class, so I just used that resolution only on the
+projector and looked up at the screen when I needed to. Ugly, but
+workable.</p>
 
-<p>Next, I decided that I would &#8220;time&#8221; myself, in a sense, while in the
-shower. I would just count (out loud or in my head) as I was in there.
-This cut off about 5 minutes on average, probably, down to about 15
-minutes.</p>
+<p>The next day I read all about XRandr and how you can add video modes
+using <code>gtf</code> and <code>xrandr</code> and thought I had everything figured out. When
+I went to connect again during a day I didn’t teach, I had an unbearable
+time of getting tons and tons of error messages and no success.</p>
 
-<p>Next, I went a bit further. I would count out each shower
-&#8220;activity&#8221;—such as washing my left arm, etc. I’d give myself to the
-count of five. (But when I counted to five, it probably really lasted
-between 10 and 15 seconds.) This was very effective and dropped me down
-to about 10 minutes per shower.</p>
+<p>I dealt with the small screen in class for a second day.</p>
 
-<p>But I knew I could do better. I just needed some technological help to
-keep me focused.</p>
+<p>After that, I decided that I would connect with OS X on my laptop and
+write down which video modes, resolutions, refresh rates, etc it could
+handle so I could pass the correct arguments to <code>gtf</code>. I was delighted
+when I realized I’d be able to run the projector at 1400x1050 and my
+laptop screen at 1440x900 and have them share a 1400x900 desktop. This
+wasn’t the default in OS X, but it was an option.</p>
 
-<p>Here’s the concept:</p>
+<p>Booting back to Linux, I had a harrowing experience trying to override
+the X server settings to get this mode enabled. Nothing.</p>
 
-<ul>
-<li><p>Plan out every activity that you’re going to do. I came up with 22
-things on days I washed my hair and 15 for other days.</p></li>
-<li><p>Give yourself 10 seconds per activity.</p></li>
-<li><p>Have a music file that &#8220;announces&#8221; what activity you should be doing
-at each time.</p></li>
-<li><p>Make it exciting by playing intense music (different music for each
-activity) during the activity.</p></li>
-<li><p>End with a horrible alarm so you will get /out/ of the shower
-immediately.</p></li>
-</ul>
+<p>At this point, I realized that I originally chose <code>disper</code> rather than
+<code>xrandr</code> because Nvidia cards haven’t always fully supported <code>xrandr</code>,
+but used another &#8220;meta mode&#8221; system instead. I decided to use a meta
+mode:</p>
 
+<p><code>nvidia-settings –assign CurrentMetaMode="DFP-2: 1440x900 {
+ViewPortIn=1400x900, ViewPortOut=1400x900+20+0 }, DFP-1: 1400x1050 {
+ViewPortIn=1400x900, ViewPortOut=1400x900+0+75 }"</code></p>
 
-<p>With this concept in mind, I created two MP3s:</p>
+<p>Unfortunately, this failed too, and would sometimes crash my X server.
+But I was able to at least mirror the screen on the projector on my
+laptop, but it was a small resolution (640x480) and it was unscaled on
+my computer, so it was a tiny little box:</p>
 
-<ul>
-<li><p><a href="/downloads/code/tmp/2012-08-06-shower.mp3">The Shower
-Song</a></p></li>
-<li><p><a href="/downloads/code/tmp/2012-08-06-shower-hair.mp3">The Shower
-Song (w/ hair)</a></p></li>
-</ul>
+<p><code>nvidia-settings –assign CurrentMetaMode="DFP-2: 1440x900 {
+ViewPortIn=640x480, ViewPortOut=640x480+400+210 }, DFP-1: 640x480 {
+ViewPortIn=640x480, ViewPortOut=640x480+0+0 }"</code></p>
 
+<p>But I continued to try&#8230;</p>
 
-<p>As my background music, I used the soundtrack for Mega Man 2 for the
-NES, by Capcom. For the announcer, I used the espeak system. For the
-alarm, I found a horrible alarm on freesound.org.</p>
+<p>I inspected the logs and found that I got the error message &#8220;Unable to
+read EDID for display device DFP-1&#8221;. A quick run to Wikipedia told me
+that EDID is the format for giving the valid display frequencies for
+devices&#8230; so maybe OS X was reading it correctly but Linux wasn’t?</p>
 
-<p>With this in place, my showers are now either 2:43 (including alarm) or
-3:51 (including alarm), depending on whether I am washing my hair on
-that day. Normally I have about 10 seconds of alarm while I’m drying
-off, though.</p>
+<p>I found an OS X app that would save EDID data and saved mine for the
+projector (after booting into OS X.) Unfortunately after parsing it, it
+said that it was fake data and that actually the EDID couldn’t be read.
+Defeated again.</p>
 
-<p>Whereas before, a shower would keep me comfortable and lull me back to
-sleep a little, now showers are a frenetic rush as I try to get
-everything done in about 10 seconds. It is exhilarating and extremely
-satisfying to have so much more free time as part of my morning.</p>
+<p>This was a fruitful path though, because it made me discover the
+<code>ModeValidation</code> option in my X config where I could add
+<code>AllowNonEdidModes</code> so that the X server wouldn’t insist on only using
+modes that were given by the EDID block.</p>
 
-<p>You can see the program I used to generate the audio here:</p>
+<p>Failure.</p>
 
-<p><a
-href="https://github.com/jeapostrophe/exp/blob/master/shower.rkt">shower.rkt</a></p>
+<p>Next, I tried to turn off other checks on valid modes:</p>
 
-<p>I highly recommend trying this out.</p>
+<p><code>NoHorizSyncCheck</code></p>
 
-<p>You may be wondering what my wife thinks about this. When I first told
-her my plan, I don’t think she believed me. But then after I used it for
-the first time, she just laughed at me for a while.</p>
+<p>Failure.</p>
+
+<p><code>NoVertRefreshCheck</code></p>
+
+<p>Failure.</p>
+
+<p><code>NoDFPNativeResolutionCheck</code></p>
+
+<p>Failure.</p>
+
+<p>I had almost given up. I decided to read through the entire Nvidia X
+configuration manual and I discovered the <code>ModeDebug</code> option that would
+give detailed reasons for why certain modes were not allowed. I turned
+that on, restarted X, and tried to use the big resolution&#8230;</p>
+
+<p>The error message was &#8220;pixel clock exceeds maximum EDID pixel clock&#8221;. I
+don’t know what a pixel clock is, but I looked in the manual and found
+another mode validation override:</p>
+
+<p><code>NoEdidMaxPClkCheck</code></p>
+
+<p>Success.</p>
+
+<p>Now, I can use my projector at the full resolution. And it’s beautiful.</p>
+
+<p>It’s days like this that make you proud to be a Linux user. I’ve subdued
+the computer and made it do exactly what I want. It feels glorious.</p>
+
+<p>The only remaining problems I have with the laptop are&#8230; the microphone
+doesn’t work and sometimes (maybe once every three weeks) the X server
+will segfault, normally right after coming back from sleep. This last
+thing is the worst because there’s no way to reset the video settings,
+so I have to reboot. The saga will continue&#8230;</p>
 </div>
   
 
@@ -245,12 +278,12 @@ the first time, she just laughed at me for a while.</p>
   
 
 
-<time datetime="2012-08-06T00:00:00-06:00" pubdate data-updated="true">Aug 6<span>th</span>, 2012</time>
+<time datetime="2012-09-10T00:00:00-06:00" pubdate data-updated="true">Sep 10<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/efficiency/'>Efficiency</a>
+    <a class='category' href='/blog/categories/apple/'>Apple</a>, <a class='category' href='/blog/categories/linux/'>Linux</a>, <a class='category' href='/blog/categories/nvidia/'>Nvidia</a>
   
 </span>
 
@@ -259,7 +292,7 @@ the first time, she just laughed at me for a while.</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/08/06/shower/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/08/06/shower/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/09/10/nvidia-macbook-air-linux/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/09/10/nvidia-macbook-air-linux/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -272,10 +305,8 @@ the first time, she just laughed at me for a while.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/07/30/cont-marks3/" title="Previous Post: Continuation Marks, part III: Marks themselves">&laquo; Continuation Marks, part III: Marks themselves</a>
+        <a class="basic-alignment left" href="/blog/2012/09/03/system-f-hoas-2/" title="Previous Post: System F: Interpreter and Type Checker, HOAS style">&laquo; System F: Interpreter and Type Checker, HOAS style</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/08/13/drdr-archive/" title="Next Post: DrDr and its archives">DrDr and its archives &raquo;</a>
       
     </p>
   </footer>
@@ -432,8 +463,8 @@ the first time, she just laughed at me for a while.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jeapostrophe.github.com/blog/2012/08/06/shower/';
-        var disqus_url = 'http://jeapostrophe.github.com/blog/2012/08/06/shower/';
+        var disqus_identifier = 'http://jeapostrophe.github.com/blog/2012/09/10/nvidia-macbook-air-linux/';
+        var disqus_url = 'http://jeapostrophe.github.com/blog/2012/09/10/nvidia-macbook-air-linux/';
         var disqus_script = 'embed.js';
       
     (function () {

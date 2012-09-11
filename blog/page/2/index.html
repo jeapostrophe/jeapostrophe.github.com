@@ -9,8 +9,8 @@
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="After the last post about continuations, I wanted to show one of the
-classic uses of them: implementing threads in user-space. ">
+  <meta name="description" content="Last week, we covered cooperative threading with continuations. This
+week we’ll change the infrastructure to mimic preemption. ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,50 @@ classic uses of them: implementing threads in user-space. ">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/02/cont-preempt/">Preemptive Threads With Continuations</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-02T00:00:00-06:00" pubdate data-updated="true">Jul 2<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/07/02/cont-preempt/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last week, we covered cooperative threading with continuations. This
+week we’ll change the infrastructure to mimic preemption.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/07/02/cont-preempt/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -544,56 +588,9 @@ questions. In this introduction to the series:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132/">Professor Layton and the Diabolical Box, Puzzle #132</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-06-30T00:00:00-06:00" pubdate data-updated="true">Jun 30<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I try to solve a puzzle of some kind every morning. I use
-<a href="https://en.wikipedia.org/wiki/Sudoku">Sudoku</a>,
-<a href="https://en.wikipedia.org/wiki/Picross">Picross</a>, and often, <a href="https://en.wikipedia.org/wiki/Professor_Layton">Professor
-Layton</a>. Sometimes it is
-convenient to write a program to solve some of the more annoying
-&#8220;search&#8221; puzzles. I’ll post the Racket programs with a little bit of
-commentary.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/3/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -615,6 +612,10 @@ commentary.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/09/10/nvidia-macbook-air-linux/">Linux on a MacBook Air and Nvidia Projector Woes</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/09/03/system-f-hoas-2/">System F: Interpreter and Type Checker, HOAS style</a>
       </li>
     
@@ -628,10 +629,6 @@ commentary.</p>
     
       <li class="post">
         <a href="/blog/2012/08/13/drdr-archive/">DrDr and its archives</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/06/shower/">The Optimal Shower</a>
       </li>
     
   </ul>

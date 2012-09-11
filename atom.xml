@@ -4,7 +4,7 @@
   <title><![CDATA[Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-09-03T08:54:00-06:00</updated>
+  <updated>2012-09-10T19:38:22-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -12,6 +12,146 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Linux on a MacBook Air and Nvidia Projector Woes]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/09/10/nvidia-macbook-air-linux/"/>
+    <updated>2012-09-10T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/09/10/nvidia-macbook-air-linux</id>
+    <content type="html"><![CDATA[<p>When I was quite young, in middle school, I switched from Windows to
+Linux. I initially used Red Hat, but fairly quickly converted to Debian.
+Eventually, when OS X first came out I was very excited and switched to
+the Mac for my personal machines.</p>
+
+<p>However, more recently, OS X has been becoming less and less Unix-like
+and my tastes for Apple-ism having been reduce, so in December (after
+classes were over), I switched back to Linux. First, I used Ubuntu and
+then I switched to Arch.</p>
+
+<p>However, running Linux on a laptop can be exciting, and a MacBook Air
+with an Nvidia graphics card is particularly exciting. I had a brutal
+problem with my projector setup, but I found the solution. In this post,
+I lay out my tale of woe.</p>
+
+<!-- more -->
+
+
+<p>Since it’s September again, it is time to teach class and I need to
+project from my laptop. I’d been using multiple displays for a long time
+with my Mac (I have an external screen in my office), so I presumed that
+I had everything working correctly.</p>
+
+<p>I use <a href="http://willem.engen.nl/projects/disper/">disper</a> to
+manage my display configurations. From Linux’s perspective, my Air has
+three displays: DFP-0 (the external display when it is connected with
+DVI), DFP-1 (the external display when it is connected with VGA), and
+DFP-2 (the built-in screen.) So I assumed it would be as simple as
+typing <code>disper -c</code> after connecting to clone my desktop across the two
+displays.</p>
+
+<p>Unfortunately, I got the error message: &#8220;Displays do not share a common
+resolution&#8221;. That’s strange, I think, I distinctly remember using these
+projectors last year, on OS X and getting a decently sized screen
+(1024x768, I believe.) A quick <code>disper -l</code> reveals that my DFP-1 only
+has one resolution: &#8220;640x480&#8221;.</p>
+
+<p>This was right before class, so I just used that resolution only on the
+projector and looked up at the screen when I needed to. Ugly, but
+workable.</p>
+
+<p>The next day I read all about XRandr and how you can add video modes
+using <code>gtf</code> and <code>xrandr</code> and thought I had everything figured out. When
+I went to connect again during a day I didn’t teach, I had an unbearable
+time of getting tons and tons of error messages and no success.</p>
+
+<p>I dealt with the small screen in class for a second day.</p>
+
+<p>After that, I decided that I would connect with OS X on my laptop and
+write down which video modes, resolutions, refresh rates, etc it could
+handle so I could pass the correct arguments to <code>gtf</code>. I was delighted
+when I realized I’d be able to run the projector at 1400x1050 and my
+laptop screen at 1440x900 and have them share a 1400x900 desktop. This
+wasn’t the default in OS X, but it was an option.</p>
+
+<p>Booting back to Linux, I had a harrowing experience trying to override
+the X server settings to get this mode enabled. Nothing.</p>
+
+<p>At this point, I realized that I originally chose <code>disper</code> rather than
+<code>xrandr</code> because Nvidia cards haven’t always fully supported <code>xrandr</code>,
+but used another &#8220;meta mode&#8221; system instead. I decided to use a meta
+mode:</p>
+
+<p><code>nvidia-settings –assign CurrentMetaMode="DFP-2: 1440x900 {
+ViewPortIn=1400x900, ViewPortOut=1400x900+20+0 }, DFP-1: 1400x1050 {
+ViewPortIn=1400x900, ViewPortOut=1400x900+0+75 }"</code></p>
+
+<p>Unfortunately, this failed too, and would sometimes crash my X server.
+But I was able to at least mirror the screen on the projector on my
+laptop, but it was a small resolution (640x480) and it was unscaled on
+my computer, so it was a tiny little box:</p>
+
+<p><code>nvidia-settings –assign CurrentMetaMode="DFP-2: 1440x900 {
+ViewPortIn=640x480, ViewPortOut=640x480+400+210 }, DFP-1: 640x480 {
+ViewPortIn=640x480, ViewPortOut=640x480+0+0 }"</code></p>
+
+<p>But I continued to try&#8230;</p>
+
+<p>I inspected the logs and found that I got the error message &#8220;Unable to
+read EDID for display device DFP-1&#8221;. A quick run to Wikipedia told me
+that EDID is the format for giving the valid display frequencies for
+devices&#8230; so maybe OS X was reading it correctly but Linux wasn’t?</p>
+
+<p>I found an OS X app that would save EDID data and saved mine for the
+projector (after booting into OS X.) Unfortunately after parsing it, it
+said that it was fake data and that actually the EDID couldn’t be read.
+Defeated again.</p>
+
+<p>This was a fruitful path though, because it made me discover the
+<code>ModeValidation</code> option in my X config where I could add
+<code>AllowNonEdidModes</code> so that the X server wouldn’t insist on only using
+modes that were given by the EDID block.</p>
+
+<p>Failure.</p>
+
+<p>Next, I tried to turn off other checks on valid modes:</p>
+
+<p><code>NoHorizSyncCheck</code></p>
+
+<p>Failure.</p>
+
+<p><code>NoVertRefreshCheck</code></p>
+
+<p>Failure.</p>
+
+<p><code>NoDFPNativeResolutionCheck</code></p>
+
+<p>Failure.</p>
+
+<p>I had almost given up. I decided to read through the entire Nvidia X
+configuration manual and I discovered the <code>ModeDebug</code> option that would
+give detailed reasons for why certain modes were not allowed. I turned
+that on, restarted X, and tried to use the big resolution&#8230;</p>
+
+<p>The error message was &#8220;pixel clock exceeds maximum EDID pixel clock&#8221;. I
+don’t know what a pixel clock is, but I looked in the manual and found
+another mode validation override:</p>
+
+<p><code>NoEdidMaxPClkCheck</code></p>
+
+<p>Success.</p>
+
+<p>Now, I can use my projector at the full resolution. And it’s beautiful.</p>
+
+<p>It’s days like this that make you proud to be a Linux user. I’ve subdued
+the computer and made it do exactly what I want. It feels glorious.</p>
+
+<p>The only remaining problems I have with the laptop are&#8230; the microphone
+doesn’t work and sometimes (maybe once every three weeks) the X server
+will segfault, normally right after coming back from sleep. This last
+thing is the worst because there’s no way to reset the video settings,
+so I have to reboot. The saga will continue&#8230;</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[System F: Interpreter and Type Checker, HOAS style]]></title>
@@ -351,7 +491,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-09-03-system-f-hoas-2.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -731,7 +871,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-08-28-system-f-hoas.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -1043,7 +1183,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-08-20-church-encoding.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -1586,7 +1726,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-07-30-cont-marks3.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -1913,7 +2053,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-07-25-cont-marks2.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -2481,7 +2621,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-07-16-cont-marks.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -2915,7 +3055,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-07-12-cont-syscall.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -3212,7 +3352,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-07-02-cont-preempt.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -3604,7 +3744,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-06-26-cont-threads.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -4108,7 +4248,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-06-18-pipe.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -4876,7 +5016,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-05-22-lz78.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -5294,7 +5434,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-05-14-boggle.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -5849,7 +5989,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-05-07-quilt-colouring.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -6051,7 +6191,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-05-07-professor-layton-and-the-last-specter-puzzle-146.rkt">Download</a></p>
+
 ]]></content>
   </entry>
   
@@ -6390,175 +6530,7 @@ this order:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="http://jeapostrophe.github.com/downloads/code/2012-03-31-siq-reverse-dll.rkt">Download</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Professor Layton and the Diabolical Box, Puzzle #132]]></title>
-    <link href="http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132/"/>
-    <updated>2011-06-30T00:00:00-06:00</updated>
-    <id>http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132</id>
-    <content type="html"><![CDATA[<p>I try to solve a puzzle of some kind every morning. I use
-<a href="https://en.wikipedia.org/wiki/Sudoku">Sudoku</a>,
-<a href="https://en.wikipedia.org/wiki/Picross">Picross</a>, and often, <a href="https://en.wikipedia.org/wiki/Professor_Layton">Professor
-Layton</a>. Sometimes it is
-convenient to write a program to solve some of the more annoying
-&#8220;search&#8221; puzzles. I’ll post the Racket programs with a little bit of
-commentary.</p>
 
-<!-- more -->
-
-
-<p>This is for <a href="http://tinyurl.com/6pjbzrs">Puzzle 132</a>. Here is the
-puzzle:</p>
-
-<blockquote><p>Two brothers have inherited their parents’ five-piece art collection.
-According to the will, the older brother will get a set of paintings
-worth twice what the younger brother gets. In order to ascertain the
-value of the paintings, the brothers called in an appraiser, who valued
-each painting as shown below. For his services, the appraiser was
-promised the one painting left over after the brothers divided the art
-according to their parents’ wishes.</p>
-
-<p>Assuming that individual paintings can’t be divided, which one does
-the appraiser get?</p></blockquote>
-
-<p>There is then a picture of five paintings with prices underneath. They
-are: A worth 20,000, B worth 60,000, C worth 55,000, D worth 45,000, E
-worth 95,000.</p>
-
-<p>I encoded this information into a vector in Racket:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;paintings&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">paintings</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">vector</span><span class="err"> </span><span class="mi">20</span><span class="err"> </span><span class="mi">60</span><span class="err"> </span><span class="mi">55</span><span class="err"> </span><span class="mi">45</span><span class="err"> </span><span class="mi">95</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We won’t keep track of the labels, we’ll just remember that, for
-example, 0 is A and 4 is E. Also, we divide everything by 1,000 so we
-don’t have to type so much.</p>
-
-<p>The basic algorithm we’ll use is a trivial search: try assigning each
-painting to each brother and stop when the value of the older brother’s
-paintings is twice that of the younger.</p>
-
-<p>The trick, however, is that we’ll represent the assignment as the older
-brother’s set combined with the younger brother’s set. We’ll do this
-simultaneously with a bit-vector, where the 1s indicate that the older
-brother gets it and the 0s indicate that the younger brother does. We’ll
-independently pick one painting which will be &#8220;left over&#8221; that the
-appraiser will get. Here’s the main loop:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;solver&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">for*</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">assignment</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="mi">31</span><span class="p">))</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">       [</span><span class="nv">appraiser</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">vector-length</span><span class="err"> </span><span class="nv">paintings</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">older-value</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">assignment-&gt;value</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">appraiser</span><span class="err"> </span><span class="no">#t</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">younger-value</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">assignment-&gt;value</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">appraiser</span><span class="err"> </span><span class="no">#f</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="p">(</span><span class="nf">=</span><span class="err"> </span><span class="nv">older-value</span><span class="err"> </span><span class="p">(</span><span class="nf">*</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="nv">younger-value</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">return</span><span class="err"> </span><span class="nv">appraiser</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>One thing to note here: for* is like a nested for—we loop over the
-assignments /and/ loop over every painting each round. (This, by the
-way, means that we do twice as much work because we consider both
-assignments for the appraiser’s painting.)</p>
-
-<p>Two other cute things: First, we use a literal binary number to write
-down the completely full set, but we have to add one to actually visit
-it. Second, the assignment->value function (below) will take an argument
-to determine whether to add up the 1s or the 0s. Here’s it’s definition</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;valuation&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">assignment-&gt;value</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">ignored</span><span class="err"> </span><span class="nv">which</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for/sum</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">painting</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">vector-length</span><span class="err"> </span><span class="nv">paintings</span><span class="p">))</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">            </span><span class="o">#</span><span class="nv">:unless</span><span class="err"> </span><span class="p">(</span><span class="nf">=</span><span class="err"> </span><span class="nv">painting</span><span class="err"> </span><span class="nv">ignored</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">           </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">eq?</span><span class="err"> </span><span class="nv">which</span><span class="err"> </span><span class="p">(</span><span class="nf">bitwise-bit-set?</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">painting</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">vector-ref</span><span class="err"> </span><span class="nv">paintings</span><span class="err"> </span><span class="nv">painting</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">             </span><span class="mi">0</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The for/sum variant adds up the result of each iteration of the loop,
-the #:unless clause skips the iteration where the appraiser’s painting
-is considered, and the if determines which brother we’re considering.</p>
-
-<p>If you know anything about Racket, there may be one more confusing thing
-about the code in <valuation>&#8230; return! Expressions in Racket don’t
-normally have non-local returns like that. How can we make the inner
-area of the loop stop and return the appraiser painting that works? It’s
-simple: bind return to an escape continuation:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;escape-continuation&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">let/ec</span><span class="err"> </span><span class="nv">return</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;solver&gt;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Was this faster or slower than doing it the old fashion way&#8230;? Who
-knows.</p>
-
-<p>Can you work out what the answer is&#8230;?</p>
-
-<p>By the way, if you use this code at home, make sure you put the code in
-this order:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nv">&lt;paintings&gt;</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="nv">&lt;valuation&gt;</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nb">vector-ref </span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">vector</span><span class="err"> </span><span class="ss">&#39;A</span><span class="err"> </span><span class="ss">&#39;B</span><span class="err"> </span><span class="ss">&#39;C</span><span class="err"> </span><span class="ss">&#39;D</span><span class="err"> </span><span class="ss">&#39;E</span><span class="p">)</span>
-</span><span class='line'>  <span class="err"> </span><span class="nv">&lt;escape-continuation&gt;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><a href="http://jeapostrophe.github.com/downloads/code/2011-06-30-professor-layton-and-the-diabolical-box-puzzle-132.rkt">Download</a></p>
 ]]></content>
   </entry>
   

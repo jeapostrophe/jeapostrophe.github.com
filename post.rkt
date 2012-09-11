@@ -19,7 +19,10 @@
             e ...
             "{% endcodeblock %}\n"))
 
+;; (define-syntax (download-link stx)
+;;   (quasisyntax/loc stx @verbatim[(format "[Download](/downloads/code/~a)" #,(path->string (syntax-source-file-name stx)))]))
+
 (define-syntax (download-link stx)
-  (quasisyntax/loc stx @verbatim[(format "[Download](/downloads/code/~a)" #,(path->string (syntax-source-file-name stx)))]))
+  (syntax/loc stx (void)))
 
 (provide (all-defined-out))

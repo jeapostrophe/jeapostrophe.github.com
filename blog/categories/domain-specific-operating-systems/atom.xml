@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Domain-Specific Operating Systems | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/domain-specific-operating-systems/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-09-03T08:54:00-06:00</updated>
+  <updated>2012-09-10T19:38:22-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -513,8 +513,6 @@ this order:</p>
 </span><span class='line'>
 </span><span class='line'><span class="nv">&lt;p&gt;</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p><a href="/downloads/code/2012-07-12-cont-syscall.rkt">Download</a></p>
 ]]></content>
   </entry>
   
