@@ -9,8 +9,9 @@
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="Last week, we covered cooperative threading with continuations. This
-week we’ll change the infrastructure to mimic preemption. ">
+  <meta name="description" content="In the past few posts I’ve been writing about threading system that are
+based on continuations in user-land. This post I’ll extend that system
+to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +79,52 @@ week we’ll change the infrastructure to mimic preemption. ">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/12/cont-syscall/">Domain-Specific Operating Systems: Threads, System Calls, and Continuations</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-12T00:00:00-06:00" pubdate data-updated="true">Jul 12<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/07/12/cont-syscall/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In the past few posts I’ve been writing about threading system that are
+based on continuations in user-land. This post I’ll extend that system
+to provide system calls that control access to sensitive resources, such
+as files and the thread pool.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/07/12/cont-syscall/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -533,61 +580,6 @@ taking?</p></blockquote>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/31/siq-reverse-dll/">Stupid Interview Questions - Introduction + Reversing a Doubly Linked List</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-31T00:00:00-06:00" pubdate data-updated="true">Mar 31<span>st</span>, 2012</time>
-        
-         | <a href="/blog/2012/03/31/siq-reverse-dll/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Stupid interviews ask applicants to write programs on whiteboards or
-pieces of paper without the resources that are normally available when
-programming. These questions purport to be able understanding the
-applicant’s algorithmic design process, but the problems in question are
-almost always so trivial that no interesting thinking is necessary.
-Worse, many of these questions are really more about knowing inane
-tricks than having good design abilities.</p>
-
-<p>Some students in my lab are always talking and worrying about such
-problems. I like to provide unnecessarily silly solutions to some of the
-questions. In this introduction to the series:</p>
-
-<p>How do you reverse a doubly linked list?</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/03/31/siq-reverse-dll/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -612,6 +604,10 @@ questions. In this introduction to the series:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/09/19/omnifocus-and-org-mode/">Switching from OmniFocus to Org-Mode</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/09/10/nvidia-macbook-air-linux/">Linux on a MacBook Air and Nvidia Projector Woes</a>
       </li>
     
@@ -625,10 +621,6 @@ questions. In this introduction to the series:</p>
     
       <li class="post">
         <a href="/blog/2012/08/20/church-encoding/">Church Encoding</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/13/drdr-archive/">DrDr and its archives</a>
       </li>
     
   </ul>
