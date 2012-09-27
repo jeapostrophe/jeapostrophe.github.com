@@ -129,11 +129,10 @@ culminating in my switch from OmniFocus to Org-Mode.</p></div>
 </div>
 
     <div class="entry-content" style="margin-top: 1em;"><p>My first foray into automated systems was a hand-written system called
-&lt;a
-href=&#8221;http://planet.racket-lang.org/display.ss?package=grid.plt&amp;owner=jaymccarthy&#8221;&gt;The
-Grid&lt;/a&gt;. This was a system for keeping track of your obedience to a
-daily regime. Check out this &lt;a
-href=&#8221;http://planet.racket-lang.org/package-source/jaymccarthy/grid.plt/1/2/tour/index.html&#8221;&gt;tour&lt;/a&gt;
+<a href="http://planet.racket-lang.org/display.ss?package=grid.plt&#38;amp;owner=jaymccarthy">The
+Grid</a>. This was a system for keeping track of your obedience to a
+daily regime. Check out this
+<a href="http://planet.racket-lang.org/package-source/jaymccarthy/grid.plt/1/2/tour/index.html">tour</a>
 to see how it worked. You would add a list of things to do and then
 there&rsquo;d be a box to check of every day. From my Grid in the tour, you
 can see that mine were: Kiss Claire (my girlfriend at the time), Eat a
@@ -143,8 +142,8 @@ cards (I wanted to learn how to, so I practiced every day), Write
 left-handed, Speak a foreign language, Write a foreign language, Read
 a scientific paper, Program, Read literature, Dance!, Smell the
 flowers, Talk to my family, and Pray.</p><p>This was awesome and I really enjoyed it.</p><p>Eventually, I wanted to keep track of more things, especially longer
-term things, so I started using &lt;a
-href=&#8221;https://www.omnigroup.com/products/omnifocus/&#8221;&gt;OmniFocus&lt;/a&gt; for
+term things, so I started using
+<a href="https://www.omnigroup.com/products/omnifocus/">OmniFocus</a> for
 the Mac. It was pretty awesome and I enjoyed it. Eventually when the
 iPhone came out and I got one, I got it for the iPhone. But it was
 pretty terrible on there, because the synchronization time was
@@ -162,16 +161,16 @@ and there weren&rsquo;t enough keyboard commands.</p><p>I researched some other 
 with switching to Org-Mode inside of Emacs.</p><p>The main thing to do was to make the interface look as much link
 OmniFocus as possible. Most of the options built-in to Org-Mode
 weren&rsquo;t good enough though, but there were two hooks that I could use:
-the &lsquo;org-agenda-before-sorting-filter-function&lsquo; and
-&lsquo;org-agenda-cmp-user-defined&lsquo;.</p><p>&lsquo;org-agenda-before-sorting-filter-function&lsquo; is run on all the items
+the <span class="stt">org-agenda-before-sorting-filter-function</span> and
+<span class="stt">org-agenda-cmp-user-defined</span>.</p><p><span class="stt">org-agenda-before-sorting-filter-function</span> is run on all the items
 that will be displayed on the agenda before they are sorted&#8230; as the
 name suggests. I programmed mine to (a) remove &#8220;TODO&#8221; from the
 displayed text, because otherwise they all would display it, (b) give
 it a color based on when it was due modeled after the OmniFocus
 colors, and (c) remove it if it was not passed the scheduled time. (c)
 is important, because even though Org-Mode claims to have an option
-that does this, it only looks at the scheduled /date/, not the
-scheduled /time/.</p><p>&lsquo;org-agenda-cmp-user-defined&lsquo; is used to order them and you can&rsquo;t, by
+that does this, it only looks at the scheduled <span style="font-style: italic">date</span>, not the
+scheduled <span style="font-style: italic">time</span>.</p><p><span class="stt">org-agenda-cmp-user-defined</span> is used to order them and you can&rsquo;t, by
 default, order by the deadline, which I wanted.</p><p>Then, I made it so the keybinding I use to view the TODO list (from
 anywhere in Emacs) automatically starts column mode and the column
 format hides everything except the deadline.</p><p>This has solved every problem I had with OmniFocus: it does everything
@@ -179,9 +178,9 @@ the same but is lightning fast.</p><p>There&rsquo;s one feature it doesn&rsquo;t
 around. OmniFocus has parallel and ordered task lists, but Org-Mode
 only has parallel. This just means duplicating some deadlines.</p><p>There&rsquo;s a feature that neither have, but with Org-Mode I can add it
 myself: the ability to skip the weekend for daily repeating tasks. I
-hope to do this eventually, but I don&rsquo;t have it yet.</p><p>You can see my Org-Mode customization starting on &lt;a
-href=&#8221;https://github.com/jeapostrophe/exp/blob/master/.emacs.el#L518&#8221;&gt;L518
-on Github&lt;/a&gt;.</p>
+hope to do this eventually, but I don&rsquo;t have it yet.</p><p>You can see my Org-Mode customization starting on
+<a href="https://github.com/jeapostrophe/exp/blob/master/.emacs.el#L518">L518
+on Github</a>.</p>
 </div>
   
 

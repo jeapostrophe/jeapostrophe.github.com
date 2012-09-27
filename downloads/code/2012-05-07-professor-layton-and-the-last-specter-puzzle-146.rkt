@@ -1,9 +1,9 @@
 #lang scribble/lp
-@(require "../../post.rkt"
+@(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
                      racket/list))
-@yaml{
+@literal{
 ---
 layout: post
 title: "Professor Layton and the Last Specter, Puzzle #146"
@@ -14,7 +14,8 @@ categories:
 ---
 }
 
-This is for [Puzzle 146](http://tinyurl.com/7yefk76). Here is the puzzle:
+This is for @link["http://tinyurl.com/7yefk76"]{Puzzle 146}. Here is
+the puzzle:
 
 > A bookcase has seven shelves each filled with 10 books of the same
 size.
@@ -27,17 +28,17 @@ choose that book.
 > Choosing as many books as possible, how many books will you end up
 taking?
 
-@more
+@(the-jump)
 
 I encoded the bookcase as a hash table in Racket, where the key is the
 coordinate of the book and the value is whether the book has been
 taken.
 
-@chunky[<bookcase>
-        (define bookcase
-          (for*/hash ([shelf (in-range 7)]
-                      [book (in-range 10)])
-                     (values (cons shelf book) #t)))]
+@chunk[<bookcase>
+       (define bookcase
+         (for*/hash ([shelf (in-range 7)]
+                     [book (in-range 10)])
+                    (values (cons shelf book) #t)))]
 
 I didn't know when I wrote it, but I assumed that it would not matter
 what order you picked the books in, so I just considered taking them
@@ -46,13 +47,13 @@ would return the new bookcase, after having removed some books. The
 number of books in this bookcase, subtracted from 70, would give me the
 number selected:
 
-@chunky[<selecting>
-        (define final-bookcase
-          (for*/fold ([bookcase bookcase])
-              ([shelf (in-range 7)]
-               [book (in-range 10)])
-            <loop-body>))
-        (- 70 (hash-count final-bookcase))]
+@chunk[<selecting>
+       (define final-bookcase
+         (for*/fold ([bookcase bookcase])
+             ([shelf (in-range 7)]
+              [book (in-range 10)])
+           <loop-body>))
+       (- 70 (hash-count final-bookcase))]
 
 Inside the loop, it will be convenient to bind an escape continuation
 to return early. The actual loop body is divided into three
@@ -61,19 +62,19 @@ there. Then, we'll make sure it has two books in every
 directions. Finally, we'll return the updated bookcase. The code will
 look like this:
 
-@chunky[<loop-body>
-        (let/ec return
-          <check-this-book>
-          <check-others>
-          <update-bookcase>)]
+@chunk[<loop-body>
+       (let/ec return
+         <check-this-book>
+         <check-others>
+         <update-bookcase>)]
 
 The first part is really simple: just call our predicate and if it
 isn't there, call the escape continuation to jump past the rest of the
 code and leave the bookcase unchanged.
 
-@chunky[<check-this-book>
-        (unless (hash-has-key? bookcase (cons shelf book))
-          (return bookcase))]
+@chunk[<check-this-book>
+       (unless (hash-has-key? bookcase (cons shelf book))
+         (return bookcase))]
 
 The middle part is the most complicated. Here's the idea: we'll loop
 over the eight other different books (the two above, below, to the
@@ -82,29 +83,29 @@ there. If any book isn't there, we'll return from the outer loop with
 the original bookcase, because the conditions aren't met, using the
 escape continuation.
 
-@chunky[<check-others>
-        (define other-book-offsets
-          (list (cons 1 0) (cons 2 0)
-                (cons -1 0) (cons -2 0)
-                (cons 0 1) (cons 0 2)
-                (cons 0 -1) (cons 0 -2)))
-        (define new-bookcase
-          (for*/fold ([new-bookcase bookcase])
-              ([diff (in-list other-book-offsets)])
-            (define new-book
-              (cons (+ shelf (car diff))
-                    (+ book (cdr diff))))
-            (if (hash-has-key? new-bookcase new-book)
-              (hash-remove new-bookcase new-book)
-              (return bookcase))))]
+@chunk[<check-others>
+       (define other-book-offsets
+         (list (cons 1 0) (cons 2 0)
+               (cons -1 0) (cons -2 0)
+               (cons 0 1) (cons 0 2)
+               (cons 0 -1) (cons 0 -2)))
+       (define new-bookcase
+         (for*/fold ([new-bookcase bookcase])
+             ([diff (in-list other-book-offsets)])
+           (define new-book
+             (cons (+ shelf (car diff))
+                   (+ book (cdr diff))))
+           (if (hash-has-key? new-bookcase new-book)
+             (hash-remove new-bookcase new-book)
+             (return bookcase))))]
 
 If the earlier two tests haven't returned, then when we get to the
 third, we'll know all the right conditions are met, so we can remove
 the current book from the bookcase (the one after the other books were
 removed):
 
-@chunky[<update-bookcase>
-        (hash-remove new-bookcase (cons shelf book))]
+@chunk[<update-bookcase>
+       (hash-remove new-bookcase (cons shelf book))]
 
 This technique makes inherent use of functional data-structures,
 because the bookcase is not destructively modified during the trial
@@ -136,8 +137,6 @@ Can you work out what the answer is...?
 By the way, if you use this code at home, make sure you put the code in this
 order:
 
-@chunky[<*>
-        <bookcase>
-        <selecting>]
-
-@download-link
+@chunk[<*>
+       <bookcase>
+       <selecting>]

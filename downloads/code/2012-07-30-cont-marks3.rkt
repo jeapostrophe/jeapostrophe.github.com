@@ -1,42 +1,42 @@
 #lang scribble/lp
-@(require "../../post.rkt"
+@(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
                      racket/list))
-@yaml{
-      ---
-      layout: post
-      title: "Continuation Marks, part III: Marks themselves"
-      comments: true
-      categories:
-      - Racket
-      - Continuations
-      - Continuation Marks
-      ---
-      }
+@literal{
+---
+layout: post
+title: "Continuation Marks, part III: Marks themselves"
+comments: true
+categories:
+- Racket
+- Continuations
+- Continuation Marks
+---
+}
 
 The last two weeks we've seen the basic ideas behind continuation
 marks, but we've never actually used them. This week we show the
 actual feature.
 
-@more
+@(the-jump)
 
 As usual, we'll return to the example from last time:
 
-@chunky[<example>
-        (define show-structure
-          (match-lambda
-           [(list e ...)
-            (with-indentation
-             (λ () (for-each show-structure e)))]
-           [(? number? x)
-            (displayln/indent x)]))
-        (show-structure
-         (list (list 1 2) 3 (list 4 5) 6 (list 7 (list 8) 9)))]
+@chunk[<example>
+       (define show-structure
+         (match-lambda
+          [(list e ...)
+           (with-indentation
+            (λ () (for-each show-structure e)))]
+          [(? number? x)
+           (displayln/indent x)]))
+       (show-structure
+        (list (list 1 2) 3 (list 4 5) 6 (list 7 (list 8) 9)))]
 
 which prints as:
 
-@verbatim:codeblock{
+@verbatim{
   1
   2
  3
@@ -51,16 +51,16 @@ which prints as:
 where we relied on the parameter feature of Racket to implement the
 indentation tracking:
 
-@chunky[<params>
-        (define indent-level (make-parameter 0))
-        (define (with-indentation t)
-          (define originally (indent-level))
-          (parameterize ([indent-level (add1 originally)])
-            (t)))
-        (define (displayln/indent x)
-          (for ([i (in-range (indent-level))])
-            (display " "))
-          (displayln x))]
+@chunk[<params>
+       (define indent-level (make-parameter 0))
+       (define (with-indentation t)
+         (define originally (indent-level))
+         (parameterize ([indent-level (add1 originally)])
+           (t)))
+       (define (displayln/indent x)
+         (for ([i (in-range (indent-level))])
+           (display " "))
+         (displayln x))]
 
 We can read @racket[parameterize] as annotating the context of the
 @racket[t] evaluation with information that says "the indentation
@@ -70,21 +70,21 @@ a convenient interface.
 The annotation could be expressed directly by "marking" (annotating)
 the "continuation" (context):
 
-@chunky[<marks>
-        (define (indent-level)
-          (continuation-mark-set-first
-           (current-continuation-marks)
-           'indent-level
-           0))
-        (define (with-indentation t)
-          (define originally (indent-level))
-          (with-continuation-mark
-           'indent-level (add1 originally)
-           (t)))
-        (define (displayln/indent x)
-          (for ([i (in-range (indent-level))])
-            (display " "))
-          (displayln x))]
+@chunk[<marks>
+       (define (indent-level)
+         (continuation-mark-set-first
+          (current-continuation-marks)
+          'indent-level
+          0))
+       (define (with-indentation t)
+         (define originally (indent-level))
+         (with-continuation-mark
+          'indent-level (add1 originally)
+          (t)))
+       (define (displayln/indent x)
+         (for ([i (in-range (indent-level))])
+           (display " "))
+         (displayln x))]
 
 The only apparent differences are that we use
 @racket[with-continuation-mark] rather than @racket[parameterize], use
@@ -103,19 +103,19 @@ see them all.
 Here's a factorial function, with continuation marks annotating its
 arguments:
 
-@chunky[<fac>
-        (define (fac n)
-          (cond
-            [(zero? n)
-             (displayln
-              (continuation-mark-set->list*
-               (current-continuation-marks) '(fac)))
-             1]
-            [else
-             (with-continuation-mark
-              'fac n
-              (* n (fac (sub1 n))))]))
-        (fac 3)]
+@chunk[<fac>
+       (define (fac n)
+         (cond
+           [(zero? n)
+            (displayln
+             (continuation-mark-set->list*
+              (current-continuation-marks) '(fac)))
+            1]
+           [else
+            (with-continuation-mark
+             'fac n
+             (* n (fac (sub1 n))))]))
+       (fac 3)]
 
 If you run this code, it prints out a list containing 1, 2, and
 3---the annotations around the call to @racket[(fac 0)]. This is
@@ -129,23 +129,23 @@ could be used for other runtime inspection purposes.
 Continuation marks behave specially when the annotation is in tail
 position. (Recall that this is why @racket[parameterize] is more
 efficient than @racket[dynamic-wind].) Since in tail position there is
-not a /new/ continuation, there is only space for one mark, so any new
+not a @emph{new} continuation, there is only space for one mark, so any new
 marks destroy old marks. A tail-recursive version of factorial
 demonstrates the difference:
 
-@chunky[<fac-tr>
-        (define (fac-tr n acc)
-          (cond
-            [(zero? n)
-             (displayln
-              (continuation-mark-set->list*
-               (current-continuation-marks) '(fac)))
-             acc]
-            [else
-             (with-continuation-mark
-              'fac n
-              (fac-tr (sub1 n) (* n acc)))]))
-        (fac-tr 3 1)]
+@chunk[<fac-tr>
+       (define (fac-tr n acc)
+         (cond
+           [(zero? n)
+            (displayln
+             (continuation-mark-set->list*
+              (current-continuation-marks) '(fac)))
+            acc]
+           [else
+            (with-continuation-mark
+             'fac n
+             (fac-tr (sub1 n) (* n acc)))]))
+       (fac-tr 3 1)]
 
 This program only prints out 1, because the single continuation only
 has space for one mark and each recursion annihilates it. 
@@ -166,22 +166,20 @@ another story.
 By the way, if you use this code at home, make sure you put the code
 in this order:
 
-@chunky[<*>
-        (require racket/match)
+@chunk[<*>
+       (require racket/match)
 
-        (let ()
-          (printf "Params\n")
-          <params>
-          <example>)
+       (let ()
+         (printf "Params\n")
+         <params>
+         <example>)
 
-        (let ()
-          (printf "Marks\n")
-          <marks>
-          <example>)
+       (let ()
+         (printf "Marks\n")
+         <marks>
+         <example>)
 
-        <fac>
-        <fac-tr>
+       <fac>
+       <fac-tr>
 
-        (printf "Done\n")]
-
-@download-link
+       (printf "Done\n")]

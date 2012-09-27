@@ -1,10 +1,10 @@
 #lang scribble/lp
-@(require "../../post.rkt"
+@(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
                      racket/list))
 
-@yaml{
+@literal{
 ---
 layout: post
 title: "The Optimal Shower"
@@ -23,7 +23,7 @@ As a computer scientist and programmer, I try to use technology to
 optimize my life whenever possible. In this article, I discuss how I
 improved my shower times and my marriage.
 
-@more
+@(the-jump)
 
 Before I start, two pieces of background information.
 
@@ -81,9 +81,9 @@ immediately.
 
 With this concept in mind, I created two MP3s:
 
-* <a href="/downloads/code/tmp/2012-08-06-shower.mp3">The Shower Song</a>
+* @link["/downloads/code/tmp/2012-08-06-shower.mp3"]{The Shower Song}
 
-* <a href="/downloads/code/tmp/2012-08-06-shower-hair.mp3">The Shower Song (w/ hair)</a>
+* @link["/downloads/code/tmp/2012-08-06-shower-hair.mp3"]{The Shower Song (w/ hair)}
 
 As my background music, I used the soundtrack for Mega Man 2 for the
 NES, by Capcom. For the announcer, I used the espeak system. For the
@@ -101,7 +101,7 @@ satisfying to have so much more free time as part of my morning.
 
 You can see the program I used to generate the audio here:
 
-<a href="https://github.com/jeapostrophe/exp/blob/master/shower.rkt">shower.rkt</a>
+@link["https://github.com/jeapostrophe/exp/blob/master/shower.rkt"]{shower.rkt}
 
 I highly recommend trying this out.
 

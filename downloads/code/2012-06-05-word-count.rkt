@@ -1,9 +1,9 @@
 #lang scribble/lp
-@(require "../../post.rkt"
+@(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
                      racket/list))
-@yaml{
+@literal{
 ---
 layout: post
 title: "LaTeX and Word Counts"
@@ -24,7 +24,7 @@ necessarily the word count.
 
 I was opposed to this proposal on technical grounds.
 
-@more
+@(the-jump)
 
 My rationale was that it is easy to manually count pages, but
 difficult (and not worth it) to count words AND manual counting is the
@@ -37,7 +37,7 @@ document and report it when the document was turned in.
 I, however, like all True Computer Scientists use LaTeX (and Scribble)
 to prepare my documents, via rendering to PostScript or PDF.
 
-# Word Counts from PostScript
+@blogsection{Word Counts from PostScript}
 
 You may think that you could just count the words directly from the
 PostScript. This is not the case, however.
@@ -60,7 +60,7 @@ But, is it really surprising that it is hard to learn higher-level
 things about a program from its compiled form? What if we looked
 directly at the LaTeX?
 
-# Word Counts from LaTeX
+@blogsection{Word Counts from LaTeX}
 
 Unfortunately, LaTeX is a Lambda-complete language due to its advanced
 macro system. By writing macros, you can add new output (words) to the
@@ -76,7 +76,7 @@ I wanted to demonstrate this to those on the committee, so I wrote a
 short example program that had a very difficult to discover word
 count.
 
-# The Collatz Conjecture
+@blogsection{The Collatz Conjecture}
 
 The Collatz Conjecture, proposed in 1937, states that if you take any
 natural number, n, and repeat on either n/2 if n is even or 3n+1 if n
@@ -90,13 +90,13 @@ sequences include 1.) For example, the sequence for 6 is 6, 3, 10, 5,
 The Collatz Conjecture has not been proved, nor has any
 counter-example been discovered.
 
-# The Collatz Sequence in LaTeX
+@blogsection{The Collatz Sequence in LaTeX}
 
 Below is a short LaTeX file that renders to the Collatz sequence of a
 random integer between 0 and 1,000,000,000:
 
+@filebox["collatz.tex"]{
 @verbatim{
-{% codeblock collatz.tex %}
 \documentclass{article}
 \usepackage{fp}
 
@@ -124,14 +124,13 @@ random integer between 0 and 1,000,000,000:
 \begin{document}
 \collatz
 \end{document}
-{% endcodeblock %}
-}
+}}
 
 This 27 line program demonstrates the absurd power of LaTeX. When you
 run it, sometimes you get pages and pages of numbers. Other times, the
 number of words will be so small it fits on just a few lines.
 
-# Word Counts from LaTeX (redux)
+@blogsection{Word Counts from LaTeX (redux)}
 
 The beauty of this program is that you can't tell how many words will
 be in the output by looking at the program source or the output,
@@ -143,22 +142,21 @@ hacked version of LaTeX that computer the word count as it went. But,
 of course, there are ways around the hacked version like by inserting
 negative space sequences:
 
+@filebox["negspace.tex"]{
 @verbatim{
-{% codeblock negspace.tex %}
 \documentclass{article}
 \begin{document}
 The qui \hspace{+9.5px}brown\hspace{-39.5px}ck
 
 The quick brown
 \end{document}
-{% endcodeblock %}
-}
+}}
 
 This document appears to have six words to the human eye, but I am
 highly skeptical of any analysis that would decide that from the seven
 word-like tokens in the source.
 
-# The Resolution
+@blogsection{The Resolution}
 
 Naturally, this argument swayed the rest of the committee and we stuck
 with page limits rather than switching to word limits.

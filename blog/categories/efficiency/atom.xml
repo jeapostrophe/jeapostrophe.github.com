@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Efficiency | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/efficiency/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-09-27T15:17:18-06:00</updated>
+  <updated>2012-09-27T16:35:43-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -102,10 +102,10 @@ immediately.</p>
 <p>With this concept in mind, I created two MP3s:</p>
 
 
-<p>* &lt;a href="http://jeapostrophe.github.com/downloads/code/tmp/2012-08-06-shower.mp3"&gt;The Shower Song&lt;/a&gt;</p>
+<p>* <a href="http://jeapostrophe.github.com/downloads/code/tmp/2012-08-06-shower.mp3">The Shower Song</a></p>
 
 
-<p>* &lt;a href="http://jeapostrophe.github.com/downloads/code/tmp/2012-08-06-shower-hair.mp3"&gt;The Shower Song (w/ hair)&lt;/a&gt;</p>
+<p>* <a href="http://jeapostrophe.github.com/downloads/code/tmp/2012-08-06-shower-hair.mp3">The Shower Song (w/ hair)</a></p>
 
 
 <p>As my background music, I used the soundtrack for Mega Man 2 for the
@@ -128,7 +128,7 @@ satisfying to have so much more free time as part of my morning.</p>
 <p>You can see the program I used to generate the audio here:</p>
 
 
-<p>&lt;a href="https://github.com/jeapostrophe/exp/blob/master/shower.rkt"&gt;shower.rkt&lt;/a&gt;</p>
+<p><a href="https://github.com/jeapostrophe/exp/blob/master/shower.rkt">shower.rkt</a></p>
 
 
 <p>I highly recommend trying this out.</p>

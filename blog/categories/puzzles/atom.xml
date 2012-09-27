@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Puzzles | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/puzzles/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-09-27T15:17:18-06:00</updated>
+  <updated>2012-09-27T16:35:43-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -43,7 +43,7 @@ representing the dictionary and representing the board. Once these are
 in place, the result is pretty obvious.</p>
 
 
-<p># The board</p>
+<h3><a name="(part._.The_board)"></a>The board</h3>
 
 
 <p>Let&rsquo;s start with the board. We&rsquo;ll represent it as a hash table mapping
@@ -70,7 +70,7 @@ the board is pretty convenient:</p>
 printer.)</p>
 
 
-<p># The dictionary</p>
+<h3><a name="(part._.The_dictionary)"></a>The dictionary</h3>
 
 
 <p>The more interesting decision comes from how we&rsquo;ll represent the
@@ -125,7 +125,7 @@ wouldn&rsquo;t change with a different list.</p>
 the total to 24. (I don&rsquo;t count the test.)</p>
 
 
-<p># The solver</p>
+<h3><a name="(part._.The_solver)"></a>The solver</h3>
 
 
 <p>Now that we have our data-structures ready, it&rsquo;s a pretty straight
@@ -204,7 +204,7 @@ still quite simple.</p>
 <p>This actually concludes the solution, which is a whopping 19 lines!</p>
 
 
-<p># The whole program</p>
+<h3><a name="(part._.The_whole_program)"></a>The whole program</h3>
 
 
 <p>The whole program is a mere 43 lines of essential code but is a
@@ -276,11 +276,11 @@ don&rsquo;t want pink and red in the same corner (but pink and red in a
 block is okay.) Similarly with green and green plaid.</p>
 
 
-<p>She&rsquo;s a [mathematician](http://icme.stanford.edu/index.php), so she
-knows about the [Four color
-theorem](https://en.wikipedia.org/wiki/Four_color_theorem). But she
-wasn&rsquo;t sure if the graph was planar, and didn&rsquo;t want to lay it out
-manually anyways.</p>
+<p>She&rsquo;s a <a href="http://icme.stanford.edu/index.php">mathematician</a>, so
+she knows about the
+<a href="https://en.wikipedia.org/wiki/Four_color_theorem">Four color
+theorem</a>. But she wasn&rsquo;t sure if the graph was planar, and didn&rsquo;t want
+to lay it out manually anyways.</p>
 
 
 <p>Let&rsquo;s work through the solution.</p>
@@ -290,7 +290,7 @@ manually anyways.</p>
 
 
 <p>The first thing I wanted to do was see the structure of the quilt as a
-graph. Naturally, [Graphviz](http://graphviz.org/) is a natural
+graph. Naturally, <a href="http://graphviz.org/">Graphviz</a> is a natural
 choice. But, first I&rsquo;d have to represent the graph in some way. I
 decided to go with a 5x5 matrix of blocks where each block was a
 structure of the four corner colors. The values of the nodes won&rsquo;t
@@ -341,7 +341,12 @@ edges.</p>
 <p><div class="SIntrapara"><a name="(elem._(chunk._~3cprint-it~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cprint-it~3e~3a1))" class="plainlink" pltdoc="x">&lt;print-it&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Filesystem.html#(form._((lib._racket%2Fruntime-path..rkt)._define-runtime-path))" class="RktStxLink" pltdoc="x">define-runtime-path</a></span><span class="hspace">&nbsp;</span><span class="RktSym">the-graph-path</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktVal">"tmp/2012-05-07-quilt-colouring.graph.dot"</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Filesystem.html#(form._((lib._racket%2Fruntime-path..rkt)._define-runtime-path))" class="RktStxLink" pltdoc="x">define-runtime-path</a></span><span class="hspace">&nbsp;</span><span class="RktSym">the-graph-png-path</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktVal">"tmp/2012-05-07-quilt-colouring.graph.png"</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/file-ports.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._with-output-to-file))" class="RktValLink" pltdoc="x">with-output-to-file</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">the-graph-path</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">#:exists</span><span class="hspace">&nbsp;</span><span class="RktVal">'</span><span class="RktVal">replace</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span><span class="hspace">&nbsp;</span><span class="RktVal">"graph {\n"</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for))" class="RktStxLink" pltdoc="x">for</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">e</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-list))" class="RktValLink" pltdoc="x">in-list</a></span><span class="hspace">&nbsp;</span><span class="RktSym">edges</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match-define))" class="RktStxLink" pltdoc="x">match-define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">u</span><span class="hspace">&nbsp;</span><span class="RktSym">v</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktSym">e</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span><span class="hspace">&nbsp;</span><span class="RktVal">"\t~a -- ~a;\n"</span><span class="hspace">&nbsp;</span><span class="RktSym">u</span><span class="hspace">&nbsp;</span><span class="RktSym">v</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span><span class="hspace">&nbsp;</span><span class="RktVal">"}\n"</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/when_unless.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._unless))" class="RktStxLink" pltdoc="x">unless</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/subprocess.html#(def._((lib._racket%2Fsystem..rkt)._system*))" class="RktValLink" pltdoc="x">system*</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Filesystem.html#(def._((lib._racket%2Fprivate%2Fmisc..rkt)._find-executable-path))" class="RktValLink" pltdoc="x">find-executable-path</a></span><span class="hspace">&nbsp;</span><span class="RktVal">"dot"</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">"-Tpng"</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">the-graph-path</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._format))" class="RktValLink" pltdoc="x">format</a></span><span class="hspace">&nbsp;</span><span class="RktVal">"-o~a"</span><span class="hspace">&nbsp;</span><span class="RktSym">the-graph-png-path</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/exns.html#(def._((quote._~23~25kernel)._error))" class="RktValLink" pltdoc="x">error</a></span><span class="hspace">&nbsp;</span><span class="RktVal">'</span><span class="RktVal">quilt-colouring</span><span class="hspace">&nbsp;</span><span class="RktVal">"dot failed :("</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p>
 
 
-<p>You can see the dot file here: [dot file](/downloads/code/tmp/2012-05-07-quilt-colouring.graph.dot), but unfortunately the picture wasn&rsquo;t very helpful. You can see it here: [graph PNG](/downloads/code/tmp/2012-05-07-quilt-colouring.graph.png).</p>
+<p>You can see the dot file here:
+<a href="http://jeapostrophe.github.com/downloads/code/tmp/2012-05-07-quilt-colouring.graph.dot">dot
+file</a>, but unfortunately the picture wasn&rsquo;t very helpful. You can see
+it here:
+<a href="http://jeapostrophe.github.com/downloads/code/tmp/2012-05-07-quilt-colouring.graph.png">graph
+PNG</a>.</p>
 
 
 <p>Now that I have the edges, I can create an adjacency list really
@@ -427,14 +432,16 @@ the end.</p>
 <p>You can see an example colouring:</p>
 
 
-<p>&lt;a href="http://jeapostrophe.github.com/downloads/code/tmp/2012-05-07-quilt-colouring.png"&gt;&lt;img src="http://jeapostrophe.github.com/downloads/code/tmp/2012-05-07-quilt-colouring.png" align="center" /&gt;&lt;/a&gt;</p>
+<p><a href="http://jeapostrophe.github.com/downloads/code/tmp/2012-05-07-quilt-colouring.png">here</a></p>
 
 
 <p>When she finishes the quilt, I&rsquo;ll update this post with a picture of
 what she went with.</p>
 
 
-<p>(*UPDATE* Here&rsquo;s her blog post about the finished quilt: &lt;a href="http://madlibster.blogspot.jp/2012/05/quilt-for-iris.html"&gt;read it&lt;/a&gt;!)</p>
+<p>(*UPDATE* Here&rsquo;s her blog post about the finished quilt:
+<a href="http://madlibster.blogspot.jp/2012/05/quilt-for-iris.html">read
+it</a>!)</p>
 
 
 <p>By the way, if you use this code at home, make sure you put the code in this
@@ -451,7 +458,8 @@ order:</p>
     <link href="http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146/"/>
     <updated>2012-05-07T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146</id>
-    <content type="html"><![CDATA[<p>This is for [Puzzle 146](http://tinyurl.com/7yefk76). Here is the puzzle:</p>
+    <content type="html"><![CDATA[<p>This is for <a href="http://tinyurl.com/7yefk76">Puzzle 146</a>. Here is
+the puzzle:</p>
 
 
 <p>&gt; A bookcase has seven shelves each filled with 10 books of the same
@@ -576,19 +584,19 @@ order:</p>
     <updated>2011-06-30T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132</id>
     <content type="html"><![CDATA[<p>I try to solve a puzzle of some kind every morning. I use
-[Sudoku](https://en.wikipedia.org/wiki/Sudoku),
-[Picross](https://en.wikipedia.org/wiki/Picross), and often,
-[Professor
-Layton](https://en.wikipedia.org/wiki/Professor_Layton). Sometimes it
-is convenient to write a program to solve some of the more
-annoying "search" puzzles. I&rsquo;ll post the Racket programs with a little
-bit of commentary.</p>
+<a href="https://en.wikipedia.org/wiki/Sudoku">Sudoku</a>,
+<a href="https://en.wikipedia.org/wiki/Picross">Picross</a>, and often,
+<a href="https://en.wikipedia.org/wiki/Professor_Layton">Professor
+Layton</a>. Sometimes it is convenient to write a program to solve some
+of the more annoying "search" puzzles. I&rsquo;ll post the Racket programs
+with a little bit of commentary.</p>
 
 
 <!-- more -->
 
 
-<p>This is for [Puzzle 132](http://tinyurl.com/6pjbzrs). Here is the puzzle:</p>
+<p>This is for <a href="http://tinyurl.com/6pjbzrs">Puzzle 132</a>. Here is
+the puzzle:</p>
 
 
 <p>&gt; Two brothers have inherited their parents&rsquo; five-piece art

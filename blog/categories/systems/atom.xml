@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Systems | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/systems/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-09-27T15:17:18-06:00</updated>
+  <updated>2012-09-27T16:35:43-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -18,7 +18,7 @@
     <link href="http://jeapostrophe.github.com/blog/2012/08/13/drdr-archive/"/>
     <updated>2012-08-13T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/08/13/drdr-archive</id>
-    <content type="html"><![CDATA[<p>After I developed [DrDr](http://drdr.racket-lang.org), it was running
+    <content type="html"><![CDATA[<p>After I developed <a href="http://drdr.racket-lang.org">DrDr</a>, it was running
 smoothly for a couple hundred revisions, when suddenly it stopped
 working. I investigated and found that I couldn&rsquo;t create any
 files... had I really run out of space on the 220G hard drive?</p>
@@ -30,23 +30,23 @@ files... had I really run out of space on the 220G hard drive?</p>
 <!-- more -->
 
 
-<p># Background on DrDr</p>
+<h3><a name="(part._.Background_on_.Dr.Dr)"></a>Background on DrDr</h3>
 
 
 <p>DrDr is an continuous integration system for Racket. Every time a push
 is made to our repository, DrDr will download it, compile it,
 and "test" every single file in the code base. In this case, "test"
 just means compile, load, and run. Some files, such as
-&lsquo;collects/tests/web-server/run-all-tests.rkt&lsquo; are test suites that run
-a huge number of tests, whereas others, like &lsquo;collects/xml/xml.rkt&lsquo;
-are simply implementations that have no run-time behavior. DrDr
-records data about every file&rsquo;s run&#8212;<wbr />how long it took, what the
-output was, what the exit code was, etc&#8212;<wbr />and reports it to the Racket
-community. (This has turned out to be a really good idea because DrDr
-needs virtually no cooperation with the files being tested. Racket
-developers are free to write tests of any kind with any library. They
-just have to ensure that failures are written to STDERR and/or the
-file exits with a code other than 0.)</p>
+<span class="stt">collects/tests/web-server/run-all-tests.rkt</span> are test suites that
+run a huge number of tests, whereas others, like
+<span class="stt">collects/xml/xml.rkt</span> are simply implementations that have no
+run-time behavior. DrDr records data about every file&rsquo;s run&#8212;<wbr />how long
+it took, what the output was, what the exit code was, etc&#8212;<wbr />and
+reports it to the Racket community. (This has turned out to be a
+really good idea because DrDr needs virtually no cooperation with the
+files being tested. Racket developers are free to write tests of any
+kind with any library. They just have to ensure that failures are
+written to STDERR and/or the file exits with a code other than 0.)</p>
 
 
 <p>In all, DrDr tests about 8,700 different files and runs for about an
@@ -68,7 +68,7 @@ there&rsquo;s a crash, there&rsquo;s no in-memory state that needs to be saved o
 recovered... it&rsquo;s all written to the filesystem immediately.)</p>
 
 
-<p># Running out of space...</p>
+<h3><a name="(part._.Running_out_of_space___)"></a>Running out of space...</h3>
 
 
 <p>This means that on every push to our repository, DrDr creates about
@@ -91,7 +91,7 @@ inodes for that 220G space.</p>
 trouble.</p>
 
 
-<p># Saving space</p>
+<h3><a name="(part._.Saving_space)"></a>Saving space</h3>
 
 
 <p>Most archive and compression formats are designed for saving
@@ -127,10 +127,12 @@ efficient format, I decided to write my own. Essentially, I needed
 something more like a filesystem.</p>
 
 
-<p># DrDr&rsquo;s Archive Format</p>
+<h3><a name="(part._.Dr.Dr_s_.Archive_.Format)"></a>DrDr&rsquo;s Archive Format</h3>
 
 
-<p>The [entire archive code](https://github.com/plt/racket/blob/master/collects/meta/drdr/archive.rkt) is a mere 150 lines of code.</p>
+<p>The
+<a href="https://github.com/plt/racket/blob/master/collects/meta/drdr/archive.rkt">entire
+archive code</a> is a mere 150 lines of code.</p>
 
 
 <p>I had the advantage of not needing to keep track of permission or any
@@ -172,7 +174,7 @@ has quite a lot of error handling in case there&rsquo;s some sort of
 problem.</p>
 
 
-<p># The outcome</p>
+<h3><a name="(part._.The_outcome)"></a>The outcome</h3>
 
 
 <p>After implementing this, it was a simple matter to write a script to
@@ -241,20 +243,31 @@ not forked and then exec&rsquo;d.</p>
 <p>Here&rsquo;s an example:</p>
 
 
-<p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt">Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</span></span></p></td></tr></table></p>
+<blockquote class="Rfilebox"></blockquote>
+
+
+<p class="Rfiletitle"><span class="Rfilename"><span class="stt">"bad.sh"</span></span></p>
+
+
+<blockquote class="Rfilecontent"><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt">#!/bin/bash</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt"></span></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt"><span class="stt">x=${1:-10}</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt"></span></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt"><span class="stt">if [ $x -eq 0 ] ; then</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">read</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">echo done</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt">else</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">./bad.sh $(expr $x - 1)</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt">fi</span></span></p></td></tr></table></blockquote>
 
 
 <p>The process tree for this bad code looks like this:</p>
 
 
-<p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt"><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">/bin/zsh&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="hspace">&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">|&lt;span class="hspace">&nbsp;&nbsp;&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh 9&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">|&lt;span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh 8&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">|&lt;span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh 7&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">|&lt;span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh 6&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">|&lt;span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh 5&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">|&lt;span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh 4&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">|&lt;span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh 3&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">|&lt;span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh 2&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">|&lt;span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh 1&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">|&lt;span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span>&lt;span class="stt">\_ bash bad.sh 0&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="hspace">&nbsp;&lt;/span>&lt;span class="stt">\_ ps f&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt"></span></code></pre></td></tr></table></div></figure></notextile></div></span></span></p></td></tr></table></p>
+<p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt">/bin/zsh</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;</span><span class="stt">\_ bash bad.sh</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 9</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 8</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 7</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 6</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 5</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 4</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 3</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 2</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 1</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 0</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;</span><span class="stt">\_ ps f</span></span></p></td></tr></table></p>
 
 
 <p>Compared to:</p>
 
 
-<p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt">Liquid error: undefined method `Py_IsInitialized' for RubyPython::Python:Module</span></span></p></td></tr></table></p>
+<blockquote class="Rfilebox"></blockquote>
+
+
+<p class="Rfiletitle"><span class="Rfilename"><span class="stt">"good.sh"</span></span></p>
+
+
+<blockquote class="Rfilecontent"><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt">#!/bin/bash</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt"></span></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt"><span class="stt">x=${1:-10}</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt"></span></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt"><span class="stt">if [ $x -eq 0 ] ; then</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">read</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">echo done</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt">else</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">exec ./good.sh $(expr $x - 1)</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt">fi</span></span></p></td></tr></table></blockquote>
 
 
 <p>(Notice that line 9 is different&#8212;<wbr />we&rsquo;ve explicitly used exec.)</p>
@@ -263,8 +276,7 @@ not forked and then exec&rsquo;d.</p>
 <p>This good code has a process tree like:</p>
 
 
-<p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt"><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">/bin/zsh&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="hspace">&nbsp;&lt;/span>&lt;span class="stt">\_ bash good.sh 0&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="hspace">&nbsp;&lt;/span>&lt;span class="stt">\_ ps f&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt"></span></code></pre></td></tr></table></div></figure></notextile></div></span></span></p></td></tr></table></p>
+<p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt">/bin/zsh</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;</span><span class="stt">\_ bash good.sh 0</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;</span><span class="stt">\_ ps f</span></span></p></td></tr></table></p>
 
 
 <p>This is very similar to the concept of safe-for-space, or tail-call

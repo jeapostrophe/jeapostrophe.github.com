@@ -1,9 +1,13 @@
 #lang scribble/lp
-@(require "../../post.rkt"
-          (for-label racket/base
+@(require (planet ryanc/scriblogify/scribble-util)
+          (for-label (except-in racket/base
+                                thread
+                                exit
+                                printf)
+                     (prefix-in racket: racket/base)
                      rackunit
                      racket/list))
-@yaml{
+@literal{
 ---
 layout: post
 title: "Cooperative Threads with Continuations"
@@ -19,25 +23,25 @@ categories:
 After the last post about continuations, I wanted to show one of the
 classic uses of them: implementing threads in user-space.
 
-@more
+@(the-jump)
 
 Let's look at an example program first:
 
-@chunky[<example>
-        (define (main)
-          (define N 5)
-          (thread
-           (λ ()
-             (for ([i (in-range (+ N 2))])
-               (printf "iter: ~a\n" i) 
-               (yield))))
-          (thread
-           (λ ()
-             (for/fold ([sum 0]) 
-                 ([i (in-range N)])
-               (printf "adder: ~a\n" (+ i sum))               
-               (yield)
-               (+ i sum)))))]
+@chunk[<example>
+       (define (main)
+         (define N 5)
+         (thread
+          (λ ()
+            (for ([i (in-range (+ N 2))])
+              (printf "iter: ~a\n" i) 
+              (yield))))
+         (thread
+          (λ ()
+            (for/fold ([sum 0]) 
+                ([i (in-range N)])
+              (printf "adder: ~a\n" (+ i sum))               
+              (yield)
+              (+ i sum)))))]
 
 In this thread system, there are a few things to notice:
 
@@ -51,7 +55,6 @@ Since we are yielding in a deterministic way, this program has a
 deterministic output as well:
 
 @verbatim{
-{% codeblock %}
 adder: 0
 iter: 0
 adder: 1
@@ -64,7 +67,6 @@ adder: 10
 iter: 4
 iter: 5
 iter: 6
-{% endcodeblock %}
 }
 
 The threading system will be very simple: it keeps a list of
@@ -74,16 +76,16 @@ end of that list, and then executes the top of the list.
 
 This is straight-forward to express in code:
 
-@chunky[<thread-basics>
-        (define ts empty)
-        (define (yield)
-          (match ts
-            [(list)
-             (void)]
-            [(cons next rest)
-             (let/cc k
-               (set! ts (snoc rest k))
-               (next))]))]
+@chunk[<thread-basics>
+       (define ts empty)
+       (define (yield)
+         (match ts
+           [(list)
+            (void)]
+           [(cons next rest)
+            (let/cc k
+              (set! ts (snoc rest k))
+              (next))]))]
 
 The final four lines are the essence of a context switch:
 
@@ -104,10 +106,10 @@ implementing @racket[thread].
 
 You might think that this is very obvious and want to write:
 
-@chunky[<broken-thread>
-        (define (thread t)
-          (set! ts (cons t ts)))
-        (main)]
+@chunk[<broken-thread>
+       (define (thread t)
+         (set! ts (cons t ts)))
+       (main)]
 
 Unfortunately, this is not correct. The problem is that it fails to
 ever call @racket[yield] and actually invoke the threads. The program
@@ -116,11 +118,11 @@ would have no output.
 Another idea is to automatically @racket[yield] every time a thread is
 created:
 
-@chunky[<yield-thread>
-        (define (thread t)
-          (set! ts (cons t ts))
-          (yield))
-        (main)]
+@chunk[<yield-thread>
+       (define (thread t)
+         (set! ts (cons t ts))
+         (yield))
+       (main)]
 
 The problem with this is that when the main program is finished
 creating the two threads, it has nothing else to do, so it just ends
@@ -135,25 +137,24 @@ convenience, we shouldn't require the programmer to ever call
 this (although they may if they want), so we'll implicitly add it to
 the end of every thread, including the main program.
 
-@chunky[<exit-thread>
-        (define (thread t)
-          (set! ts (cons (λ () (t) (exit)) ts)))
-        (define (exit)
-          (match ts
-            [(list)
-             (void)]
-            [(cons next rest)
-             (set! ts rest)
-             (next)]))
-        
-        (main)
-        (exit)]
+@chunk[<exit-thread>
+       (define (thread t)
+         (set! ts (cons (λ () (t) (exit)) ts)))
+       (define (exit)
+         (match ts
+           [(list)
+            (void)]
+           [(cons next rest)
+            (set! ts rest)
+            (next)]))
+       
+       (main)
+       (exit)]
 
 This version seems like it should be correct, but it actually has a
 very strange output:
 
 @verbatim{
-{% codeblock %}
 adder: 0
 iter: 0
 adder: 1
@@ -170,7 +171,6 @@ adder: 1
 adder: 3
 adder: 6
 adder: 10
-{% endcodeblock %}
 }
 
 For some reason, after the adder ends, and the iterator ends (it has
@@ -199,28 +199,28 @@ In order to fix this, we could make the final call abort the
 current context, so that code wasn't run, but it would be better to
 ensure that it wasn't there in the first place.
 
-@chunky[<best-thread>
-        (define (thread t)
-          (set! ts 
-                (cons (λ () 
-                        (abort-current-continuation
-                         (default-continuation-prompt-tag)
-                         (λ ()
-                           (t)
-                           (exit))))
-                      ts)))
-        (define (exit)
-          (match ts
-            [(list)
-             (void)]
-            [(cons next rest)
-             (set! ts rest)
-             (next)]))
-        
-        (call-with-continuation-prompt
-         (λ ()
-           (main)
-           (exit)))]
+@chunk[<best-thread>
+       (define (thread t)
+         (set! ts 
+               (cons (λ () 
+                       (abort-current-continuation
+                        (default-continuation-prompt-tag)
+                        (λ ()
+                          (t)
+                          (exit))))
+                     ts)))
+       (define (exit)
+         (match ts
+           [(list)
+            (void)]
+           [(cons next rest)
+            (set! ts rest)
+            (next)]))
+       
+       (call-with-continuation-prompt
+        (λ ()
+          (main)
+          (exit)))]
 
 The function @racket[abort-current-continuation] destroys the current
 context and goes back to the beginning of the program. This is like
@@ -253,17 +253,15 @@ then elaborate the kernel to add system calls! Aren't you excited?
 By the way, if you use this code at home, make sure you put the code
 in this order:
 
-@chunky[<*>
-        (require racket/list
-                 racket/match)
+@chunk[<*>
+       (require racket/list
+                racket/match)
 
-        (define (snoc l x)
-          (append l (list x)))
+       (define (snoc l x)
+         (append l (list x)))
 
-        <thread-basics>
+       <thread-basics>
 
-        <example>        
+       <example>        
        
-        <best-thread>]
-
-@download-link
+       <best-thread>]

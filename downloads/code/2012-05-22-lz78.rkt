@@ -1,9 +1,9 @@
 #lang scribble/lp
-@(require "../../post.rkt"
+@(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
                      racket/list))
-@yaml{
+@literal{
 ---
 layout: post
 title: "An LZ78 Implementation"
@@ -23,10 +23,10 @@ idea was, but I do remember that incident.
 Despite this long connection, I'd never implemented the algorithm
 before. I sought to rectify that situation.
 
-@more
+@(the-jump)
 
 First, I read about the algorithm on Wikipedia. The
-[article](https://en.wikipedia.org/wiki/LZ77) is pretty
+@link["https://en.wikipedia.org/wiki/LZ77"]{article} is pretty
 informative. I'll briefly recap it.
 
 As you read through the content to compress, you keep track of a
@@ -49,19 +49,19 @@ previously seen, then there will be no right-hand side of the output
 pair. You could add a special character to indicate that. I decided to
 output just the phrase reference, in that case.
 
-# Compression
+@blogsection{Compression}
 
 My compression code looks like this:
 
-@chunky[<compress>
-        (define (compress ip)
-          <next-unseen>
-          (let outer-loop ([next 1])
-            (match (next-unseen next)
-              [(? number? ref)
-               (stream ref)]
-              [(and W (cons ref c))
-               (stream-cons W (outer-loop (add1 next)))])))]
+@chunk[<compress>
+       (define (compress ip)
+         <next-unseen>
+         (let outer-loop ([next 1])
+           (match (next-unseen next)
+             [(? number? ref)
+              (stream ref)]
+             [(and W (cons ref c))
+              (stream-cons W (outer-loop (add1 next)))])))]
 
 The main work all happens in @racket[next-unseen] which takes the
 reference that the next phrase will be given and either returns a
@@ -92,22 +92,22 @@ that new name.
 
 Here's that in code:
 
-@chunky[<next-unseen>
-        (define top-dict (make-hasheq))
-        (define (next-unseen this)
-          (let loop ([dict top-dict]
-                     [last 0])
-            (define b (read-byte ip))
-            (cond
-              [(eof-object? b)
-               last]
-              [(hash-ref dict b #f)
-               =>
-               (λ (next)
-                 (loop (cdr next) (car next)))]
-              [else
-               (hash-set! dict b (cons this (make-hasheq)))
-               (cons last b)])))]
+@chunk[<next-unseen>
+       (define top-dict (make-hasheq))
+       (define (next-unseen this)
+         (let loop ([dict top-dict]
+                    [last 0])
+           (define b (read-byte ip))
+           (cond
+             [(eof-object? b)
+              last]
+             [(hash-ref dict b #f)
+              =>
+              (λ (next)
+                (loop (cdr next) (car next)))]
+             [else
+              (hash-set! dict b (cons this (make-hasheq)))
+              (cons last b)])))]
 
 This code uses a similar dictionary structure to my Boggle solver,
 from the previous blog post. However, in this code, it's mutable
@@ -118,40 +118,40 @@ I'm kind of amazed that the compression can fit in 23 lines!
 
 Here's a little example:
 
-@chunky[<compress-example>
-        (define some-input #"AABABBBABAABABBBABBABB")
-        (define compressed
-          (compress
-           (open-input-bytes some-input)))
-        (define A (char->integer #\A))
-        (define B (char->integer #\B))
-        (check-equal?
-         (stream->list
-          compressed)
-         (list (cons 0 A)
-               (cons 1 B)
-               (cons 2 B)
-               (cons 0 B)
-               (cons 2 A)
-               (cons 5 B)
-               (cons 4 B)
-               (cons 3 A)
-               7))]
+@chunk[<compress-example>
+       (define some-input #"AABABBBABAABABBBABBABB")
+       (define compressed
+         (compress
+          (open-input-bytes some-input)))
+       (define A (char->integer #\A))
+       (define B (char->integer #\B))
+       (check-equal?
+        (stream->list
+         compressed)
+        (list (cons 0 A)
+              (cons 1 B)
+              (cons 2 B)
+              (cons 0 B)
+              (cons 2 A)
+              (cons 5 B)
+              (cons 4 B)
+              (cons 3 A)
+              7))]
 
 In this example, the final dictionary looks like this:
 
-@chunky[<compress-example-dict>
-        (hasheq
-         B 
-         (cons 4 (hasheq B (cons 7 (hasheq))))
-         A
-         (cons 1
-               (hasheq B
-                       (cons 2
-                             (hasheq B (cons 3 (hasheq A (cons 8 (hasheq))))
-                                     A (cons 5 (hasheq B (cons 6 (hasheq)))))))))]
+@chunk[<compress-example-dict>
+       (hasheq
+        B 
+        (cons 4 (hasheq B (cons 7 (hasheq))))
+        A
+        (cons 1
+              (hasheq B
+                      (cons 2
+                            (hasheq B (cons 3 (hasheq A (cons 8 (hasheq))))
+                                    A (cons 5 (hasheq B (cons 6 (hasheq)))))))))]
 
-# Decompression
+@blogsection{Decompression}
 
 Naturally, decompression is dual to compression. It will also maintain
 a dictionary, but it will have the opposite information: rather than
@@ -164,20 +164,20 @@ fold over the input stream, rather than a more generative loop.
 
 Here's the core of it:
 
-@chunky[<decompress>
-        (define (decompress str)
-          (define dict (make-hasheq))
-          <output-from-dict>
-          (for/fold ([next 1])
-              ([p (in-stream str)])
-            (match p
-              [(cons ref b)
-               (hash-set! dict next p)
-               (output-from-dict next)
-               (add1 next)]
-              [(? number? ref)
-               (output-from-dict ref)
-               next])))]
+@chunk[<decompress>
+       (define (decompress str)
+         (define dict (make-hasheq))
+         <output-from-dict>
+         (for/fold ([next 1])
+             ([p (in-stream str)])
+           (match p
+             [(cons ref b)
+              (hash-set! dict next p)
+              (output-from-dict next)
+              (add1 next)]
+             [(? number? ref)
+              (output-from-dict ref)
+              next])))]
 
 Basically, each element of the stream is either a new dictionary
 entry, in which case we remember it and output it, or it's just a
@@ -186,14 +186,14 @@ use a functional hash, but there's no benefit here.)
 
 When you get a reference and need to output it, it's also quite easy:
 
-@chunky[<output-from-dict>
-        (define (output-from-dict this)
-          (match (hash-ref dict this #f)
-            [#f
-             (void)]
-            [(cons last this-b)
-             (output-from-dict last)
-             (write-byte this-b)]))]
+@chunk[<output-from-dict>
+       (define (output-from-dict this)
+         (match (hash-ref dict this #f)
+           [#f
+            (void)]
+           [(cons last this-b)
+            (output-from-dict last)
+            (write-byte this-b)]))]
 
 Either the reference isn't in the dictionary, so you stop, or it is,
 so you output its prefix and then the byte associated with it. We use
@@ -204,28 +204,28 @@ The whole decompression is just 20 lines. Wow!
 
 We can check that the output is the same as the input:
 
-@chunky[<decompress-example>
-        (check-equal?
-         (with-output-to-bytes
-          (λ ()
-            (decompress compressed)))
-         some-input)]
+@chunk[<decompress-example>
+       (check-equal?
+        (with-output-to-bytes
+         (λ ()
+           (decompress compressed)))
+        some-input)]
 
 In the example, the dictionary is:
 
-@chunky[<decompress-example-dict>
-        (hasheq 8 (cons 3 A)
-                7 (cons 4 B)
-                6 (cons 5 B)
-                5 (cons 2 A)
-                4 (cons 0 B)
-                3 (cons 2 B)
-                2 (cons 1 B)
-                1 (cons 0 A))]
+@chunk[<decompress-example-dict>
+       (hasheq 8 (cons 3 A)
+               7 (cons 4 B)
+               6 (cons 5 B)
+               5 (cons 2 A)
+               4 (cons 0 B)
+               3 (cons 2 B)
+               2 (cons 1 B)
+               1 (cons 0 A))]
 
 And that's it!
 
-# Further work
+@blogsection{Further work}
 
 One strange thing about this implementation is that the output is just
 a stream of pairs rather than bytes. The easiest way to encode it as
@@ -253,19 +253,17 @@ This was a very fun thing to implement. I hope you enjoy it!
 By the way, if you use this code at home, make sure you put the code
 in this order:
 
-@chunky[<*>
-        (require rackunit
-                 racket/list
-                 racket/match
-                 racket/stream
-                 racket/port)
+@chunk[<*>
+       (require rackunit
+                racket/list
+                racket/match
+                racket/stream
+                racket/port)
 
-        <compress>
-        <compress-example>
-        <compress-example-dict>
-        <decompress>
-        <decompress-example>
-        <decompress-example-dict>
-        ]
-
-@download-link
+       <compress>
+       <compress-example>
+       <compress-example-dict>
+       <decompress>
+       <decompress-example>
+       <decompress-example-dict>
+       ]

@@ -1,9 +1,13 @@
 #lang scribble/lp
-@(require "../../post.rkt"
-          (for-label racket/base
+@(require (planet ryanc/scriblogify/scribble-util)
+          (for-label (except-in racket/base
+                                thread
+                                exit
+                                printf)
+                     (prefix-in racket: racket/base)
                      rackunit
                      racket/list))
-@yaml{
+@literal{
 ---
 layout: post
 title: "Preemptive Threads with Continuations"
@@ -19,25 +23,25 @@ categories:
 Last week, we covered cooperative threading with continuations. This
 week we'll change the infrastructure to mimic preemption.
 
-@more
+@(the-jump)
 
 Before we start, make sure you've read last week's post.
 
 We'll be working from almost the same example program:
 
-@chunky[<example>
-        (define (main)
-          (define N 5)
-          (thread
-           (λ ()
-             (for ([i (in-range (+ N 2))])
-               (printf "iter: ~a\n" i) )))
-          (thread
-           (λ ()
-             (for/fold ([sum 0]) 
-                 ([i (in-range N)])
-               (printf "adder: ~a\n" (+ i sum))
-               (+ i sum)))))]
+@chunk[<example>
+       (define (main)
+         (define N 5)
+         (thread
+          (λ ()
+            (for ([i (in-range (+ N 2))])
+              (printf "iter: ~a\n" i) )))
+         (thread
+          (λ ()
+            (for/fold ([sum 0]) 
+                ([i (in-range N)])
+              (printf "adder: ~a\n" (+ i sum))
+              (+ i sum)))))]
 
 The only difference is that I've removed the calls to @racket[yield]
 after the calls to @racket[printf].
@@ -45,7 +49,6 @@ after the calls to @racket[printf].
 Recall that this program has the following output:
 
 @verbatim{
-{% codeblock %}
 adder: 0
 iter: 0
 adder: 1
@@ -58,43 +61,42 @@ adder: 10
 iter: 4
 iter: 5
 iter: 6
-{% endcodeblock %}
 }
 
 We'll also be using the same basic threading system:
 
-@chunky[<threading-system>
-        (define ts empty)
-        (define (yield)
-          (match ts
-            [(list)
-             (void)]
-            [(cons next rest)
-             (let/cc k
-               (set! ts (snoc rest k))
-               (next))]))
+@chunk[<threading-system>
+       (define ts empty)
+       (define (yield)
+         (match ts
+           [(list)
+            (void)]
+           [(cons next rest)
+            (let/cc k
+              (set! ts (snoc rest k))
+              (next))]))
 
-        (define (thread t)
-          (set! ts 
-                (cons (λ () 
-                        (abort-current-continuation
-                         (default-continuation-prompt-tag)
-                         (λ ()
-                           (t)
-                           (exit))))
-                      ts)))
-        (define (exit)
-          (match ts
-            [(list)
-             (void)]
-            [(cons next rest)
-             (set! ts rest)
-             (next)]))
-        
-        (call-with-continuation-prompt
-         (λ ()
-           (main)
-           (exit)))]
+       (define (thread t)
+         (set! ts 
+               (cons (λ () 
+                       (abort-current-continuation
+                        (default-continuation-prompt-tag)
+                        (λ ()
+                          (t)
+                          (exit))))
+                     ts)))
+       (define (exit)
+         (match ts
+           [(list)
+            (void)]
+           [(cons next rest)
+            (set! ts rest)
+            (next)]))
+       
+       (call-with-continuation-prompt
+        (λ ()
+          (main)
+          (exit)))]
 
 Now, this system is about modeling concurrency through threading, so
 there is no actual real concurrency in the system. In contrast, in a
@@ -119,10 +121,10 @@ functions provided by the OS and have them call @racket[yield] on
 behalf of the process. For example, @racket[printf] is a naturally
 choice.
 
-@chunky[<primitive-printf>
-        (define (printf . args)
-          (begin0 (apply racket:printf args)
-                  (yield)))]
+@chunk[<primitive-printf>
+       (define (printf . args)
+         (begin0 (apply racket:printf args)
+                 (yield)))]
 
 When we take this approach, we need to ensure that the process has no
 other way of getting to these primitives. This is not a very hard
@@ -143,21 +145,20 @@ context switches. In that case, it's wise to use some sort of "fuel"
 counter that indicates how many function calls are allowed before
 switching. We can realize this in the @racket[printf] code:
 
-@chunky[<fuel-printf>
-        (define INITIAL-FUEL 2)
-        (define FUEL INITIAL-FUEL)
-        (define (printf . args)
-          (begin0 (apply racket:printf args)
-                  (set! FUEL (sub1 FUEL))
-                  (when (zero? FUEL)
-                    (set! FUEL INITIAL-FUEL)
-                    (yield))))]
+@chunk[<fuel-printf>
+       (define INITIAL-FUEL 2)
+       (define FUEL INITIAL-FUEL)
+       (define (printf . args)
+         (begin0 (apply racket:printf args)
+                 (set! FUEL (sub1 FUEL))
+                 (when (zero? FUEL)
+                   (set! FUEL INITIAL-FUEL)
+                   (yield))))]
 
 In this example I used a fuel of two, which renders the following
 output:
 
 @verbatim{
-{% codeblock %}
 adder: 0
 adder: 1
 iter: 0
@@ -170,7 +171,6 @@ adder: 10
 iter: 4
 iter: 5
 iter: 6
-{% endcodeblock %}
 }
 
 A nice side-effect of a fuel system like this is that you can give
@@ -187,16 +187,14 @@ Next week, we'll look at system calls in this infrastructure.
 By the way, if you use this code at home, make sure you put the code
 in this order:
 
-@chunky[<*>
-        (require racket/list
-                 racket/match
-                 (prefix-in racket: racket/base))
+@chunk[<*>
+       (require racket/list
+                racket/match
+                (prefix-in racket: racket/base))
 
-        (define (snoc l x)
-          (append l (list x)))
+       (define (snoc l x)
+         (append l (list x)))
 
-        <fuel-printf>
-        <example>
-        <threading-system>]
-
-@download-link
+       <fuel-printf>
+       <example>
+       <threading-system>]

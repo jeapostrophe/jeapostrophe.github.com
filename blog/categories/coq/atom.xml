@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Coq | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/coq/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-09-27T15:17:18-06:00</updated>
+  <updated>2012-09-27T16:35:43-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -33,7 +33,7 @@ language can represent things like numbers, lists, and other complex
 data structures?</p>
 
 
-<p># Booleans</p>
+<h3><a name="(part._.Booleans)"></a>Booleans</h3>
 
 
 <p>I think it is actually easier to start with the most basic of
@@ -70,7 +70,7 @@ the condition selects. This example makes the right choice:</p>
 
 
 <p>Booleans are a microcosm of the idea of Church Encoding: represent
-data by what it /does/ rather than "is". Other to put it another way,
+data by what it <span style="font-style: italic">does</span> rather than "is". Other to put it another way,
 data "isn&rsquo;t" anything, it is just what it does. Booleans make choices,
 so encode them as functions that make choices.</p>
 
@@ -89,7 +89,7 @@ on the understanding that booleans *are* IF, so we don&rsquo;t need to call
 it.</p>
 
 
-<p># Natural numbers</p>
+<h3><a name="(part._.Natural_numbers)"></a>Natural numbers</h3>
 
 
 <p>Let&rsquo;s do something a little bit more complicated: numbers.</p>
@@ -152,8 +152,8 @@ Encoding?</p>
 
 
 <p>Well, Church Encoding of natural numbers represents them as their own
-induction functions. The Church Encoding of &rsquo;two&rsquo; IS &ldquo;(Pm2PSm (Pm2PSm
-Pz))&ldquo; where the proof for zero and the proof for the successor are
+induction functions. The Church Encoding of &rsquo;two&rsquo; IS <span class="stt">(Pm2PSm (Pm2PSm
+Pz))</span> where the proof for zero and the proof for the successor are
 passed as arguments.</p>
 
 
@@ -165,7 +165,9 @@ natural numbers is induction.</p>
 
 
 <p>As an aside, Church Encoding is Ur-Object-Oriented Programming. For
-more on this, read William Cook&rsquo;s great paper: [On understanding data abstraction, revisited](http://www.cs.utexas.edu/~wcook/Drafts/2009/essay.pdf).</p>
+more on this, read William Cook&rsquo;s great paper:
+<a href="http://www.cs.utexas.edu/~wcook/Drafts/2009/essay.pdf">On
+understanding data abstraction, revisited</a>.</p>
 
 
 <p>By the way, if you use this code at home, make sure you put the code

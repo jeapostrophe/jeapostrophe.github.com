@@ -1,9 +1,9 @@
 #lang scribble/lp
-@(require "../../post.rkt"
+@(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
                      racket/list))
-@yaml{
+@literal{
 ---
 layout: post
 title: "exec and Tail-call Optimization"
@@ -17,7 +17,7 @@ I'm often bothered by programs that fail to use @tt{exec} properly and
 instead use @tt{system}. In this article, we'll review the difference
 and relate it to tail-call optimization.
 
-@more
+@(the-jump)
 
 In Unix, there's not really a way to start a totally new
 process. Instead, every process comes into being by another process
@@ -46,8 +46,9 @@ not forked and then exec'd.
 
 Here's an example:
 
+@filebox["bad.sh"]{
 @verbatim{
-{% codeblock bad.sh %}#!/bin/bash
+#!/bin/bash
 
 x=${1:-10}
 
@@ -57,13 +58,11 @@ if [ $x -eq 0 ] ; then
 else
     ./bad.sh $(expr $x - 1)
 fi
-{% endcodeblock %}
-}
+}}
 
 The process tree for this bad code looks like this:
 
 @verbatim{
-{% codeblock %}
 /bin/zsh
  \_ bash bad.sh
 |   \_ bash bad.sh 9
@@ -77,13 +76,13 @@ The process tree for this bad code looks like this:
 |                                   \_ bash bad.sh 1
 |                                       \_ bash bad.sh 0
  \_ ps f
-{% endcodeblock %}
 }
 
 Compared to:
 
+@filebox["good.sh"]{
 @verbatim{
-{% codeblock good.sh %}#!/bin/bash
+#!/bin/bash
 
 x=${1:-10}
 
@@ -93,19 +92,16 @@ if [ $x -eq 0 ] ; then
 else
     exec ./good.sh $(expr $x - 1)
 fi
-{% endcodeblock %}
-}
+}}
 
 (Notice that line 9 is different---we've explicitly used exec.)
 
 This good code has a process tree like:
 
 @verbatim{
-{% codeblock %}
 /bin/zsh
  \_ bash good.sh 0
  \_ ps f
-{% endcodeblock %}
 }
 
 This is very similar to the concept of safe-for-space, or tail-call

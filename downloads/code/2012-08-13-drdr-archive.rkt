@@ -1,44 +1,44 @@
 #lang scribble/lp
-@(require "../../post.rkt"
+@(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
                      racket/list))
-@yaml{
-      ---
-      layout: post
-      title: "DrDr and its archives"
-      comments: true
-      categories:
-      - Racket
-      - Systems
-      ---
-      }
+@literal{
+---
+layout: post
+title: "DrDr and its archives"
+comments: true
+categories:
+- Racket
+- Systems
+---
+}
 
-After I developed [DrDr](http://drdr.racket-lang.org), it was running
+After I developed @link["http://drdr.racket-lang.org"]{DrDr}, it was running
 smoothly for a couple hundred revisions, when suddenly it stopped
 working. I investigated and found that I couldn't create any
 files... had I really run out of space on the 220G hard drive?
 
 In this post, I discuss how I found and fixed the problem.
 
-@more
+@(the-jump)
 
-# Background on DrDr
+@blogsection{Background on DrDr}
 
 DrDr is an continuous integration system for Racket. Every time a push
 is made to our repository, DrDr will download it, compile it,
 and "test" every single file in the code base. In this case, "test"
 just means compile, load, and run. Some files, such as
-`collects/tests/web-server/run-all-tests.rkt` are test suites that run
-a huge number of tests, whereas others, like `collects/xml/xml.rkt`
-are simply implementations that have no run-time behavior. DrDr
-records data about every file's run---how long it took, what the
-output was, what the exit code was, etc---and reports it to the Racket
-community. (This has turned out to be a really good idea because DrDr
-needs virtually no cooperation with the files being tested. Racket
-developers are free to write tests of any kind with any library. They
-just have to ensure that failures are written to STDERR and/or the
-file exits with a code other than 0.)
+@tt{collects/tests/web-server/run-all-tests.rkt} are test suites that
+run a huge number of tests, whereas others, like
+@tt{collects/xml/xml.rkt} are simply implementations that have no
+run-time behavior. DrDr records data about every file's run---how long
+it took, what the output was, what the exit code was, etc---and
+reports it to the Racket community. (This has turned out to be a
+really good idea because DrDr needs virtually no cooperation with the
+files being tested. Racket developers are free to write tests of any
+kind with any library. They just have to ensure that failures are
+written to STDERR and/or the file exits with a code other than 0.)
 
 In all, DrDr tests about 8,700 different files and runs for about an
 hour and ten minutes per push. (It's a 12-core machine and gets about
@@ -57,7 +57,7 @@ Makefile that creates and records these files as it goes. So when
 there's a crash, there's no in-memory state that needs to be saved or
 recovered... it's all written to the filesystem immediately.)
 
-# Running out of space...
+@blogsection{Running out of space...}
 
 This means that on every push to our repository, DrDr creates about
 18,000 files. Every file is very small, typically less than 50 bytes,
@@ -76,7 +76,7 @@ inodes for that 220G space.
 After a few hundred revisions, I had run out of inodes and was in
 trouble.
 
-# Saving space
+@blogsection{Saving space}
 
 Most archive and compression formats are designed for saving
 space. They normally also save inodes... because 10,000 files can be
@@ -106,9 +106,11 @@ After a brief investigation of other formats and failing to find any
 efficient format, I decided to write my own. Essentially, I needed
 something more like a filesystem.
 
-# DrDr's Archive Format
+@blogsection{DrDr's Archive Format}
 
-The [entire archive code](https://github.com/plt/racket/blob/master/collects/meta/drdr/archive.rkt) is a mere 150 lines of code.
+The
+@link["https://github.com/plt/racket/blob/master/collects/meta/drdr/archive.rkt"]{entire
+archive code} is a mere 150 lines of code.
 
 I had the advantage of not needing to keep track of permission or any
 UNIX attributes. In addition, I didn't need to deal with modifying the
@@ -140,7 +142,7 @@ The code that does the lookup is a bit longer---47 lines---because it
 has quite a lot of error handling in case there's some sort of
 problem.
 
-# The outcome
+@blogsection{The outcome}
 
 After implementing this, it was a simple matter to write a script to
 archive everything that had been produced. (I deleted the last

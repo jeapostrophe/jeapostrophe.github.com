@@ -4,7 +4,7 @@
   <title><![CDATA[Category: OmniGroup | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/omnigroup/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-09-27T15:17:18-06:00</updated>
+  <updated>2012-09-27T16:35:43-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -31,11 +31,10 @@ culminating in my switch from OmniFocus to Org-Mode.</p>
 
 
 <p>My first foray into automated systems was a hand-written system called
-&lt;a
-href="http://planet.racket-lang.org/display.ss?package=grid.plt&amp;owner=jaymccarthy"&gt;The
-Grid&lt;/a&gt;. This was a system for keeping track of your obedience to a
-daily regime. Check out this &lt;a
-href="http://planet.racket-lang.org/package-source/jaymccarthy/grid.plt/1/2/tour/index.html"&gt;tour&lt;/a&gt;
+<a href="http://planet.racket-lang.org/display.ss?package=grid.plt&#38;amp;owner=jaymccarthy">The
+Grid</a>. This was a system for keeping track of your obedience to a
+daily regime. Check out this
+<a href="http://planet.racket-lang.org/package-source/jaymccarthy/grid.plt/1/2/tour/index.html">tour</a>
 to see how it worked. You would add a list of things to do and then
 there&rsquo;d be a box to check of every day. From my Grid in the tour, you
 can see that mine were: Kiss Claire (my girlfriend at the time), Eat a
@@ -51,8 +50,8 @@ flowers, Talk to my family, and Pray.</p>
 
 
 <p>Eventually, I wanted to keep track of more things, especially longer
-term things, so I started using &lt;a
-href="https://www.omnigroup.com/products/omnifocus/"&gt;OmniFocus&lt;/a&gt; for
+term things, so I started using
+<a href="https://www.omnigroup.com/products/omnifocus/">OmniFocus</a> for
 the Mac. It was pretty awesome and I enjoyed it. Eventually when the
 iPhone came out and I got one, I got it for the iPhone. But it was
 pretty terrible on there, because the synchronization time was
@@ -85,22 +84,22 @@ with switching to Org-Mode inside of Emacs.</p>
 <p>The main thing to do was to make the interface look as much link
 OmniFocus as possible. Most of the options built-in to Org-Mode
 weren&rsquo;t good enough though, but there were two hooks that I could use:
-the &lsquo;org-agenda-before-sorting-filter-function&lsquo; and
-&lsquo;org-agenda-cmp-user-defined&lsquo;.</p>
+the <span class="stt">org-agenda-before-sorting-filter-function</span> and
+<span class="stt">org-agenda-cmp-user-defined</span>.</p>
 
 
-<p>&lsquo;org-agenda-before-sorting-filter-function&lsquo; is run on all the items
+<p><span class="stt">org-agenda-before-sorting-filter-function</span> is run on all the items
 that will be displayed on the agenda before they are sorted... as the
 name suggests. I programmed mine to (a) remove "TODO" from the
 displayed text, because otherwise they all would display it, (b) give
 it a color based on when it was due modeled after the OmniFocus
 colors, and (c) remove it if it was not passed the scheduled time. (c)
 is important, because even though Org-Mode claims to have an option
-that does this, it only looks at the scheduled /date/, not the
-scheduled /time/.</p>
+that does this, it only looks at the scheduled <span style="font-style: italic">date</span>, not the
+scheduled <span style="font-style: italic">time</span>.</p>
 
 
-<p>&lsquo;org-agenda-cmp-user-defined&lsquo; is used to order them and you can&rsquo;t, by
+<p><span class="stt">org-agenda-cmp-user-defined</span> is used to order them and you can&rsquo;t, by
 default, order by the deadline, which I wanted.</p>
 
 
@@ -123,9 +122,9 @@ myself: the ability to skip the weekend for daily repeating tasks. I
 hope to do this eventually, but I don&rsquo;t have it yet.</p>
 
 
-<p>You can see my Org-Mode customization starting on &lt;a
-href="https://github.com/jeapostrophe/exp/blob/master/.emacs.el#L518"&gt;L518
-on Github&lt;/a&gt;.</p>
+<p>You can see my Org-Mode customization starting on
+<a href="https://github.com/jeapostrophe/exp/blob/master/.emacs.el#L518">L518
+on Github</a>.</p>
 
 ]]></content>
   </entry>

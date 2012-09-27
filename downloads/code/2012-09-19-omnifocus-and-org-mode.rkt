@@ -1,10 +1,10 @@
 #lang scribble/lp
-@(require "../../post.rkt"
+@(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
                      racket/list))
 
-@yaml{
+@literal{
 ---
 layout: post
 title: "Switching from OmniFocus to Org-Mode"
@@ -24,14 +24,13 @@ got to graduate school, I used more automatic approaches.
 In this post, I discuss my journey through various TODO list manager,
 culminating in my switch from OmniFocus to Org-Mode.
 
-@more
+@(the-jump)
 
 My first foray into automated systems was a hand-written system called
-<a
-href="http://planet.racket-lang.org/display.ss?package=grid.plt&owner=jaymccarthy">The
-Grid</a>. This was a system for keeping track of your obedience to a
-daily regime. Check out this <a
-href="http://planet.racket-lang.org/package-source/jaymccarthy/grid.plt/1/2/tour/index.html">tour</a>
+@link["http://planet.racket-lang.org/display.ss?package=grid.plt&owner=jaymccarthy"]{The
+Grid}. This was a system for keeping track of your obedience to a
+daily regime. Check out this
+@link["http://planet.racket-lang.org/package-source/jaymccarthy/grid.plt/1/2/tour/index.html"]{tour}
 to see how it worked. You would add a list of things to do and then
 there'd be a box to check of every day. From my Grid in the tour, you
 can see that mine were: Kiss Claire (my girlfriend at the time), Eat a
@@ -45,8 +44,8 @@ flowers, Talk to my family, and Pray.
 This was awesome and I really enjoyed it.
 
 Eventually, I wanted to keep track of more things, especially longer
-term things, so I started using <a
-href="https://www.omnigroup.com/products/omnifocus/">OmniFocus</a> for
+term things, so I started using
+@link["https://www.omnigroup.com/products/omnifocus/"]{OmniFocus} for
 the Mac. It was pretty awesome and I enjoyed it. Eventually when the
 iPhone came out and I got one, I got it for the iPhone. But it was
 pretty terrible on there, because the synchronization time was
@@ -74,20 +73,20 @@ with switching to Org-Mode inside of Emacs.
 The main thing to do was to make the interface look as much link
 OmniFocus as possible. Most of the options built-in to Org-Mode
 weren't good enough though, but there were two hooks that I could use:
-the `org-agenda-before-sorting-filter-function` and
-`org-agenda-cmp-user-defined`.
+the @tt{org-agenda-before-sorting-filter-function} and
+@tt{org-agenda-cmp-user-defined}.
 
-`org-agenda-before-sorting-filter-function` is run on all the items
+@tt{org-agenda-before-sorting-filter-function} is run on all the items
 that will be displayed on the agenda before they are sorted... as the
 name suggests. I programmed mine to (a) remove "TODO" from the
 displayed text, because otherwise they all would display it, (b) give
 it a color based on when it was due modeled after the OmniFocus
 colors, and (c) remove it if it was not passed the scheduled time. (c)
 is important, because even though Org-Mode claims to have an option
-that does this, it only looks at the scheduled /date/, not the
-scheduled /time/.
+that does this, it only looks at the scheduled @emph{date}, not the
+scheduled @emph{time}.
 
-`org-agenda-cmp-user-defined` is used to order them and you can't, by
+@tt{org-agenda-cmp-user-defined} is used to order them and you can't, by
 default, order by the deadline, which I wanted.
 
 Then, I made it so the keybinding I use to view the TODO list (from
@@ -105,6 +104,6 @@ There's a feature that neither have, but with Org-Mode I can add it
 myself: the ability to skip the weekend for daily repeating tasks. I
 hope to do this eventually, but I don't have it yet.
 
-You can see my Org-Mode customization starting on <a
-href="https://github.com/jeapostrophe/exp/blob/master/.emacs.el#L518">L518
-on Github</a>.
+You can see my Org-Mode customization starting on
+@link["https://github.com/jeapostrophe/exp/blob/master/.emacs.el#L518"]{L518
+on Github}.

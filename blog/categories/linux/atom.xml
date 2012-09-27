@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Linux | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-09-27T15:17:18-06:00</updated>
+  <updated>2012-09-27T16:35:43-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -31,11 +31,10 @@ culminating in my switch from OmniFocus to Org-Mode.</p>
 
 
 <p>My first foray into automated systems was a hand-written system called
-&lt;a
-href="http://planet.racket-lang.org/display.ss?package=grid.plt&amp;owner=jaymccarthy"&gt;The
-Grid&lt;/a&gt;. This was a system for keeping track of your obedience to a
-daily regime. Check out this &lt;a
-href="http://planet.racket-lang.org/package-source/jaymccarthy/grid.plt/1/2/tour/index.html"&gt;tour&lt;/a&gt;
+<a href="http://planet.racket-lang.org/display.ss?package=grid.plt&#38;amp;owner=jaymccarthy">The
+Grid</a>. This was a system for keeping track of your obedience to a
+daily regime. Check out this
+<a href="http://planet.racket-lang.org/package-source/jaymccarthy/grid.plt/1/2/tour/index.html">tour</a>
 to see how it worked. You would add a list of things to do and then
 there&rsquo;d be a box to check of every day. From my Grid in the tour, you
 can see that mine were: Kiss Claire (my girlfriend at the time), Eat a
@@ -51,8 +50,8 @@ flowers, Talk to my family, and Pray.</p>
 
 
 <p>Eventually, I wanted to keep track of more things, especially longer
-term things, so I started using &lt;a
-href="https://www.omnigroup.com/products/omnifocus/"&gt;OmniFocus&lt;/a&gt; for
+term things, so I started using
+<a href="https://www.omnigroup.com/products/omnifocus/">OmniFocus</a> for
 the Mac. It was pretty awesome and I enjoyed it. Eventually when the
 iPhone came out and I got one, I got it for the iPhone. But it was
 pretty terrible on there, because the synchronization time was
@@ -85,22 +84,22 @@ with switching to Org-Mode inside of Emacs.</p>
 <p>The main thing to do was to make the interface look as much link
 OmniFocus as possible. Most of the options built-in to Org-Mode
 weren&rsquo;t good enough though, but there were two hooks that I could use:
-the &lsquo;org-agenda-before-sorting-filter-function&lsquo; and
-&lsquo;org-agenda-cmp-user-defined&lsquo;.</p>
+the <span class="stt">org-agenda-before-sorting-filter-function</span> and
+<span class="stt">org-agenda-cmp-user-defined</span>.</p>
 
 
-<p>&lsquo;org-agenda-before-sorting-filter-function&lsquo; is run on all the items
+<p><span class="stt">org-agenda-before-sorting-filter-function</span> is run on all the items
 that will be displayed on the agenda before they are sorted... as the
 name suggests. I programmed mine to (a) remove "TODO" from the
 displayed text, because otherwise they all would display it, (b) give
 it a color based on when it was due modeled after the OmniFocus
 colors, and (c) remove it if it was not passed the scheduled time. (c)
 is important, because even though Org-Mode claims to have an option
-that does this, it only looks at the scheduled /date/, not the
-scheduled /time/.</p>
+that does this, it only looks at the scheduled <span style="font-style: italic">date</span>, not the
+scheduled <span style="font-style: italic">time</span>.</p>
 
 
-<p>&lsquo;org-agenda-cmp-user-defined&lsquo; is used to order them and you can&rsquo;t, by
+<p><span class="stt">org-agenda-cmp-user-defined</span> is used to order them and you can&rsquo;t, by
 default, order by the deadline, which I wanted.</p>
 
 
@@ -123,9 +122,9 @@ myself: the ability to skip the weekend for daily repeating tasks. I
 hope to do this eventually, but I don&rsquo;t have it yet.</p>
 
 
-<p>You can see my Org-Mode customization starting on &lt;a
-href="https://github.com/jeapostrophe/exp/blob/master/.emacs.el#L518"&gt;L518
-on Github&lt;/a&gt;.</p>
+<p>You can see my Org-Mode customization starting on
+<a href="https://github.com/jeapostrophe/exp/blob/master/.emacs.el#L518">L518
+on Github</a>.</p>
 
 ]]></content>
   </entry>
@@ -162,19 +161,19 @@ time with my Mac (I have an external screen in my office), so I
 presumed that I had everything working correctly.</p>
 
 
-<p>I use &lt;a href="http://willem.engen.nl/projects/disper/"&gt;disper&lt;/a&gt; to
+<p>I use <a href="http://willem.engen.nl/projects/disper/">disper</a> to
 manage my display configurations. From Linux&rsquo;s perspective, my Air has
 three displays: DFP-0 (the external display when it is connected with
 DVI), DFP-1 (the external display when it is connected with VGA), and
 DFP-2 (the built-in screen.) So I assumed it would be as simple as
-typing &lsquo;disper -c&lsquo; after connecting to clone my desktop across the two
+typing <span class="stt">disper -c</span> after connecting to clone my desktop across the two
 displays.</p>
 
 
 <p>Unfortunately, I got the error message: "Displays do not share a
 common resolution". That&rsquo;s strange, I think, I distinctly remember
 using these projectors last year, on OS X and getting a decently sized
-screen (1024x768, I believe.) A quick &lsquo;disper -l&lsquo; reveals that my
+screen (1024x768, I believe.) A quick <span class="stt">disper -l</span> reveals that my
 DFP-1 only has one resolution: "640x480".</p>
 
 
@@ -184,7 +183,7 @@ workable.</p>
 
 
 <p>The next day I read all about XRandr and how you can add video modes
-using &lsquo;gtf&lsquo; and &lsquo;xrandr&lsquo; and thought I had everything figured
+using <span class="stt">gtf</span> and <span class="stt">xrandr</span> and thought I had everything figured
 out. When I went to connect again during a day I didn&rsquo;t teach, I had
 an unbearable time of getting tons and tons of error messages and no
 success.</p>
@@ -195,7 +194,7 @@ success.</p>
 
 <p>After that, I decided that I would connect with OS X on my laptop and
 write down which video modes, resolutions, refresh rates, etc it could
-handle so I could pass the correct arguments to &lsquo;gtf&lsquo;. I was delighted
+handle so I could pass the correct arguments to <span class="stt">gtf</span>. I was delighted
 when I realized I&rsquo;d be able to run the projector at 1400x1050 and my
 laptop screen at 1440x900 and have them share a 1400x900 desktop. This
 wasn&rsquo;t the default in OS X, but it was an option.</p>
@@ -205,13 +204,13 @@ wasn&rsquo;t the default in OS X, but it was an option.</p>
 the X server settings to get this mode enabled. Nothing.</p>
 
 
-<p>At this point, I realized that I originally chose &lsquo;disper&lsquo; rather than
-&lsquo;xrandr&lsquo; because Nvidia cards haven&rsquo;t always fully supported &lsquo;xrandr&lsquo;,
+<p>At this point, I realized that I originally chose <span class="stt">disper</span> rather than
+<span class="stt">xrandr</span> because Nvidia cards haven&rsquo;t always fully supported <span class="stt">xrandr</span>,
 but used another "meta mode" system instead. I decided to use a meta
 mode:</p>
 
 
-<p>&lsquo;nvidia-settings &ndash;assign CurrentMetaMode="DFP-2: 1440x900 { ViewPortIn=1400x900, ViewPortOut=1400x900+20+0 }, DFP-1: 1400x1050 { ViewPortIn=1400x900, ViewPortOut=1400x900+0+75 }"&lsquo;</p>
+<p><span class="hspace">&nbsp;&nbsp;</span><span class="stt">nvidia-settings --assign CurrentMetaMode="DFP-2: 1440x900 { ViewPortIn=1400x900, ViewPortOut=1400x900+20+0 }, DFP-1: 1400x1050 { ViewPortIn=1400x900, ViewPortOut=1400x900+0+75 }"</span></p>
 
 
 <p>Unfortunately, this failed too, and would sometimes crash my X
@@ -220,7 +219,7 @@ on my laptop, but it was a small resolution (640x480) and it was
 unscaled on my computer, so it was a tiny little box:</p>
 
 
-<p>&lsquo;nvidia-settings &ndash;assign CurrentMetaMode="DFP-2: 1440x900 { ViewPortIn=640x480, ViewPortOut=640x480+400+210 }, DFP-1: 640x480 { ViewPortIn=640x480, ViewPortOut=640x480+0+0 }"&lsquo;</p>
+<p><span class="hspace">&nbsp;&nbsp;</span><span class="stt">nvidia-settings --assign CurrentMetaMode="DFP-2: 1440x900 { ViewPortIn=640x480, ViewPortOut=640x480+400+210 }, DFP-1: 640x480 { ViewPortIn=640x480, ViewPortOut=640x480+0+0 }"</span></p>
 
 
 <p>But I continued to try...</p>
@@ -239,8 +238,8 @@ read. Defeated again.</p>
 
 
 <p>This was a fruitful path though, because it made me discover the
-&lsquo;ModeValidation&lsquo; option in my X config where I could add
-&lsquo;AllowNonEdidModes&lsquo; so that the X server wouldn&rsquo;t insist on only using
+<span class="stt">ModeValidation</span> option in my X config where I could add
+<span class="stt">AllowNonEdidModes</span> so that the X server wouldn&rsquo;t insist on only using
 modes that were given by the EDID block.</p>
 
 
@@ -250,26 +249,26 @@ modes that were given by the EDID block.</p>
 <p>Next, I tried to turn off other checks on valid modes:</p>
 
 
-<p>&lsquo;NoHorizSyncCheck&lsquo;</p>
+<p><span class="stt">NoHorizSyncCheck</span></p>
 
 
 <p>Failure.</p>
 
 
-<p>&lsquo;NoVertRefreshCheck&lsquo;</p>
+<p><span class="stt">NoVertRefreshCheck</span></p>
 
 
 <p>Failure.</p>
 
 
-<p>&lsquo;NoDFPNativeResolutionCheck&lsquo;</p>
+<p><span class="stt">NoDFPNativeResolutionCheck</span></p>
 
 
 <p>Failure.</p>
 
 
 <p>I had almost given up. I decided to read through the entire Nvidia X
-configuration manual and I discovered the &lsquo;ModeDebug&lsquo; option that
+configuration manual and I discovered the <span class="stt">ModeDebug</span> option that
 would give detailed reasons for why certain modes were not allowed. I
 turned that on, restarted X, and tried to use the big resolution...</p>
 
@@ -279,7 +278,7 @@ clock". I don&rsquo;t know what a pixel clock is, but I looked in the manual
 and found another mode validation override:</p>
 
 
-<p>&lsquo;NoEdidMaxPClkCheck&lsquo;</p>
+<p><span class="stt">NoEdidMaxPClkCheck</span></p>
 
 
 <p>Success.</p>

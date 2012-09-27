@@ -1,9 +1,9 @@
 #lang scribble/lp
-@(require "../../post.rkt"
+@(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
                      racket/list))
-@yaml{
+@literal{
 ---
 layout: post
 title: "Continuation Marks, part I: Dynamic Wind"
@@ -28,32 +28,31 @@ we need to cover a different feature of Racket called
 but I like to pronounce it like a gust of wind and say "Dynaaamic
 WIND!" as if it was a Street Fighter move.)
 
-@more
+@(the-jump)
 
 The classic example of continuation marks is a flow-sensitive
 variable, like the current indentation level of debugging printfs.
 
 For example, suppose you have this program:
 
-@chunky[<show-structure>
-        (define show-structure
-          (match-lambda
-           [(list e ...)
-            (with-indentation
-             (λ () (for-each show-structure e)))]
-           [(? number? x)
-            (displayln/indent x)]))]
+@chunk[<show-structure>
+       (define show-structure
+         (match-lambda
+          [(list e ...)
+           (with-indentation
+            (λ () (for-each show-structure e)))]
+          [(? number? x)
+           (displayln/indent x)]))]
 
 And with this example
 
-@chunky[<example1>
-        (show-structure 
-         (list (list 1 2) 3 (list 4 5) 6 (list 7 (list 8) 9)))]
+@chunk[<example1>
+       (show-structure 
+        (list (list 1 2) 3 (list 4 5) 6 (list 7 (list 8) 9)))]
 
 You want it to print as:
 
 @verbatim{
-{% codeblock %}
   1
   2
  3
@@ -63,22 +62,21 @@ You want it to print as:
   7
    8
   9
-{% endcodeblock %}
 }
 
 One obvious way is to use a global variable:
 
-@chunky[<mutation>
-        (define indent-level 0)
-        (define (with-indentation t)
-          (define originally indent-level)
-          (set! indent-level (add1 originally))
-          (t)
-          (set! indent-level originally))
-        (define (displayln/indent x)
-          (for ([i (in-range indent-level)])
-            (display " "))
-          (displayln x))]
+@chunk[<mutation>
+       (define indent-level 0)
+       (define (with-indentation t)
+         (define originally indent-level)
+         (set! indent-level (add1 originally))
+         (t)
+         (set! indent-level originally))
+       (define (displayln/indent x)
+         (for ([i (in-range indent-level)])
+           (display " "))
+         (displayln x))]
 
 The key is to reset the indentation level after the thunk returns.
 
@@ -86,17 +84,16 @@ However, this is not a robust technique in the presence of control
 effects. For example, if the code throws an exception than the reset
 will not occur.
 
-@chunky[<example2>
-        (with-handlers ([exn:misc:match? (λ (x) 'failed)])
-          (show-structure
-           (list 1 (list 2 (list 3 'error!)))))
-        (show-structure
-         (list 1 (list 2 (list 3))))]
+@chunk[<example2>
+       (with-handlers ([exn:misc:match? (λ (x) 'failed)])
+         (show-structure
+          (list 1 (list 2 (list 3 'error!)))))
+       (show-structure
+        (list 1 (list 2 (list 3))))]
 
 So it prints as:
 
 @verbatim{
-{% codeblock %}
  1
   2
    3
@@ -104,7 +101,6 @@ So it prints as:
     1
      2
       3          
-{% endcodeblock %}
 }
 
 And every subsequent is off by three. The same problem occurs when
@@ -113,21 +109,21 @@ continuations are captured and invoked.
 Racket provides a feature called @racket[dynamic-wind] that helps you
 write this mutation code safely with respect to control effects:
 
-@chunky[<mutation-control-safe>
-        (define indent-level 0)
-        (define (with-indentation t)
-          (define originally indent-level)
-          (dynamic-wind
-              (λ ()
-                (set! indent-level (add1 originally)))
-              (λ () 
-                (t))
-              (λ ()
-                (set! indent-level originally))))
-        (define (displayln/indent x)
-          (for ([i (in-range indent-level)])
-            (display " "))
-          (displayln x))]
+@chunk[<mutation-control-safe>
+       (define indent-level 0)
+       (define (with-indentation t)
+         (define originally indent-level)
+         (dynamic-wind
+             (λ ()
+               (set! indent-level (add1 originally)))
+             (λ () 
+               (t))
+             (λ ()
+               (set! indent-level originally))))
+       (define (displayln/indent x)
+         (for ([i (in-range indent-level)])
+           (display " "))
+         (displayln x))]
 
 @racket[dynamic-wind] takes three functions. The first gets called
 whenever the body is "entered", the second is the body and is just
@@ -148,94 +144,94 @@ Try to predict the output of these programs:
 
 Example 1: Just a sequence of printfs.
 
-@chunky[<dw-1>
-        (begin
-          (printf "In\n")
-          (printf "Body\n")
-          (printf "Out\n"))]
+@chunk[<dw-1>
+       (begin
+         (printf "In\n")
+         (printf "Body\n")
+         (printf "Out\n"))]
 
 Example 2: An equivalent sequence, but within @racket[dynamic-wind].
 
-@chunky[<dw-2>
-        (begin
-          (dynamic-wind
-              (λ () (printf "In\n"))
-              (λ () (printf "Body\n"))
-              (λ () (printf "Out\n"))))]
+@chunk[<dw-2>
+       (begin
+         (dynamic-wind
+             (λ () (printf "In\n"))
+             (λ () (printf "Body\n"))
+             (λ () (printf "Out\n"))))]
 
 Example 3: An almost identical sequence, but now with an exception.
 
-@chunky[<dw-3>
-        (with-handlers
-            ([(λ (x) #t) (λ (x) x)])
-          (dynamic-wind
-              (λ () (printf "In\n"))
-              (λ () 
-                (printf "Body Pre\n")
-                (raise 'error)
-                (printf "Body Post\n"))
-              (λ () (printf "Out\n"))))]
+@chunk[<dw-3>
+       (with-handlers
+           ([(λ (x) #t) (λ (x) x)])
+         (dynamic-wind
+             (λ () (printf "In\n"))
+             (λ () 
+               (printf "Body Pre\n")
+               (raise 'error)
+               (printf "Body Post\n"))
+             (λ () (printf "Out\n"))))]
 
 Example 4: Now we replace the raise with continuation capture and
 invoke the continuation.
 
-@chunky[<dw-4>
-        (begin
-          (define the-k #f)
-          (when
-              (dynamic-wind
-                  (λ () (printf "In\n"))
-                  (λ () 
-                    (printf "Body Pre\n")
-                    (begin0
-                      (let/cc k                  
-                        (set! the-k k))
-                      (printf "Body Post\n")))
-                  (λ () (printf "Out\n")))
-            (the-k #f)))]
+@chunk[<dw-4>
+       (begin
+         (define the-k #f)
+         (when
+             (dynamic-wind
+                 (λ () (printf "In\n"))
+                 (λ () 
+                   (printf "Body Pre\n")
+                   (begin0
+                     (let/cc k                  
+                       (set! the-k k))
+                     (printf "Body Post\n")))
+                 (λ () (printf "Out\n")))
+           (the-k #f)))]
 
 Bonus question: Why doesn't this code infinite loop?
 
 Example 5: Now rather than using mutation, we communicate the
 continuation with an exception.
 
-@chunky[<dw-5>
-        (begin
-          (with-handlers 
-              ([continuation?
-                (λ (k)
-                  (k 0))])
-            (dynamic-wind
-                (λ () (printf "In\n"))
-                (λ () 
-                  (printf "Body Pre\n")
-                  (let/cc k
-                    (raise k))
-                  (printf "Body Post\n"))
-                (λ () (printf "Out\n")))))]
+@chunk[<dw-5>
+       (begin
+         (with-handlers 
+             ([continuation?
+               (λ (k)
+                 (k 0))])
+           (dynamic-wind
+               (λ () (printf "In\n"))
+               (λ () 
+                 (printf "Body Pre\n")
+                 (let/cc k
+                   (raise k))
+                 (printf "Body Post\n"))
+               (λ () (printf "Out\n")))))]
 
 Example 6: Invoking the continuation repeatedly inside the exception
 handler.
 
-@chunky[<dw-6>
-        (begin
-          (with-handlers 
-              ([pair?
-                (λ (k*n)
-                  (printf "Pong\n")
-                  ((car k*n) (add1 (cdr k*n))))])
-            (dynamic-wind
-                (λ () (printf "In\n"))
-                (λ () 
-                  (printf "Body Pre\n")
-                  (let loop ([i 0])
-                    (unless (= i 3)
-                      (printf "Ping ~a\n" i)
-                      (loop
-                       (let/cc k
-                         (raise (cons k i))))))
-                  (printf "Body Post\n"))
-                (λ () (printf "Out\n")))))]
+@chunk[<dw-6>
+       (begin
+         (with-handlers 
+             ([pair?
+               (λ (k*n)
+                 (printf "Pong\n")
+                 ((car k*n) (add1 (cdr k*n))))])
+           (dynamic-wind
+               (λ () (printf "In\n"))
+               (λ () 
+                 (printf "Body Pre\n")
+                 (let loop ([i 0])
+                   (unless (= i 3)
+                     (printf "Ping ~a\n" i)
+                     (loop
+                      (let/cc k
+                        (raise (cons k i))))))
+                 (printf "Body Post\n"))
+               (λ () (printf "Out\n")))))]
 
 Next week we'll go on to how @racket[dynamic-wind] relates to
 continuation marks.
@@ -243,7 +239,6 @@ continuation marks.
 And here is the expected output, by the way:
 
 @verbatim{
-{% codeblock %}
 Example 1
 In
 Body
@@ -294,40 +289,37 @@ Pong
 In
 Body Post
 Out
-{% endcodeblock %}
 }
 
 By the way, if you use this code at home, make sure you put the code
 in this order:
 
-@chunky[<*>
-        (require racket/match)
+@chunk[<*>
+       (require racket/match)
 
-        (let ()
-          (printf "Control un-Safe\n")
-          <mutation>
-          <show-structure>
-          <example1>
-          <example2>)
+       (let ()
+         (printf "Control un-Safe\n")
+         <mutation>
+         <show-structure>
+         <example1>
+         <example2>)
 
-        (let ()
-          (printf "Control Safe\n")
-          <mutation-control-safe>
-          <show-structure>
-          <example1>
-          <example2>)
+       (let ()
+         (printf "Control Safe\n")
+         <mutation-control-safe>
+         <show-structure>
+         <example1>
+         <example2>)
 
-        (printf "\nExample 1\n")
-        <dw-1>
-        (printf "\nExample 2\n")
-        <dw-2>
-        (printf "\nExample 3\n")
-        <dw-3>
-        (printf "\nExample 4\n")
-        <dw-4>
-        (printf "\nExample 5\n")
-        <dw-5>
-        (printf "\nExample 6\n")
-        <dw-6>]
-
-@download-link
+       (printf "\nExample 1\n")
+       <dw-1>
+       (printf "\nExample 2\n")
+       <dw-2>
+       (printf "\nExample 3\n")
+       <dw-3>
+       (printf "\nExample 4\n")
+       <dw-4>
+       (printf "\nExample 5\n")
+       <dw-5>
+       (printf "\nExample 6\n")
+       <dw-6>]

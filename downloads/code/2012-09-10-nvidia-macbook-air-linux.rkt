@@ -1,9 +1,9 @@
 #lang scribble/lp
-@(require "../../post.rkt"
+@(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
                      racket/list))
-@yaml{
+@literal{
 ---
 layout: post
 title: "Linux on a MacBook Air and Nvidia Projector Woes"
@@ -30,25 +30,25 @@ with an Nvidia graphics card is particularly exciting. I had a brutal
 problem with my projector setup, but I found the solution. In this
 post, I lay out my tale of woe.
 
-@more
+@(the-jump)
 
 Since it's September again, it is time to teach class and I need to
 project from my laptop. I'd been using multiple displays for a long
 time with my Mac (I have an external screen in my office), so I
 presumed that I had everything working correctly.
 
-I use <a href="http://willem.engen.nl/projects/disper/">disper</a> to
+I use @link["http://willem.engen.nl/projects/disper/"]{disper} to
 manage my display configurations. From Linux's perspective, my Air has
 three displays: DFP-0 (the external display when it is connected with
 DVI), DFP-1 (the external display when it is connected with VGA), and
 DFP-2 (the built-in screen.) So I assumed it would be as simple as
-typing `disper -c` after connecting to clone my desktop across the two
+typing @tt{disper -c} after connecting to clone my desktop across the two
 displays.
 
 Unfortunately, I got the error message: "Displays do not share a
 common resolution". That's strange, I think, I distinctly remember
 using these projectors last year, on OS X and getting a decently sized
-screen (1024x768, I believe.) A quick `disper -l` reveals that my
+screen (1024x768, I believe.) A quick @tt{disper -l} reveals that my
 DFP-1 only has one resolution: "640x480".
 
 This was right before class, so I just used that resolution only on
@@ -56,7 +56,7 @@ the projector and looked up at the screen when I needed to. Ugly, but
 workable.
 
 The next day I read all about XRandr and how you can add video modes
-using `gtf` and `xrandr` and thought I had everything figured
+using @tt{gtf} and @tt{xrandr} and thought I had everything figured
 out. When I went to connect again during a day I didn't teach, I had
 an unbearable time of getting tons and tons of error messages and no
 success.
@@ -65,7 +65,7 @@ I dealt with the small screen in class for a second day.
 
 After that, I decided that I would connect with OS X on my laptop and
 write down which video modes, resolutions, refresh rates, etc it could
-handle so I could pass the correct arguments to `gtf`. I was delighted
+handle so I could pass the correct arguments to @tt{gtf}. I was delighted
 when I realized I'd be able to run the projector at 1400x1050 and my
 laptop screen at 1440x900 and have them share a 1400x900 desktop. This
 wasn't the default in OS X, but it was an option.
@@ -73,19 +73,19 @@ wasn't the default in OS X, but it was an option.
 Booting back to Linux, I had a harrowing experience trying to override
 the X server settings to get this mode enabled. Nothing.
 
-At this point, I realized that I originally chose `disper` rather than
-`xrandr` because Nvidia cards haven't always fully supported `xrandr`,
+At this point, I realized that I originally chose @tt{disper} rather than
+@tt{xrandr} because Nvidia cards haven't always fully supported @tt{xrandr},
 but used another "meta mode" system instead. I decided to use a meta
 mode:
 
-`nvidia-settings --assign CurrentMetaMode="DFP-2: 1440x900 { ViewPortIn=1400x900, ViewPortOut=1400x900+20+0 }, DFP-1: 1400x1050 { ViewPortIn=1400x900, ViewPortOut=1400x900+0+75 }"`
+@commandline{nvidia-settings --assign CurrentMetaMode="DFP-2: 1440x900 { ViewPortIn=1400x900, ViewPortOut=1400x900+20+0 }, DFP-1: 1400x1050 { ViewPortIn=1400x900, ViewPortOut=1400x900+0+75 }"}
 
 Unfortunately, this failed too, and would sometimes crash my X
 server. But I was able to at least mirror the screen on the projector
 on my laptop, but it was a small resolution (640x480) and it was
 unscaled on my computer, so it was a tiny little box:
 
-`nvidia-settings --assign CurrentMetaMode="DFP-2: 1440x900 { ViewPortIn=640x480, ViewPortOut=640x480+400+210 }, DFP-1: 640x480 { ViewPortIn=640x480, ViewPortOut=640x480+0+0 }"`
+@commandline{nvidia-settings --assign CurrentMetaMode="DFP-2: 1440x900 { ViewPortIn=640x480, ViewPortOut=640x480+400+210 }, DFP-1: 640x480 { ViewPortIn=640x480, ViewPortOut=640x480+0+0 }"}
 
 But I continued to try...
 
@@ -100,28 +100,28 @@ it said that it was fake data and that actually the EDID couldn't be
 read. Defeated again.
 
 This was a fruitful path though, because it made me discover the
-`ModeValidation` option in my X config where I could add
-`AllowNonEdidModes` so that the X server wouldn't insist on only using
+@tt{ModeValidation} option in my X config where I could add
+@tt{AllowNonEdidModes} so that the X server wouldn't insist on only using
 modes that were given by the EDID block.
 
 Failure.
 
 Next, I tried to turn off other checks on valid modes:
 
-`NoHorizSyncCheck`
+@tt{NoHorizSyncCheck}
 
 Failure.
 
-`NoVertRefreshCheck`
+@tt{NoVertRefreshCheck}
 
 Failure.
 
-`NoDFPNativeResolutionCheck`
+@tt{NoDFPNativeResolutionCheck}
 
 Failure.
 
 I had almost given up. I decided to read through the entire Nvidia X
-configuration manual and I discovered the `ModeDebug` option that
+configuration manual and I discovered the @tt{ModeDebug} option that
 would give detailed reasons for why certain modes were not allowed. I
 turned that on, restarted X, and tried to use the big resolution...
 
@@ -129,7 +129,7 @@ The error message was "pixel clock exceeds maximum EDID pixel
 clock". I don't know what a pixel clock is, but I looked in the manual
 and found another mode validation override:
 
-`NoEdidMaxPClkCheck`
+@tt{NoEdidMaxPClkCheck}
 
 Success.
 

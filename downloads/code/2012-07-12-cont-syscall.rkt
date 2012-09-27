@@ -1,9 +1,13 @@
 #lang scribble/lp
-@(require "../../post.rkt"
-          (for-label racket/base
+@(require (planet ryanc/scriblogify/scribble-util)
+          (for-label (except-in racket/base
+                                thread
+                                exit
+                                printf)
+                     (prefix-in racket: racket/base)
                      rackunit
                      racket/list))
-@yaml{
+@literal{
 ---
 layout: post
 title: "Domain-Specific Operating Systems: Threads, System Calls, and Continuations"
@@ -22,30 +26,29 @@ are based on continuations in user-land. This post I'll extend that
 system to provide system calls that control access to sensitive
 resources, such as files and the thread pool.
 
-@more
+@(the-jump)
 
 We'll be working from the same example program as last week, except
 that we'll be changing @racket[printf] from a "primitive" function to
 a system call. Here's the program:
 
-@chunky[<example>
-        (define (main)
-          (define N 5)
-          (thread
-           (λ ()
-             (for ([i (in-range (+ N 2))])
-               (printf "iter: ~a\n" i) )))
-          (thread
-           (λ ()
-             (for/fold ([sum 0]) 
-                 ([i (in-range N)])
-               (printf "adder: ~a\n" (+ i sum))
-               (+ i sum)))))]
+@chunk[<example>
+       (define (main)
+         (define N 5)
+         (thread
+          (λ ()
+            (for ([i (in-range (+ N 2))])
+              (printf "iter: ~a\n" i) )))
+         (thread
+          (λ ()
+            (for/fold ([sum 0]) 
+                ([i (in-range N)])
+              (printf "adder: ~a\n" (+ i sum))
+              (+ i sum)))))]
 
 Recall that this program has the following output:
 
 @verbatim{
-{% codeblock %}
 adder: 0
 iter: 0
 adder: 1
@@ -58,48 +61,47 @@ adder: 10
 iter: 4
 iter: 5
 iter: 6
-{% endcodeblock %}
 }
 
 In the original threading system, global mutable variables were used
 to handle the state of the threading system:
 
-@chunky[<basic-threading-system>
-        (define ts empty)
-        (define (yield)
-          (match ts
-            [(list)
-             (void)]
-            [(cons next rest)
-             (let/cc k
-               (set! ts (snoc rest k))
-               (next))]))
+@chunk[<basic-threading-system>
+       (define ts empty)
+       (define (yield)
+         (match ts
+           [(list)
+            (void)]
+           [(cons next rest)
+            (let/cc k
+              (set! ts (snoc rest k))
+              (next))]))
 
-        (define (thread t)
-          (set! ts 
-                (cons (λ () 
-                        (abort-current-continuation
-                         (default-continuation-prompt-tag)
-                         (λ ()
-                           (t)
-                           (exit))))
-                      ts)))
-        (define (exit)
-          (match ts
-            [(list)
-             (void)]
-            [(cons next rest)
-             (set! ts rest)
-             (next)]))
+       (define (thread t)
+         (set! ts 
+               (cons (λ () 
+                       (abort-current-continuation
+                        (default-continuation-prompt-tag)
+                        (λ ()
+                          (t)
+                          (exit))))
+                     ts)))
+       (define (exit)
+         (match ts
+           [(list)
+            (void)]
+           [(cons next rest)
+            (set! ts rest)
+            (next)]))
 
-        (define (printf . args)
-          (begin0 (apply racket:printf args)
-                  (yield)))
-        
-        (call-with-continuation-prompt
-         (λ ()
-           (main)
-           (exit)))]
+       (define (printf . args)
+         (begin0 (apply racket:printf args)
+                 (yield)))
+       
+       (call-with-continuation-prompt
+        (λ ()
+          (main)
+          (exit)))]
 
 Notice that the "logical" system calls---@racket[thread],
 @racket[exit], @racket[yield] and @racket[printf]---all mutate the
@@ -107,40 +109,40 @@ thread system's state (@racket[ts]). This makes the system difficult
 to test and analyze.
 
 Our goal is to tease out all this code into a single "kernel" that
-actually /is/ the threading system and exists independently from the
+actually @emph{is} the threading system and exists independently from the
 state of the various threads. Here's a sketch of the kernel:
 
-@chunky[<kernel>
-        (struct kernel (threads))
+@chunk[<kernel>
+       (struct kernel (threads))
 
-        (define (boot main)
-          (define initial (kernel (list main)))
-          (let loop ([ks initial])
-            (unless (empty? (kernel-threads ks))
-              (loop (step-one-thread ks)))))]
+       (define (boot main)
+         (define initial (kernel (list main)))
+         (let loop ([ks initial])
+           (unless (empty? (kernel-threads ks))
+             (loop (step-one-thread ks)))))]
 
 The state of the kernel will simply be the list of threads and all the
 kernel really does is continuously call @racket[step-one-thread] to
 advance the state of the kernel until all the threads exit. All the
 work will, of course, take place in @racket[step-one-thread]:
 
-@chunky[<step-one-thread>
-        (define (step-one-thread ks)
-          (match-define (kernel (cons top-thread other-threads)) ks)
-          (define syscall (run-thread-until-syscall top-thread))
-          (execute-syscall syscall (kernel other-threads)))]
+@chunk[<step-one-thread>
+       (define (step-one-thread ks)
+         (match-define (kernel (cons top-thread other-threads)) ks)
+         (define syscall (run-thread-until-syscall top-thread))
+         (execute-syscall syscall (kernel other-threads)))]
 
 Its job is simply to select the first thread, run it until it reaches
 a system call and then deal with the system call.
 
 Let's represent each system call as structure:
 
-@chunky[<syscalls>
-        (struct syscall (user-context))
+@chunk[<syscalls>
+       (struct syscall (user-context))
 
-        (struct syscall:thread syscall (child-thunk))
-        (struct syscall:exit syscall ())
-        (struct syscall:printf syscall (fmt arg))]
+       (struct syscall:thread syscall (child-thunk))
+       (struct syscall:exit syscall ())
+       (struct syscall:printf syscall (fmt arg))]
 
 The thing that all system calls have in common is that the context of
 the user program is preserved, but other than that, each is distinct
@@ -149,17 +151,17 @@ in the data that it carries.
 Once this is in place, we can pretty easily write the code to handle
 the system calls and update the kernel's state:
 
-@chunky[<execute-syscall>
-        (define (execute-syscall call kernel-state)
-          (match-define (kernel threads) kernel-state)
-          (match call
-            [(syscall:thread user-ctxt child-t)
-             (kernel (list* user-ctxt child-t threads))]
-            [(syscall:exit user-ctxt)
-             (kernel threads)]
-            [(syscall:printf user-ctxt fmt arg)
-             (racket:printf fmt arg)
-             (kernel (snoc threads user-ctxt))]))]
+@chunk[<execute-syscall>
+       (define (execute-syscall call kernel-state)
+         (match-define (kernel threads) kernel-state)
+         (match call
+           [(syscall:thread user-ctxt child-t)
+            (kernel (list* user-ctxt child-t threads))]
+           [(syscall:exit user-ctxt)
+            (kernel threads)]
+           [(syscall:printf user-ctxt fmt arg)
+            (racket:printf fmt arg)
+            (kernel (snoc threads user-ctxt))]))]
 
 A new thread just needs to push both contexts (the parent and the
 child) onto the thread queue. (We add them to the top of the queue to
@@ -179,46 +181,46 @@ back to the kernel as something like an exception (really, an abort,
 which you can think of as an exception that can only be caught by
 privileged code.)
 
-@chunky[<syscall-throw:thread>
-        (define (thread child-t)
-          (call-with-composable-continuation
-           (λ (user-ctxt)
-             (abort-current-continuation
-              kernel-prompt-tag
-              (syscall:thread user-ctxt child-t)))
-           kernel-prompt-tag))]
+@chunk[<syscall-throw:thread>
+       (define (thread child-t)
+         (call-with-composable-continuation
+          (λ (user-ctxt)
+            (abort-current-continuation
+             kernel-prompt-tag
+             (syscall:thread user-ctxt child-t)))
+          kernel-prompt-tag))]
 
 The other code will be very similar to this, so we'll write a macro to
 simplify it:
 
-@chunky[<syscall-throw>
-        (define-syntax-rule 
-          (define-syscall-throw user-id syscall-id)
-          (define (user-id . syscall-args)
-            (call-with-composable-continuation
-             (λ (user-ctxt)
-               (abort-current-continuation
-                kernel-prompt-tag
-                (apply syscall-id user-ctxt syscall-args)))
-             kernel-prompt-tag)))
+@chunk[<syscall-throw>
+       (define-syntax-rule 
+         (define-syscall-throw user-id syscall-id)
+         (define (user-id . syscall-args)
+           (call-with-composable-continuation
+            (λ (user-ctxt)
+              (abort-current-continuation
+               kernel-prompt-tag
+               (apply syscall-id user-ctxt syscall-args)))
+            kernel-prompt-tag)))
 
-        (define-syscall-throw thread syscall:thread)
-        (define-syscall-throw exit syscall:exit)
-        (define-syscall-throw printf syscall:printf)]
+       (define-syscall-throw thread syscall:thread)
+       (define-syscall-throw exit syscall:exit)
+       (define-syscall-throw printf syscall:printf)]
 
 Now that we know how the "thrower" works, we can easily implement
 the "catcher":
 
-@chunky[<syscall-catch>
-        (define kernel-prompt-tag 
-          (make-continuation-prompt-tag 'kernel))
-        (define (run-thread-until-syscall thread-ctxt)
-          (call-with-continuation-prompt
-           (λ ()
-             (thread-ctxt)
-             (exit))
-           kernel-prompt-tag
-           values))]
+@chunk[<syscall-catch>
+       (define kernel-prompt-tag 
+         (make-continuation-prompt-tag 'kernel))
+       (define (run-thread-until-syscall thread-ctxt)
+         (call-with-continuation-prompt
+          (λ ()
+            (thread-ctxt)
+            (exit))
+          kernel-prompt-tag
+          values))]
 
 This code says that you just invoke the thread context like a
 function, but you wrap it in a new prompt. When the code inside aborts
@@ -247,23 +249,21 @@ I'll write more about it in the future.
 By the way, if you use this code at home, make sure you put the code
 in this order:
 
-@chunky[<*>
-        (require racket/list
-                 racket/match
-                 (prefix-in racket: racket/base))
+@chunk[<*>
+       (require racket/list
+                racket/match
+                (prefix-in racket: racket/base))
 
-        (define (snoc l x)
-          (append l (list x)))
+       (define (snoc l x)
+         (append l (list x)))
 
-        <kernel>
-        <step-one-thread>
-        <syscalls>
-        <execute-syscall>
-        <syscall-throw>
-        <syscall-catch>
+       <kernel>
+       <step-one-thread>
+       <syscalls>
+       <execute-syscall>
+       <syscall-throw>
+       <syscall-catch>
 
-        <example>
+       <example>
 
-        (boot main)]
-
-@download-link
+       (boot main)]
