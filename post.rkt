@@ -2,25 +2,17 @@
 (require scribble/base
          (for-syntax racket/base
                      unstable/syntax)
+         (planet ryanc/scriblogify/scribble-util)
          scribble/lp)
 
-(define yaml verbatim)
-(define more
-  @verbatim{
-<!-- more -->
-}
-  )
+(define yaml literal)
+(define more (the-jump))
 
 (define-syntax-rule (chunky . e)
-  (begin @verbatim{{% codeblock lang:scheme %}} (chunk . e) @verbatim{{% endcodeblock %}}))
+  (chunk . e))
 
 (define-syntax-rule (verbatim:codeblock e ...)
-  (verbatim "{% codeblock %}\n"
-            e ...
-            "{% endcodeblock %}\n"))
-
-;; (define-syntax (download-link stx)
-;;   (quasisyntax/loc stx @verbatim[(format "[Download](/downloads/code/~a)" #,(path->string (syntax-source-file-name stx)))]))
+  (verbatim e ...))
 
 (define-syntax (download-link stx)
   (syntax/loc stx (void)))

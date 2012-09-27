@@ -2,12 +2,15 @@
 (require racket/system
          racket/path
          racket/file
-         racket/runtime-path)
+         racket/port
+         racket/runtime-path
+         (planet ryanc/scriblogify))
 
 (define-runtime-path posts "_posts")
 (define-runtime-path posts.rkt "downloads/code")
 
 (define (rkt->markdown rkt-p)
+  (printf "~a\n" rkt-p)
   (define build-dir
     (build-path (current-directory) "build"))
   (make-directory* build-dir)
@@ -18,19 +21,22 @@
     #:exists 'replace
     (λ ()
       (printf "#lang scribble/base\n")
-      (printf "@(require scribble/lp-include)\n")
+      (printf "@(require scribble/lp-include) @author{Jay McCarthy}\n")
       (printf "@lp-include[~v]\n"
               (path->string
                (find-relative-path build-dir
                                    (build-path (current-directory)
                                                rkt-p))))))
-  (parameterize ([current-directory build-dir])
-    (system* (find-executable-path "raco") "scribble" "--text" scrbl-p))
-  (define text-p
-    (build-path build-dir
-                (path-replace-suffix rkt-p #".txt")))
-  (define markdown-p (path-replace-suffix rkt-p #".markdown"))
-  (rename-file-or-directory text-p (build-path posts markdown-p) #t)
+  (define html-str
+    (with-output-to-string
+      (λ ()
+        (scriblogify (path->string scrbl-p) #:link-to-pre? #t))))
+  (define markdown-p 
+    (build-path posts (path-replace-suffix rkt-p #".html")))
+  (display-to-file
+   (regexp-replace #rx"^<p>---(.*?)---</p>" html-str "---\\1---\n\n")
+   markdown-p 
+    #:exists 'replace)
   (delete-directory/files build-dir))
 
 (parameterize ([current-directory posts.rkt])

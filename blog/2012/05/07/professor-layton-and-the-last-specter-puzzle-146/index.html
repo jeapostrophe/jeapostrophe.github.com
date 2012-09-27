@@ -9,9 +9,8 @@
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="This is for Puzzle 146. Here is the
-puzzle: A bookcase has seven shelves each filled with 10 books of the same
-size. When you choose a book, you must &hellip;">
+  <meta name="description" content="This is for [Puzzle 146](http://tinyurl.com/7yefk76). Here is the puzzle:&gt; A bookcase has seven shelves each filled with 10 books of the same
+size &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -22,6 +21,7 @@ size. When you choose a book, you must &hellip;">
   
   <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/05/07/professor-layton-and-the-last-specter-puzzle-146">
   <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/racket.css" rel="stylesheet" type="text/css">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
@@ -107,21 +107,12 @@ size. When you choose a book, you must &hellip;">
   </header>
 
 
-  <div class="entry-content"><p>This is for <a href="http://tinyurl.com/7yefk76">Puzzle 146</a>. Here is the
-puzzle:</p>
-
-<blockquote><p>A bookcase has seven shelves each filled with 10 books of the same
-size.</p>
-
-<p>When you choose a book, you must also take the two books above, below,
-to the left, and to the right of the one you actually want. If there are
-fewer than two books in any of these directions, you cannot choose that
-book.</p>
-
-<p>Choosing as many books as possible, how many books will you end up
-taking?</p></blockquote>
-
-</div>
+  <div class="entry-content"><p>This is for [Puzzle 146](http://tinyurl.com/7yefk76). Here is the puzzle:</p><p>&gt; A bookcase has seven shelves each filled with 10 books of the same
+size.</p><p>&gt; When you choose a book, you must also take the two books above,
+below, to the left, and to the right of the one you actually want. If
+there are fewer than two books in any of these directions, you cannot
+choose that book.</p><p>&gt; Choosing as many books as possible, how many books will you end up
+taking?</p></div>
   
   
     <div style="text-align: center;">
@@ -138,186 +129,47 @@ taking?</p></blockquote>
   </script>
 </div>
 
-    <div class="entry-content" style="margin-top: 1em;">
-
-
-<p>I encoded the bookcase as a hash table in Racket, where the key is the
-coordinate of the book and the value is whether the book has been taken.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;bookcase&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">bookcase</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for*/hash</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">shelf</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="mi">7</span><span class="p">)</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">              [</span><span class="nv">book</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="mi">10</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">values</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">shelf</span><span class="err"> </span><span class="nv">book</span><span class="p">)</span><span class="err"> </span><span class="no">#t</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I didn’t know when I wrote it, but I assumed that it would not matter
+    <div class="entry-content" style="margin-top: 1em;"><p>I encoded the bookcase as a hash table in Racket, where the key is the
+coordinate of the book and the value is whether the book has been
+taken.</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cbookcase~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cbookcase~3e~3a1))" class="plainlink" pltdoc="x">&lt;bookcase&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">bookcase</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for*%2Fhash))" class="RktStxLink" pltdoc="x">for*/hash</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">shelf</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktVal">7</span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktSym">book</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktVal">10</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/values.html#(def._((quote._~23~25kernel)._values))" class="RktValLink" pltdoc="x">values</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">shelf</span><span class="hspace">&nbsp;</span><span class="RktSym">book</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktVal">#t</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>I didn&rsquo;t know when I wrote it, but I assumed that it would not matter
 what order you picked the books in, so I just considered taking them
-from left to right, and top to bottom. After consider each book, I would
-return the new bookcase, after having removed some books. The number of
-books in this bookcase, subtracted from 70, would give me the number
-selected:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;selecting&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">final-bookcase</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for*/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">bookcase</span><span class="err"> </span><span class="nv">bookcase</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">shelf</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="mi">7</span><span class="p">)</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">       [</span><span class="nv">book</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="mi">10</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">    </span><span class="nv">&lt;loop-body&gt;</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">-</span><span class="err"> </span><span class="mi">70</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-count</span><span class="err"> </span><span class="nv">final-bookcase</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Inside the loop, it will be convenient to bind an escape continuation to
-return early. The actual loop body is divided into three parts. First,
-we’ll make sure that the book we’re consider is actually there. Then,
-we’ll make sure it has two books in every directions. Finally, we’ll
-return the updated bookcase. The code will look like this:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;loop-body&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">let/ec</span><span class="err"> </span><span class="nv">return</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;check-this-book&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;check-others&gt;</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;update-bookcase&gt;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The first part is really simple: just call our predicate and if it isn’t
-there, call the escape continuation to jump past the rest of the code
-and leave the bookcase unchanged.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;check-this-book&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">unless</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-has-key?</span><span class="err"> </span><span class="nv">bookcase</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">shelf</span><span class="err"> </span><span class="nv">book</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">return</span><span class="err"> </span><span class="nv">bookcase</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The middle part is the most complicated. Here’s the idea: we’ll loop
-over the eight other different books (the two above, below, to the left,
-and to the right) and remove them from the bookcase, if they are there.
-If any book isn’t there, we’ll return from the outer loop with the
-original bookcase, because the conditions aren’t met, using the escape
-continuation.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;check-others&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">other-book-offsets</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">1</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">-1</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">-2</span><span class="err"> </span><span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">1</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">2</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">-1</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">-2</span><span class="p">)))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">new-bookcase</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for*/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">new-bookcase</span><span class="err"> </span><span class="nv">bookcase</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">diff</span><span class="err"> </span><span class="p">(</span><span class="nf">in-list</span><span class="err"> </span><span class="nv">other-book-offsets</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">new-book</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">shelf</span><span class="err"> </span><span class="p">(</span><span class="nf">car</span><span class="err"> </span><span class="nv">diff</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">book</span><span class="err"> </span><span class="p">(</span><span class="nf">cdr</span><span class="err"> </span><span class="nv">diff</span><span class="p">))))</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-has-key?</span><span class="err"> </span><span class="nv">new-bookcase</span><span class="err"> </span><span class="nv">new-book</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">hash-remove</span><span class="err"> </span><span class="nv">new-bookcase</span><span class="err"> </span><span class="nv">new-book</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="nf">return</span><span class="err"> </span><span class="nv">bookcase</span><span class="p">))))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If the earlier two tests haven’t returned, then when we get to the
-third, we’ll know all the right conditions are met, so we can remove the
-current book from the bookcase (the one after the other books were
-removed):</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;update-bookcase&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">hash-remove</span><span class="err"> </span><span class="nv">new-bookcase</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">shelf</span><span class="err"> </span><span class="nv">book</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This technique makes inherent use of functional data-structures, because
-the bookcase is not destructively modified during the trial deletions of
-the eight books. If it were, then we couldn’t just return the original
-bookcase. Instead, we’d have to undo the changes, or do the inner loop
-twice: once to check if we should and once to actually remove them.
-Either way, we’d be doing about twice as much work.</p>
-
-<p>This program also demonstrates how useful early return, escape
-continuations can be. If we didn’t have them, then in the first case,
-we’d just have to change the syntactic structure of the program, by
-putting the rest of the loop body on the false side of if. In the second
-case, however, it would be more complicated, because we’d have to
-continue the loop past the point of usefulness and check if it was
-successful at the end—maybe seeing how many books were removed or by
-keeping a boolean on the side. Either way, escape continuations saved
-the day.</p>
-
-<p>In retrospect, I think a good way to solve this would be to think of it
-has a packing problem where you have a plus sign where the legs are each
-two units and you are trying to fit as many as possible on a 7x10 grid.</p>
-
-<p>Was this faster or slower than doing it the old fashion way&#8230;? Who
-knows.</p>
-
-<p>Can you work out what the answer is&#8230;?</p>
-
-<p>By the way, if you use this code at home, make sure you put the code in
-this order:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nv">&lt;bookcase&gt;</span>
-</span><span class='line'>  <span class="nv">&lt;selecting&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
+from left to right, and top to bottom. After consider each book, I
+would return the new bookcase, after having removed some books. The
+number of books in this bookcase, subtracted from 70, would give me the
+number selected:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cselecting~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cselecting~3e~3a1))" class="plainlink" pltdoc="x">&lt;selecting&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">final-bookcase</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for*%2Ffold))" class="RktStxLink" pltdoc="x">for*/fold</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">bookcase</span><span class="hspace">&nbsp;</span><span class="RktSym">bookcase</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">shelf</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktVal">7</span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktSym">book</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktVal">10</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#(elem._(chunk._~3cloop-body~3e~3a1))" class="plainlink" pltdoc="x">&lt;loop-body&gt;</a><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._-))" class="RktValLink" pltdoc="x"><span class="nobreak">-</span></a></span><span class="hspace">&nbsp;</span><span class="RktVal">70</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-count))" class="RktValLink" pltdoc="x">hash-count</a></span><span class="hspace">&nbsp;</span><span class="RktSym">final-bookcase</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>Inside the loop, it will be convenient to bind an escape continuation
+to return early. The actual loop body is divided into three
+parts. First, we&rsquo;ll make sure that the book we&rsquo;re consider is actually
+there. Then, we&rsquo;ll make sure it has two books in every
+directions. Finally, we&rsquo;ll return the updated bookcase. The code will
+look like this:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cloop-body~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cloop-body~3e~3a1))" class="plainlink" pltdoc="x">&lt;loop-body&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._let%2Fec))" class="RktStxLink" pltdoc="x">let/ec</a></span><span class="hspace">&nbsp;</span><span class="RktSym">return</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><a href="#(elem._(chunk._~3ccheck-this-book~3e~3a1))" class="plainlink" pltdoc="x">&lt;check-this-book&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><a href="#(elem._(chunk._~3ccheck-others~3e~3a1))" class="plainlink" pltdoc="x">&lt;check-others&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><a href="#(elem._(chunk._~3cupdate-bookcase~3e~3a1))" class="plainlink" pltdoc="x">&lt;update-bookcase&gt;</a><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The first part is really simple: just call our predicate and if it
+isn&rsquo;t there, call the escape continuation to jump past the rest of the
+code and leave the bookcase unchanged.</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3ccheck-this-book~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3ccheck-this-book~3e~3a1))" class="plainlink" pltdoc="x">&lt;check-this-book&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/when_unless.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._unless))" class="RktStxLink" pltdoc="x">unless</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((lib._racket%2Fprivate%2Fmore-scheme..rkt)._hash-has-key~3f))" class="RktValLink" pltdoc="x">hash-has-key?</a></span><span class="hspace">&nbsp;</span><span class="RktSym">bookcase</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">shelf</span><span class="hspace">&nbsp;</span><span class="RktSym">book</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">return</span><span class="hspace">&nbsp;</span><span class="RktSym">bookcase</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The middle part is the most complicated. Here&rsquo;s the idea: we&rsquo;ll loop
+over the eight other different books (the two above, below, to the
+left, and to the right) and remove them from the bookcase, if they are
+there. If any book isn&rsquo;t there, we&rsquo;ll return from the outer loop with
+the original bookcase, because the conditions aren&rsquo;t met, using the
+escape continuation.</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3ccheck-others~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3ccheck-others~3e~3a1))" class="plainlink" pltdoc="x">&lt;check-others&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">other-book-offsets</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._list))" class="RktValLink" pltdoc="x">list</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">1</span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">2</span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal"><span class="nobreak">-1</span></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal"><span class="nobreak">-2</span></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="hspace">&nbsp;</span><span class="RktVal">1</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="hspace">&nbsp;</span><span class="RktVal">2</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="hspace">&nbsp;</span><span class="RktVal"><span class="nobreak">-1</span></span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="hspace">&nbsp;</span><span class="RktVal"><span class="nobreak">-2</span></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">new-bookcase</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for*%2Ffold))" class="RktStxLink" pltdoc="x">for*/fold</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">new-bookcase</span><span class="hspace">&nbsp;</span><span class="RktSym">bookcase</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">diff</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-list))" class="RktValLink" pltdoc="x">in-list</a></span><span class="hspace">&nbsp;</span><span class="RktSym">other-book-offsets</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">new-book</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._%2B))" class="RktValLink" pltdoc="x">+</a></span><span class="hspace">&nbsp;</span><span class="RktSym">shelf</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._car))" class="RktValLink" pltdoc="x">car</a></span><span class="hspace">&nbsp;</span><span class="RktSym">diff</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._%2B))" class="RktValLink" pltdoc="x">+</a></span><span class="hspace">&nbsp;</span><span class="RktSym">book</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cdr))" class="RktValLink" pltdoc="x">cdr</a></span><span class="hspace">&nbsp;</span><span class="RktSym">diff</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/if.html#(form._((quote._~23~25kernel)._if))" class="RktStxLink" pltdoc="x">if</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((lib._racket%2Fprivate%2Fmore-scheme..rkt)._hash-has-key~3f))" class="RktValLink" pltdoc="x">hash-has-key?</a></span><span class="hspace">&nbsp;</span><span class="RktSym">new-bookcase</span><span class="hspace">&nbsp;</span><span class="RktSym">new-book</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-remove))" class="RktValLink" pltdoc="x">hash-remove</a></span><span class="hspace">&nbsp;</span><span class="RktSym">new-bookcase</span><span class="hspace">&nbsp;</span><span class="RktSym">new-book</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">return</span><span class="hspace">&nbsp;</span><span class="RktSym">bookcase</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>If the earlier two tests haven&rsquo;t returned, then when we get to the
+third, we&rsquo;ll know all the right conditions are met, so we can remove
+the current book from the bookcase (the one after the other books were
+removed):</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cupdate-bookcase~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cupdate-bookcase~3e~3a1))" class="plainlink" pltdoc="x">&lt;update-bookcase&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"></blockquote><p><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-remove))" class="RktValLink" pltdoc="x">hash-remove</a></span><span class="hspace">&nbsp;</span><span class="RktSym">new-bookcase</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">shelf</span><span class="hspace">&nbsp;</span><span class="RktSym">book</span><span class="RktPn">)</span><span class="RktPn">)</span></p></div></p><p>This technique makes inherent use of functional data-structures,
+because the bookcase is not destructively modified during the trial
+deletions of the eight books. If it were, then we couldn&rsquo;t just return
+the original bookcase. Instead, we&rsquo;d have to undo the changes, or do
+the inner loop twice: once to check if we should and once to actually
+remove them. Either way, we&rsquo;d be doing about twice as much work.</p><p>This program also demonstrates how useful early return, escape
+continuations can be. If we didn&rsquo;t have them, then in the first case,
+we&rsquo;d just have to change the syntactic structure of the program, by
+putting the rest of the loop body on the false side of <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/if.html#(form._((quote._~23~25kernel)._if))" class="RktStxLink" pltdoc="x">if</a></span>. In
+the second case, however, it would be more complicated, because we&rsquo;d
+have to continue the loop past the point of usefulness and check if it
+was successful at the end&#8212;<wbr />maybe seeing how many books were removed
+or by keeping a boolean on the side. Either way, escape continuations
+saved the day.</p><p>In retrospect, I think a good way to solve this would be to think of
+it has a packing problem where you have a plus sign where the legs are
+each two units and you are trying to fit as many as possible on a 7x10
+grid.</p><p>Was this faster or slower than doing it the old fashion way&#8230;? Who
+knows.</p><p>Can you work out what the answer is&#8230;?</p><p>By the way, if you use this code at home, make sure you put the code in this
+order:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3c*~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3c*~3e~3a1))" class="plainlink" pltdoc="x">&lt;*&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><a href="#(elem._(chunk._~3cbookcase~3e~3a1))" class="plainlink" pltdoc="x">&lt;bookcase&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3cselecting~3e~3a1))" class="plainlink" pltdoc="x">&lt;selecting&gt;</a></td></tr></table></blockquote></div></p>
 </div>
   
 

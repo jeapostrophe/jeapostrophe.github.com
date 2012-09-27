@@ -10,10 +10,8 @@
 
   
   <meta name="description" content="I try to solve a puzzle of some kind every morning. I use
-Sudoku,
-Picross, and often, Professor
-Layton. Sometimes it is
-convenient to write a program &hellip;">
+[Sudoku](https://en.wikipedia.org/wiki/Sudoku),
+[Picross](https://en.wikipedia.org/wiki/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -24,6 +22,7 @@ convenient to write a program &hellip;">
   
   <link rel="canonical" href="http://jeapostrophe.github.com/blog/2011/06/30/professor-layton-and-the-diabolical-box-puzzle-132">
   <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/racket.css" rel="stylesheet" type="text/css">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
@@ -110,14 +109,13 @@ convenient to write a program &hellip;">
 
 
   <div class="entry-content"><p>I try to solve a puzzle of some kind every morning. I use
-<a href="https://en.wikipedia.org/wiki/Sudoku">Sudoku</a>,
-<a href="https://en.wikipedia.org/wiki/Picross">Picross</a>, and often, <a href="https://en.wikipedia.org/wiki/Professor_Layton">Professor
-Layton</a>. Sometimes it is
-convenient to write a program to solve some of the more annoying
-&#8220;search&#8221; puzzles. I’ll post the Racket programs with a little bit of
-commentary.</p>
-
-</div>
+[Sudoku](https://en.wikipedia.org/wiki/Sudoku),
+[Picross](https://en.wikipedia.org/wiki/Picross), and often,
+[Professor
+Layton](https://en.wikipedia.org/wiki/Professor_Layton). Sometimes it
+is convenient to write a program to solve some of the more
+annoying &#8220;search&#8221; puzzles. I&rsquo;ll post the Racket programs with a little
+bit of commentary.</p></div>
   
   
     <div style="text-align: center;">
@@ -134,158 +132,43 @@ commentary.</p>
   </script>
 </div>
 
-    <div class="entry-content" style="margin-top: 1em;">
-
-
-<p>This is for <a href="http://tinyurl.com/6pjbzrs">Puzzle 132</a>. Here is the
-puzzle:</p>
-
-<blockquote><p>Two brothers have inherited their parents’ five-piece art collection.
-According to the will, the older brother will get a set of paintings
-worth twice what the younger brother gets. In order to ascertain the
-value of the paintings, the brothers called in an appraiser, who valued
-each painting as shown below. For his services, the appraiser was
-promised the one painting left over after the brothers divided the art
-according to their parents’ wishes.</p>
-
-<p>Assuming that individual paintings can’t be divided, which one does
-the appraiser get?</p></blockquote>
-
-<p>There is then a picture of five paintings with prices underneath. They
+    <div class="entry-content" style="margin-top: 1em;"><p>This is for [Puzzle 132](http://tinyurl.com/6pjbzrs). Here is the puzzle:</p><p>&gt; Two brothers have inherited their parents&rsquo; five-piece art
+collection. According to the will, the older brother will get a set of
+paintings worth twice what the younger brother gets. In order to
+ascertain the value of the paintings, the brothers called in an
+appraiser, who valued each painting as shown below. For his services,
+the appraiser was promised the one painting left over after the
+brothers divided the art according to their parents&rsquo; wishes.</p><p>&gt; Assuming that individual paintings can&rsquo;t be divided, which one does
+the appraiser get?</p><p>There is then a picture of five paintings with prices underneath. They
 are: A worth 20,000, B worth 60,000, C worth 55,000, D worth 45,000, E
-worth 95,000.</p>
-
-<p>I encoded this information into a vector in Racket:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;paintings&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">paintings</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">vector</span><span class="err"> </span><span class="mi">20</span><span class="err"> </span><span class="mi">60</span><span class="err"> </span><span class="mi">55</span><span class="err"> </span><span class="mi">45</span><span class="err"> </span><span class="mi">95</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We won’t keep track of the labels, we’ll just remember that, for
+worth 95,000.</p><p>I encoded this information into a vector in Racket:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cpaintings~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cpaintings~3e~3a1))" class="plainlink" pltdoc="x">&lt;paintings&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">paintings</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/vectors.html#(def._((quote._~23~25kernel)._vector))" class="RktValLink" pltdoc="x">vector</a></span><span class="hspace">&nbsp;</span><span class="RktVal">20</span><span class="hspace">&nbsp;</span><span class="RktVal">60</span><span class="hspace">&nbsp;</span><span class="RktVal">55</span><span class="hspace">&nbsp;</span><span class="RktVal">45</span><span class="hspace">&nbsp;</span><span class="RktVal">95</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>We won&rsquo;t keep track of the labels, we&rsquo;ll just remember that, for
 example, 0 is A and 4 is E. Also, we divide everything by 1,000 so we
-don’t have to type so much.</p>
-
-<p>The basic algorithm we’ll use is a trivial search: try assigning each
-painting to each brother and stop when the value of the older brother’s
-paintings is twice that of the younger.</p>
-
-<p>The trick, however, is that we’ll represent the assignment as the older
-brother’s set combined with the younger brother’s set. We’ll do this
-simultaneously with a bit-vector, where the 1s indicate that the older
-brother gets it and the 0s indicate that the younger brother does. We’ll
-independently pick one painting which will be &#8220;left over&#8221; that the
-appraiser will get. Here’s the main loop:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;solver&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">for*</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">assignment</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">add1</span><span class="err"> </span><span class="mi">31</span><span class="p">))</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">       [</span><span class="nv">appraiser</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">vector-length</span><span class="err"> </span><span class="nv">paintings</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">older-value</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">assignment-&gt;value</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">appraiser</span><span class="err"> </span><span class="no">#t</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">younger-value</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">assignment-&gt;value</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">appraiser</span><span class="err"> </span><span class="no">#f</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="p">(</span><span class="nf">=</span><span class="err"> </span><span class="nv">older-value</span><span class="err"> </span><span class="p">(</span><span class="nf">*</span><span class="err"> </span><span class="mi">2</span><span class="err"> </span><span class="nv">younger-value</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">return</span><span class="err"> </span><span class="nv">appraiser</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>One thing to note here: for* is like a nested for—we loop over the
-assignments /and/ loop over every painting each round. (This, by the
-way, means that we do twice as much work because we consider both
-assignments for the appraiser’s painting.)</p>
-
-<p>Two other cute things: First, we use a literal binary number to write
+don&rsquo;t have to type so much.</p><p>The basic algorithm we&rsquo;ll use is a trivial search: try assigning each
+painting to each brother and stop when the value of the older
+brother&rsquo;s paintings is twice that of the younger.</p><p>The trick, however, is that we&rsquo;ll represent the assignment as the
+older brother&rsquo;s set combined with the younger brother&rsquo;s set. We&rsquo;ll do
+this simultaneously with a bit-vector, where the <span class="RktInBG"><span class="hspace"></span><span class="RktIn">1</span><span class="hspace"></span></span>s indicate
+that the older brother gets it and the <span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span>s indicate that the
+younger brother does. We&rsquo;ll independently pick one painting which will
+be &#8220;left over&#8221; that the appraiser will get. Here&rsquo;s the main loop:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3csolver~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3csolver~3e~3a1))" class="plainlink" pltdoc="x">&lt;solver&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for*))" class="RktStxLink" pltdoc="x">for*</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">assignment</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._add1))" class="RktValLink" pltdoc="x">add1</a></span><span class="hspace">&nbsp;</span><span class="RktVal">31</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktSym">appraiser</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/vectors.html#(def._((quote._~23~25kernel)._vector-length))" class="RktValLink" pltdoc="x">vector-length</a></span><span class="hspace">&nbsp;</span><span class="RktSym">paintings</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">older-value</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">assignment-&gt;value</span><span class="hspace">&nbsp;</span><span class="RktSym">assignment</span><span class="hspace">&nbsp;</span><span class="RktSym">appraiser</span><span class="hspace">&nbsp;</span><span class="RktVal">#t</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">younger-value</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">assignment-&gt;value</span><span class="hspace">&nbsp;</span><span class="RktSym">assignment</span><span class="hspace">&nbsp;</span><span class="RktSym">appraiser</span><span class="hspace">&nbsp;</span><span class="RktVal">#f</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/when_unless.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._when))" class="RktStxLink" pltdoc="x">when</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._~3d))" class="RktValLink" pltdoc="x">=</a></span><span class="hspace">&nbsp;</span><span class="RktSym">older-value</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._*))" class="RktValLink" pltdoc="x">*</a></span><span class="hspace">&nbsp;</span><span class="RktVal">2</span><span class="hspace">&nbsp;</span><span class="RktSym">younger-value</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">return</span><span class="hspace">&nbsp;</span><span class="RktSym">appraiser</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>One thing to note here: <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for*))" class="RktStxLink" pltdoc="x">for*</a></span> is like a nested
+<span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for))" class="RktStxLink" pltdoc="x">for</a></span>&#8212;<wbr />we loop over the assignments /and/ loop over every
+painting each round. (This, by the way, means that we do twice as much
+work because we consider both assignments for the appraiser&rsquo;s
+painting.)</p><p>Two other cute things: First, we use a literal binary number to write
 down the completely full set, but we have to add one to actually visit
-it. Second, the assignment->value function (below) will take an argument
-to determine whether to add up the 1s or the 0s. Here’s it’s definition</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;valuation&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">assignment-&gt;value</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">ignored</span><span class="err"> </span><span class="nv">which</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for/sum</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">painting</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">vector-length</span><span class="err"> </span><span class="nv">paintings</span><span class="p">))</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">            </span><span class="o">#</span><span class="nv">:unless</span><span class="err"> </span><span class="p">(</span><span class="nf">=</span><span class="err"> </span><span class="nv">painting</span><span class="err"> </span><span class="nv">ignored</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">           </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">eq?</span><span class="err"> </span><span class="nv">which</span><span class="err"> </span><span class="p">(</span><span class="nf">bitwise-bit-set?</span><span class="err"> </span><span class="nv">assignment</span><span class="err"> </span><span class="nv">painting</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">             </span><span class="p">(</span><span class="nf">vector-ref</span><span class="err"> </span><span class="nv">paintings</span><span class="err"> </span><span class="nv">painting</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">             </span><span class="mi">0</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The for/sum variant adds up the result of each iteration of the loop,
-the #:unless clause skips the iteration where the appraiser’s painting
-is considered, and the if determines which brother we’re considering.</p>
-
-<p>If you know anything about Racket, there may be one more confusing thing
-about the code in <valuation>&#8230; return! Expressions in Racket don’t
-normally have non-local returns like that. How can we make the inner
-area of the loop stop and return the appraiser painting that works? It’s
-simple: bind return to an escape continuation:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;escape-continuation&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">let/ec</span><span class="err"> </span><span class="nv">return</span>
-</span><span class='line'>  <span class="err">  </span><span class="nv">&lt;solver&gt;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Was this faster or slower than doing it the old fashion way&#8230;? Who
-knows.</p>
-
-<p>Can you work out what the answer is&#8230;?</p>
-
-<p>By the way, if you use this code at home, make sure you put the code in
-this order:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nv">&lt;paintings&gt;</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="nv">&lt;valuation&gt;</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nb">vector-ref </span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">vector</span><span class="err"> </span><span class="ss">&#39;A</span><span class="err"> </span><span class="ss">&#39;B</span><span class="err"> </span><span class="ss">&#39;C</span><span class="err"> </span><span class="ss">&#39;D</span><span class="err"> </span><span class="ss">&#39;E</span><span class="p">)</span>
-</span><span class='line'>  <span class="err"> </span><span class="nv">&lt;escape-continuation&gt;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
+it. Second, the <span class="RktSym">assignment-&gt;value</span> function (below) will take
+an argument to determine whether to add up the <span class="RktInBG"><span class="hspace"></span><span class="RktIn">1</span><span class="hspace"></span></span>s or the
+<span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span>s. Here&rsquo;s it&rsquo;s definition</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cvaluation~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cvaluation~3e~3a1))" class="plainlink" pltdoc="x">&lt;valuation&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">assignment-&gt;value</span><span class="hspace">&nbsp;</span><span class="RktSym">assignment</span><span class="hspace">&nbsp;</span><span class="RktSym">ignored</span><span class="hspace">&nbsp;</span><span class="RktSym">which</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for%2Fsum))" class="RktStxLink" pltdoc="x">for/sum</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">painting</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/vectors.html#(def._((quote._~23~25kernel)._vector-length))" class="RktValLink" pltdoc="x">vector-length</a></span><span class="hspace">&nbsp;</span><span class="RktSym">paintings</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">#:unless</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._~3d))" class="RktValLink" pltdoc="x">=</a></span><span class="hspace">&nbsp;</span><span class="RktSym">painting</span><span class="hspace">&nbsp;</span><span class="RktSym">ignored</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/if.html#(form._((quote._~23~25kernel)._if))" class="RktStxLink" pltdoc="x">if</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/booleans.html#(def._((quote._~23~25kernel)._eq~3f))" class="RktValLink" pltdoc="x">eq?</a></span><span class="hspace">&nbsp;</span><span class="RktSym">which</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._bitwise-bit-set~3f))" class="RktValLink" pltdoc="x">bitwise-bit-set?</a></span><span class="hspace">&nbsp;</span><span class="RktSym">assignment</span><span class="hspace">&nbsp;</span><span class="RktSym">painting</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/vectors.html#(def._((quote._~23~25kernel)._vector-ref))" class="RktValLink" pltdoc="x">vector-ref</a></span><span class="hspace">&nbsp;</span><span class="RktSym">paintings</span><span class="hspace">&nbsp;</span><span class="RktSym">painting</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">0</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for%2Fsum))" class="RktStxLink" pltdoc="x">for/sum</a></span> variant adds up the result of each iteration of
+the loop, the <span class="RktPn">#:unless</span> clause skips the iteration where the
+appraiser&rsquo;s painting is considered, and the <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/if.html#(form._((quote._~23~25kernel)._if))" class="RktStxLink" pltdoc="x">if</a></span> determines
+which brother we&rsquo;re considering.</p><p>If you know anything about Racket, there may be one more confusing
+thing about the code in <a href="#(elem._(chunk._~3cvaluation~3e~3a1))" class="plainlink" pltdoc="x">&lt;valuation&gt;</a>&#8230; <span class="RktSym">return</span>!
+Expressions in Racket don&rsquo;t normally have non-local returns like
+that. How can we make the inner area of the loop stop and return the
+appraiser painting that works? It&rsquo;s simple: bind <span class="RktSym">return</span> to an
+escape continuation:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cescape-continuation~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cescape-continuation~3e~3a1))" class="plainlink" pltdoc="x">&lt;escape-continuation&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._let%2Fec))" class="RktStxLink" pltdoc="x">let/ec</a></span><span class="hspace">&nbsp;</span><span class="RktSym">return</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><a href="#(elem._(chunk._~3csolver~3e~3a1))" class="plainlink" pltdoc="x">&lt;solver&gt;</a><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>Was this faster or slower than doing it the old fashion way&#8230;? Who
+knows.</p><p>Can you work out what the answer is&#8230;?</p><p>By the way, if you use this code at home, make sure you put the code in this
+order:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3c*~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3c*~3e~3a1))" class="plainlink" pltdoc="x">&lt;*&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><a href="#(elem._(chunk._~3cpaintings~3e~3a1))" class="plainlink" pltdoc="x">&lt;paintings&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><a href="#(elem._(chunk._~3cvaluation~3e~3a1))" class="plainlink" pltdoc="x">&lt;valuation&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/vectors.html#(def._((quote._~23~25kernel)._vector-ref))" class="RktValLink" pltdoc="x">vector-ref</a></span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/vectors.html#(def._((quote._~23~25kernel)._vector))" class="RktValLink" pltdoc="x">vector</a></span><span class="hspace">&nbsp;</span><span class="RktVal">&#8217;</span><span class="RktVal">A</span><span class="hspace">&nbsp;</span><span class="RktVal">&#8217;</span><span class="RktVal">B</span><span class="hspace">&nbsp;</span><span class="RktVal">&#8217;</span><span class="RktVal">C</span><span class="hspace">&nbsp;</span><span class="RktVal">&#8217;</span><span class="RktVal">D</span><span class="hspace">&nbsp;</span><span class="RktVal">&#8217;</span><span class="RktVal">E</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span><a href="#(elem._(chunk._~3cescape-continuation~3e~3a1))" class="plainlink" pltdoc="x">&lt;escape-continuation&gt;</a><span class="RktPn">)</span></td></tr></table></blockquote></div></p>
 </div>
   
 

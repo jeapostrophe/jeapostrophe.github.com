@@ -9,9 +9,8 @@
   <meta name="author" content="Jay McCarthy">
 
   
-  <meta name="description" content="In the past few posts I’ve been writing about threading system that are
-based on continuations in user-land. This post I’ll extend that system
-to &hellip;">
+  <meta name="description" content="In the past few posts I&rsquo;ve been writing about threading system that
+are based on continuations in user-land. This post I&rsquo;ll extend that &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -22,6 +21,7 @@ to &hellip;">
   
   <link rel="canonical" href="http://jeapostrophe.github.com/blog/page/2">
   <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/racket.css" rel="stylesheet" type="text/css">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
@@ -110,12 +110,10 @@ to &hellip;">
   </header>
 
 
-  <div class="entry-content"><p>In the past few posts I’ve been writing about threading system that are
-based on continuations in user-land. This post I’ll extend that system
-to provide system calls that control access to sensitive resources, such
-as files and the thread pool.</p>
-
-</div>
+  <div class="entry-content"><p>In the past few posts I&rsquo;ve been writing about threading system that
+are based on continuations in user-land. This post I&rsquo;ll extend that
+system to provide system calls that control access to sensitive
+resources, such as files and the thread pool.</p></div>
   
   
     <footer>
@@ -157,9 +155,7 @@ as files and the thread pool.</p>
 
 
   <div class="entry-content"><p>Last week, we covered cooperative threading with continuations. This
-week we’ll change the infrastructure to mimic preemption.</p>
-
-</div>
+week we&rsquo;ll change the infrastructure to mimic preemption.</p></div>
   
   
     <footer>
@@ -201,9 +197,7 @@ week we’ll change the infrastructure to mimic preemption.</p>
 
 
   <div class="entry-content"><p>After the last post about continuations, I wanted to show one of the
-classic uses of them: implementing threads in user-space.</p>
-
-</div>
+classic uses of them: implementing threads in user-space.</p></div>
   
   
     <footer>
@@ -244,22 +238,14 @@ classic uses of them: implementing threads in user-space.</p>
   </header>
 
 
-  <div class="entry-content"><p>I love continuations. We couldn’t do much of anything on a computer
-without them. But, I love first-class access to continuations (i.e.
-call/cc) even more.</p>
-
-<p>The standard reason is that call/cc allows you to express things that
-are not possible at the user-level without it. For example, generators,
-implicit back-tracking search, threads, etc.</p>
-
-<p>However, many of these use-cases for call/cc use mutation in an
+  <div class="entry-content"><p>I love continuations. We couldn&rsquo;t do much of anything on a computer
+without them. But, I love first-class access to
+continuations (i.e. call/cc) even more.</p><p>The standard reason is that call/cc allows you to express things that
+are not possible at the user-level without it. For example,
+generators, implicit back-tracking search, threads, etc.</p><p>However, many of these use-cases for call/cc use mutation in an
 essential way and have led some to criticize useful uses of call/cc to
-be necessarily tied to mutation.</p>
-
-<p>In this post, I’ll show how call/cc saves use from mutation and produces
-something pretty elegant.</p>
-
-</div>
+be necessarily tied to mutation.</p><p>In this post, I&rsquo;ll show how call/cc saves use from mutation and
+produces something pretty elegant.</p></div>
   
   
     <footer>
@@ -301,16 +287,10 @@ something pretty elegant.</p>
 
 
   <div class="entry-content"><p>A few years ago, a proposal came to a committee I was on to limit the
-documents we evaluated based on their word count, rather than their page
-length.</p>
-
-<p>The rationale was that so-called &#8220;graphics&#8221; research would include many
-pictures which would increase the page length, but not necessarily the
-word count.</p>
-
-<p>I was opposed to this proposal on technical grounds.</p>
-
-</div>
+documents we evaluated based on their word count, rather than their
+page length.</p><p>The rationale was that so-called &#8220;graphics&#8221; research would include
+many pictures which would increase the page length, but not
+necessarily the word count.</p><p>I was opposed to this proposal on technical grounds.</p></div>
   
   
     <footer>
@@ -351,11 +331,9 @@ word count.</p>
   </header>
 
 
-  <div class="entry-content"><p>I’m often bothered by programs that fail to use exec properly and
-instead use system. In this article, we’ll review the difference and
-relate it to tail-call optimization.</p>
-
-</div>
+  <div class="entry-content"><p>I&rsquo;m often bothered by programs that fail to use <span class="stt">exec</span> properly and
+instead use <span class="stt">system</span>. In this article, we&rsquo;ll review the difference
+and relate it to tail-call optimization.</p></div>
   
   
     <footer>
@@ -396,16 +374,12 @@ relate it to tail-call optimization.</p>
   </header>
 
 
-  <div class="entry-content"><p>For a long time I’ve known about and relied on the LZ77/78 compression
-algorithms. Once when I was in middle school, I told a friend an idea I
-had about compression, and the friend—who was in college at the
-time—said it sounded exactly like LZ77. I don’t remember what my idea
-was, but I do remember that incident.</p>
-
-<p>Despite this long connection, I’d never implemented the algorithm
-before. I sought to rectify that situation.</p>
-
-</div>
+  <div class="entry-content"><p>For a long time I&rsquo;ve known about and relied on the LZ77/78 compression
+algorithms. Once when I was in middle school, I told a friend an idea
+I had about compression, and the friend&#8212;<wbr />who was in college at the
+time&#8212;<wbr />said it sounded exactly like LZ77. I don&rsquo;t remember what my
+idea was, but I do remember that incident.</p><p>Despite this long connection, I&rsquo;d never implemented the algorithm
+before. I sought to rectify that situation.</p></div>
   
   
     <footer>
@@ -449,11 +423,10 @@ before. I sought to rectify that situation.</p>
   <div class="entry-content"><p>Boggle is a classic word game that lends itself well to algorithmic
 attacks. A student of mine wanted to show me his solution (as it is an
 assignment in one of BYU early classes), but I have a hard time
-evaluating things like this unless I’ve done them myself. So, I decided
-to make an attempt. I was able to do it in about 19 lines of code, minus
-the 24 to set up the data-structures. Let’s see how it goes&#8230;</p>
-
-</div>
+evaluating things like this unless I&rsquo;ve done them myself. So, I
+decided to make an attempt. I was able to do it in about 19 lines of
+code, minus the 24 to set up the data-structures. Let&rsquo;s see how it
+goes&#8230;</p></div>
   
   
     <footer>
@@ -494,27 +467,15 @@ the 24 to set up the data-structures. Let’s see how it goes&#8230;</p>
   </header>
 
 
-  <div class="entry-content"><p>I got this email from my wife:</p>
-
-<blockquote><p>Honey,</p>
-
-<p>I’m making a quilt with 25 blocks. Each block has four colors on it.
-The colors I’m using are red, pink, green, yellow, blue, and green
-plaid.</p>
-
-<p>I don’t want to duplicate colors in a block or in the corners and I
-don’t want pink and red in the same corner (but pink and red in a block
-is okay.) Similarly with green and green plaid.</p></blockquote>
-
-<p>She’s a <a href="http://icme.stanford.edu/index.php">mathematician</a>, so she
-knows about the <a href="https://en.wikipedia.org/wiki/Four_color_theorem">Four color
-theorem</a>. But she
-wasn’t sure if the graph was planar, and didn’t want to lay it out
-manually anyways.</p>
-
-<p>Let’s work through the solution.</p>
-
-</div>
+  <div class="entry-content"><p>I got this email from my wife:</p><p>&gt; Honey,</p><p>&gt; I&rsquo;m making a quilt with 25 blocks. Each block has four colors on
+it. The colors I&rsquo;m using are red, pink, green, yellow, blue, and green
+plaid.</p><p>&gt; I don&rsquo;t want to duplicate colors in a block or in the corners and I
+don&rsquo;t want pink and red in the same corner (but pink and red in a
+block is okay.) Similarly with green and green plaid.</p><p>She&rsquo;s a [mathematician](http://icme.stanford.edu/index.php), so she
+knows about the [Four color
+theorem](https://en.wikipedia.org/wiki/Four_color_theorem). But she
+wasn&rsquo;t sure if the graph was planar, and didn&rsquo;t want to lay it out
+manually anyways.</p><p>Let&rsquo;s work through the solution.</p></div>
   
   
     <footer>
@@ -555,21 +516,12 @@ manually anyways.</p>
   </header>
 
 
-  <div class="entry-content"><p>This is for <a href="http://tinyurl.com/7yefk76">Puzzle 146</a>. Here is the
-puzzle:</p>
-
-<blockquote><p>A bookcase has seven shelves each filled with 10 books of the same
-size.</p>
-
-<p>When you choose a book, you must also take the two books above, below,
-to the left, and to the right of the one you actually want. If there are
-fewer than two books in any of these directions, you cannot choose that
-book.</p>
-
-<p>Choosing as many books as possible, how many books will you end up
-taking?</p></blockquote>
-
-</div>
+  <div class="entry-content"><p>This is for [Puzzle 146](http://tinyurl.com/7yefk76). Here is the puzzle:</p><p>&gt; A bookcase has seven shelves each filled with 10 books of the same
+size.</p><p>&gt; When you choose a book, you must also take the two books above,
+below, to the left, and to the right of the one you actually want. If
+there are fewer than two books in any of these directions, you cannot
+choose that book.</p><p>&gt; Choosing as many books as possible, how many books will you end up
+taking?</p></div>
   
   
     <footer>

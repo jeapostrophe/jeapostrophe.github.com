@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Nvidia | Jay McCarthy]]></title>
   <link href="http://jeapostrophe.github.com/blog/categories/nvidia/atom.xml" rel="self"/>
   <link href="http://jeapostrophe.github.com/"/>
-  <updated>2012-09-19T15:24:03-06:00</updated>
+  <updated>2012-09-27T15:17:18-06:00</updated>
   <id>http://jeapostrophe.github.com/</id>
   <author>
     <name><![CDATA[Jay McCarthy]]></name>
@@ -19,137 +19,170 @@
     <updated>2012-09-10T00:00:00-06:00</updated>
     <id>http://jeapostrophe.github.com/blog/2012/09/10/nvidia-macbook-air-linux</id>
     <content type="html"><![CDATA[<p>When I was quite young, in middle school, I switched from Windows to
-Linux. I initially used Red Hat, but fairly quickly converted to Debian.
-Eventually, when OS X first came out I was very excited and switched to
-the Mac for my personal machines.</p>
+Linux. I initially used Red Hat, but fairly quickly converted to
+Debian. Eventually, when OS X first came out I was very excited and
+switched to the Mac for my personal machines.</p>
+
 
 <p>However, more recently, OS X has been becoming less and less Unix-like
 and my tastes for Apple-ism having been reduce, so in December (after
 classes were over), I switched back to Linux. First, I used Ubuntu and
 then I switched to Arch.</p>
 
+
 <p>However, running Linux on a laptop can be exciting, and a MacBook Air
 with an Nvidia graphics card is particularly exciting. I had a brutal
-problem with my projector setup, but I found the solution. In this post,
-I lay out my tale of woe.</p>
+problem with my projector setup, but I found the solution. In this
+post, I lay out my tale of woe.</p>
+
 
 <!-- more -->
 
 
-<p>Since it’s September again, it is time to teach class and I need to
-project from my laptop. I’d been using multiple displays for a long time
-with my Mac (I have an external screen in my office), so I presumed that
-I had everything working correctly.</p>
+<p>Since it&rsquo;s September again, it is time to teach class and I need to
+project from my laptop. I&rsquo;d been using multiple displays for a long
+time with my Mac (I have an external screen in my office), so I
+presumed that I had everything working correctly.</p>
 
-<p>I use <a href="http://willem.engen.nl/projects/disper/">disper</a> to
-manage my display configurations. From Linux’s perspective, my Air has
+
+<p>I use &lt;a href="http://willem.engen.nl/projects/disper/"&gt;disper&lt;/a&gt; to
+manage my display configurations. From Linux&rsquo;s perspective, my Air has
 three displays: DFP-0 (the external display when it is connected with
 DVI), DFP-1 (the external display when it is connected with VGA), and
 DFP-2 (the built-in screen.) So I assumed it would be as simple as
-typing <code>disper -c</code> after connecting to clone my desktop across the two
+typing &lsquo;disper -c&lsquo; after connecting to clone my desktop across the two
 displays.</p>
 
-<p>Unfortunately, I got the error message: "Displays do not share a common
-resolution". That’s strange, I think, I distinctly remember using these
-projectors last year, on OS X and getting a decently sized screen
-(1024x768, I believe.) A quick <code>disper -l</code> reveals that my DFP-1 only
-has one resolution: "640x480".</p>
 
-<p>This was right before class, so I just used that resolution only on the
-projector and looked up at the screen when I needed to. Ugly, but
+<p>Unfortunately, I got the error message: "Displays do not share a
+common resolution". That&rsquo;s strange, I think, I distinctly remember
+using these projectors last year, on OS X and getting a decently sized
+screen (1024x768, I believe.) A quick &lsquo;disper -l&lsquo; reveals that my
+DFP-1 only has one resolution: "640x480".</p>
+
+
+<p>This was right before class, so I just used that resolution only on
+the projector and looked up at the screen when I needed to. Ugly, but
 workable.</p>
 
+
 <p>The next day I read all about XRandr and how you can add video modes
-using <code>gtf</code> and <code>xrandr</code> and thought I had everything figured out. When
-I went to connect again during a day I didn’t teach, I had an unbearable
-time of getting tons and tons of error messages and no success.</p>
+using &lsquo;gtf&lsquo; and &lsquo;xrandr&lsquo; and thought I had everything figured
+out. When I went to connect again during a day I didn&rsquo;t teach, I had
+an unbearable time of getting tons and tons of error messages and no
+success.</p>
+
 
 <p>I dealt with the small screen in class for a second day.</p>
 
+
 <p>After that, I decided that I would connect with OS X on my laptop and
 write down which video modes, resolutions, refresh rates, etc it could
-handle so I could pass the correct arguments to <code>gtf</code>. I was delighted
-when I realized I’d be able to run the projector at 1400x1050 and my
+handle so I could pass the correct arguments to &lsquo;gtf&lsquo;. I was delighted
+when I realized I&rsquo;d be able to run the projector at 1400x1050 and my
 laptop screen at 1440x900 and have them share a 1400x900 desktop. This
-wasn’t the default in OS X, but it was an option.</p>
+wasn&rsquo;t the default in OS X, but it was an option.</p>
+
 
 <p>Booting back to Linux, I had a harrowing experience trying to override
 the X server settings to get this mode enabled. Nothing.</p>
 
-<p>At this point, I realized that I originally chose <code>disper</code> rather than
-<code>xrandr</code> because Nvidia cards haven’t always fully supported <code>xrandr</code>,
+
+<p>At this point, I realized that I originally chose &lsquo;disper&lsquo; rather than
+&lsquo;xrandr&lsquo; because Nvidia cards haven&rsquo;t always fully supported &lsquo;xrandr&lsquo;,
 but used another "meta mode" system instead. I decided to use a meta
 mode:</p>
 
-<p><code>nvidia-settings –assign CurrentMetaMode="DFP-2: 1440x900 {
-ViewPortIn=1400x900, ViewPortOut=1400x900+20+0 }, DFP-1: 1400x1050 {
-ViewPortIn=1400x900, ViewPortOut=1400x900+0+75 }"</code></p>
 
-<p>Unfortunately, this failed too, and would sometimes crash my X server.
-But I was able to at least mirror the screen on the projector on my
-laptop, but it was a small resolution (640x480) and it was unscaled on
-my computer, so it was a tiny little box:</p>
+<p>&lsquo;nvidia-settings &ndash;assign CurrentMetaMode="DFP-2: 1440x900 { ViewPortIn=1400x900, ViewPortOut=1400x900+20+0 }, DFP-1: 1400x1050 { ViewPortIn=1400x900, ViewPortOut=1400x900+0+75 }"&lsquo;</p>
 
-<p><code>nvidia-settings –assign CurrentMetaMode="DFP-2: 1440x900 {
-ViewPortIn=640x480, ViewPortOut=640x480+400+210 }, DFP-1: 640x480 {
-ViewPortIn=640x480, ViewPortOut=640x480+0+0 }"</code></p>
+
+<p>Unfortunately, this failed too, and would sometimes crash my X
+server. But I was able to at least mirror the screen on the projector
+on my laptop, but it was a small resolution (640x480) and it was
+unscaled on my computer, so it was a tiny little box:</p>
+
+
+<p>&lsquo;nvidia-settings &ndash;assign CurrentMetaMode="DFP-2: 1440x900 { ViewPortIn=640x480, ViewPortOut=640x480+400+210 }, DFP-1: 640x480 { ViewPortIn=640x480, ViewPortOut=640x480+0+0 }"&lsquo;</p>
+
 
 <p>But I continued to try...</p>
+
 
 <p>I inspected the logs and found that I got the error message "Unable to
 read EDID for display device DFP-1". A quick run to Wikipedia told me
 that EDID is the format for giving the valid display frequencies for
-devices... so maybe OS X was reading it correctly but Linux wasn’t?</p>
+devices... so maybe OS X was reading it correctly but Linux wasn&rsquo;t?</p>
+
 
 <p>I found an OS X app that would save EDID data and saved mine for the
-projector (after booting into OS X.) Unfortunately after parsing it, it
-said that it was fake data and that actually the EDID couldn’t be read.
-Defeated again.</p>
+projector (after booting into OS X.) Unfortunately after parsing it,
+it said that it was fake data and that actually the EDID couldn&rsquo;t be
+read. Defeated again.</p>
+
 
 <p>This was a fruitful path though, because it made me discover the
-<code>ModeValidation</code> option in my X config where I could add
-<code>AllowNonEdidModes</code> so that the X server wouldn’t insist on only using
+&lsquo;ModeValidation&lsquo; option in my X config where I could add
+&lsquo;AllowNonEdidModes&lsquo; so that the X server wouldn&rsquo;t insist on only using
 modes that were given by the EDID block.</p>
 
+
 <p>Failure.</p>
+
 
 <p>Next, I tried to turn off other checks on valid modes:</p>
 
-<p><code>NoHorizSyncCheck</code></p>
+
+<p>&lsquo;NoHorizSyncCheck&lsquo;</p>
+
 
 <p>Failure.</p>
 
-<p><code>NoVertRefreshCheck</code></p>
+
+<p>&lsquo;NoVertRefreshCheck&lsquo;</p>
+
 
 <p>Failure.</p>
 
-<p><code>NoDFPNativeResolutionCheck</code></p>
+
+<p>&lsquo;NoDFPNativeResolutionCheck&lsquo;</p>
+
 
 <p>Failure.</p>
+
 
 <p>I had almost given up. I decided to read through the entire Nvidia X
-configuration manual and I discovered the <code>ModeDebug</code> option that would
-give detailed reasons for why certain modes were not allowed. I turned
-that on, restarted X, and tried to use the big resolution...</p>
+configuration manual and I discovered the &lsquo;ModeDebug&lsquo; option that
+would give detailed reasons for why certain modes were not allowed. I
+turned that on, restarted X, and tried to use the big resolution...</p>
 
-<p>The error message was "pixel clock exceeds maximum EDID pixel clock". I
-don’t know what a pixel clock is, but I looked in the manual and found
-another mode validation override:</p>
 
-<p><code>NoEdidMaxPClkCheck</code></p>
+<p>The error message was "pixel clock exceeds maximum EDID pixel
+clock". I don&rsquo;t know what a pixel clock is, but I looked in the manual
+and found another mode validation override:</p>
+
+
+<p>&lsquo;NoEdidMaxPClkCheck&lsquo;</p>
+
 
 <p>Success.</p>
 
-<p>Now, I can use my projector at the full resolution. And it’s beautiful.</p>
 
-<p>It’s days like this that make you proud to be a Linux user. I’ve subdued
-the computer and made it do exactly what I want. It feels glorious.</p>
+<p>Now, I can use my projector at the full resolution. And it&rsquo;s
+beautiful.</p>
 
-<p>The only remaining problems I have with the laptop are... the microphone
-doesn’t work and sometimes (maybe once every three weeks) the X server
-will segfault, normally right after coming back from sleep. This last
-thing is the worst because there’s no way to reset the video settings,
-so I have to reboot. The saga will continue...</p>
+
+<p>It&rsquo;s days like this that make you proud to be a Linux user. I&rsquo;ve
+subdued the computer and made it do exactly what I want. It feels
+glorious.</p>
+
+
+<p>The only remaining problems I have with the laptop are... the
+microphone doesn&rsquo;t work and sometimes (maybe once every three weeks)
+the X server will segfault, normally right after coming back from
+sleep. This last thing is the worst because there&rsquo;s no way to reset
+the video settings, so I have to reboot. The saga will continue...</p>
+
 ]]></content>
   </entry>
   

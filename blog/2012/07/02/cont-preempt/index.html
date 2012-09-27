@@ -10,7 +10,7 @@
 
   
   <meta name="description" content="Last week, we covered cooperative threading with continuations. This
-week we’ll change the infrastructure to mimic preemption. <!-- google_ad_client &hellip;">
+week we&rsquo;ll change the infrastructure to mimic preemption. <!-- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,6 +21,7 @@ week we’ll change the infrastructure to mimic preemption. <!-- google_ad_clien
   
   <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/07/02/cont-preempt">
   <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/racket.css" rel="stylesheet" type="text/css">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
@@ -107,9 +108,7 @@ week we’ll change the infrastructure to mimic preemption. <!-- google_ad_clien
 
 
   <div class="entry-content"><p>Last week, we covered cooperative threading with continuations. This
-week we’ll change the infrastructure to mimic preemption.</p>
-
-</div>
+week we&rsquo;ll change the infrastructure to mimic preemption.</p></div>
   
   
     <div style="text-align: center;">
@@ -126,292 +125,47 @@ week we’ll change the infrastructure to mimic preemption.</p>
   </script>
 </div>
 
-    <div class="entry-content" style="margin-top: 1em;">
-
-
-<p>Before we start, make sure you’ve read last week’s post.</p>
-
-<p>We’ll be working from almost the same example program:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;example&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">main</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">N</span><span class="err"> </span><span class="mi">5</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">thread</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">N</span><span class="err"> </span><span class="mi">2</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;iter: ~a\n&quot;</span><span class="err"> </span><span class="nv">i</span><span class="p">))))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">thread</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">for/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">sum</span><span class="err"> </span><span class="mi">0</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">N</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;adder: ~a\n&quot;</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">i</span><span class="err"> </span><span class="nv">sum</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">i</span><span class="err"> </span><span class="nv">sum</span><span class="p">)))))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The only difference is that I’ve removed the calls to yield after the
-calls to printf.</p>
-
-<p>Recall that this program has the following output:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>adder: 0          
-</span><span class='line'>iter: 0           
-</span><span class='line'>adder: 1          
-</span><span class='line'>iter: 1           
-</span><span class='line'>adder: 3          
-</span><span class='line'>iter: 2           
-</span><span class='line'>adder: 6          
-</span><span class='line'>iter: 3           
-</span><span class='line'>adder: 10         
-</span><span class='line'>iter: 4           
-</span><span class='line'>iter: 5           
-</span><span class='line'>iter: 6</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We’ll also be using the same basic threading system:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;threading-system&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="nv">empty</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">yield</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">ts</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">void</span><span class="p">)</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">next</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">let/cc</span><span class="err"> </span><span class="nv">k</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="p">(</span><span class="nf">snoc</span><span class="err"> </span><span class="nv">rest</span><span class="err"> </span><span class="nv">k</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">next</span><span class="p">))</span><span class="err">]</span><span class="p">))</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">thread</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span>
-</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">                </span><span class="p">(</span><span class="nf">abort-current-continuation</span>
-</span><span class='line'>  <span class="err">                 </span><span class="p">(</span><span class="nf">default-continuation-prompt-tag</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">                 </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">                   </span><span class="p">(</span><span class="nf">t</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">                   </span><span class="p">(</span><span class="nf">exit</span><span class="p">))))</span>
-</span><span class='line'>  <span class="err">              </span><span class="nv">ts</span><span class="p">)))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">exit</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">ts</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">void</span><span class="p">)</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">next</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">next</span><span class="p">)</span><span class="err">]</span><span class="p">))</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">call-with-continuation-prompt</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">main</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">exit</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now, this system is about modeling concurrency through threading, so
+    <div class="entry-content" style="margin-top: 1em;"><p>Before we start, make sure you&rsquo;ve read last week&rsquo;s post.</p><p>We&rsquo;ll be working from almost the same example program:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cexample~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cexample~3e~3a1))" class="plainlink" pltdoc="x">&lt;example&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">main</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">N</span><span class="hspace">&nbsp;</span><span class="RktVal">5</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for))" class="RktStxLink" pltdoc="x">for</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">i</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._%2B))" class="RktValLink" pltdoc="x">+</a></span><span class="hspace">&nbsp;</span><span class="RktSym">N</span><span class="hspace">&nbsp;</span><span class="RktVal">2</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span><span class="hspace">&nbsp;</span><span class="RktVal">&#8220;iter: ~a\n&#8221;</span><span class="hspace">&nbsp;</span><span class="RktSym">i</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for%2Ffold))" class="RktStxLink" pltdoc="x">for/fold</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">sum</span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">i</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktSym">N</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span><span class="hspace">&nbsp;</span><span class="RktVal">&#8220;adder: ~a\n&#8221;</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._%2B))" class="RktValLink" pltdoc="x">+</a></span><span class="hspace">&nbsp;</span><span class="RktSym">i</span><span class="hspace">&nbsp;</span><span class="RktSym">sum</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._%2B))" class="RktValLink" pltdoc="x">+</a></span><span class="hspace">&nbsp;</span><span class="RktSym">i</span><span class="hspace">&nbsp;</span><span class="RktSym">sum</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The only difference is that I&rsquo;ve removed the calls to <span class="RktSym">yield</span>
+after the calls to <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span>.</p><p>Recall that this program has the following output:</p><p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt"><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 0&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 0&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 1&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 1&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 3&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 2&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 6&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 3&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 10&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 4&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 5&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 6&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt"></span></code></pre></td></tr></table></div></figure></span></span></p></td></tr></table></p><p>We&rsquo;ll also be using the same basic threading system:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cthreading-system~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cthreading-system~3e~3a1))" class="plainlink" pltdoc="x">&lt;threading-system&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._empty))" class="RktValLink" pltdoc="x">empty</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">yield</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match))" class="RktStxLink" pltdoc="x">match</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._list))" class="RktValLink" pltdoc="x">list</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/void.html#(def._((quote._~23~25kernel)._void))" class="RktValLink" pltdoc="x">void</a></span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(form._((lib._racket%2Fprivate%2Fmore-scheme..rkt)._let%2Fcc))" class="RktStxLink" pltdoc="x">let/cc</a></span><span class="hspace">&nbsp;</span><span class="RktSym">k</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">snoc</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="hspace">&nbsp;</span><span class="RktSym">k</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">next</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span><span class="hspace">&nbsp;</span><span class="RktSym">t</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(def._((quote._~23~25kernel)._abort-current-continuation))" class="RktValLink" pltdoc="x">abort-current-continuation</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(def._((quote._~23~25kernel)._default-continuation-prompt-tag))" class="RktValLink" pltdoc="x">default-continuation-prompt-tag</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">t</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">ts</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match))" class="RktStxLink" pltdoc="x">match</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._list))" class="RktValLink" pltdoc="x">list</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/void.html#(def._((quote._~23~25kernel)._void))" class="RktValLink" pltdoc="x">void</a></span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">next</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(def._((quote._~23~25kernel)._call-with-continuation-prompt))" class="RktValLink" pltdoc="x">call-with-continuation-prompt</a></span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">main</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>Now, this system is about modeling concurrency through threading, so
 there is no actual real concurrency in the system. In contrast, in a
 real operating system there is true concurrency because the computer
 interacts with concurrently-running pieces of hardware&#8230; such as disk
 devices, the network card, or an alarm device. When this concurrent
-devices message the kernel, through interrupts, it can take control from
-the user programs and potentially choose a different user program to
-re-use, without the permission of the user process.</p>
-
-<p>This option is not available at the user level, particularly if you do
+devices message the kernel, through interrupts, it can take control
+from the user programs and potentially choose a different user program
+to re-use, without the permission of the user process.</p><p>This option is not available at the user level, particularly if you do
 not assume the pre-existence of a lower-level threading system. Since
-I’m a good academic, whenever you face a problem that seems unsolvable,
-the one sure path is to redefine success. Thus, we’ll focus on the
-&#8220;without permission&#8221; part of preemptive concurrency—removing the need of
-threaded programs from calling yield, but having it called for them,
-without their permission, periodically.</p>
-
-<p>The simplest way to realize this is to choose a set of &#8220;primitive&#8221;
-functions provided by the OS and have them call yield on behalf of the
-process. For example, printf is a naturally choice.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;primitive-printf&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="o">.</span> <span class="nv">args</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">begin0</span><span class="err"> </span><span class="p">(</span><span class="nf">apply</span><span class="err"> </span><span class="nv">racket:printf</span><span class="err"> </span><span class="nv">args</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">yield</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>When we take this approach, we need to ensure that the process has no
-other way of getting to these primitives. This is not a very hard thing
-to do if we’re implementing a language tower, like Racket, but is more
-difficult if we are simply writing a library atop Racket.</p>
-
-<p>This approach has a fundamental trade-off with regards to fairness: the
-fewer primitive functions, the more likely it is that the other
+I&rsquo;m a good academic, whenever you face a problem that seems
+unsolvable, the one sure path is to redefine success. Thus, we&rsquo;ll
+focus on the &#8220;without permission&#8221; part of preemptive
+concurrency&#8212;<wbr />removing the need of threaded programs from calling
+<span class="RktSym">yield</span>, but having it called for them, without their
+permission, periodically.</p><p>The simplest way to realize this is to choose a set of &#8220;primitive&#8221;
+functions provided by the OS and have them call <span class="RktSym">yield</span> on
+behalf of the process. For example, <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span> is a naturally
+choice.</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cprimitive-printf~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cprimitive-printf~3e~3a1))" class="plainlink" pltdoc="x">&lt;primitive-printf&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span><span class="hspace">&nbsp;</span><span class="RktPn">. </span><span class="RktSym">args</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/begin.html#(form._((quote._~23~25kernel)._begin0))" class="RktStxLink" pltdoc="x">begin0</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/procedures.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._apply))" class="RktValLink" pltdoc="x">apply</a></span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">racket:printf</a></span><span class="hspace">&nbsp;</span><span class="RktSym">args</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">yield</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>When we take this approach, we need to ensure that the process has no
+other way of getting to these primitives. This is not a very hard
+thing to do if we&rsquo;re implementing a language tower, like Racket, but
+is more difficult if we are simply writing a library atop Racket.</p><p>This approach has a fundamental trade-off with regards to fairness:
+the fewer primitive functions, the more likely it is that the other
 processes will starve, as the current thread may not ever call a
-primitive, such as printf. A typical solution to this is to call yield
-on every function return, including tail-calls (i.e. loops), because
-every program must do this very often.</p>
-
-<p>However, if primitive functions always call yield and there are many
-such primitive functions, then we’re likely to have too many context
-switches. In that case, it’s wise to use some sort of &#8220;fuel&#8221; counter
-that indicates how many function calls are allowed before switching. We
-can realize this in the printf code:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;fuel-printf&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">INITIAL-FUEL</span><span class="err"> </span><span class="mi">2</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">FUEL</span><span class="err"> </span><span class="nv">INITIAL-FUEL</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="o">.</span> <span class="nv">args</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">begin0</span><span class="err"> </span><span class="p">(</span><span class="nf">apply</span><span class="err"> </span><span class="nv">racket:printf</span><span class="err"> </span><span class="nv">args</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">FUEL</span><span class="err"> </span><span class="p">(</span><span class="nf">sub1</span><span class="err"> </span><span class="nv">FUEL</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">          </span><span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="nv">FUEL</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">FUEL</span><span class="err"> </span><span class="nv">INITIAL-FUEL</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">            </span><span class="p">(</span><span class="nf">yield</span><span class="p">))))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In this example I used a fuel of two, which renders the following
-output:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>adder: 0          
-</span><span class='line'>adder: 1          
-</span><span class='line'>iter: 0           
-</span><span class='line'>iter: 1           
-</span><span class='line'>adder: 3          
-</span><span class='line'>adder: 6          
-</span><span class='line'>iter: 2           
-</span><span class='line'>iter: 3           
-</span><span class='line'>adder: 10         
-</span><span class='line'>iter: 4           
-</span><span class='line'>iter: 5           
-</span><span class='line'>iter: 6</span></code></pre></td></tr></table></div></figure>
-
-
-<p>A nice side-effect of a fuel system like this is that you can give
-different processes different amounts of fuel to represent priorities.</p>
-
-<p>This is actually how the Racket threading system is implemented,
+primitive, such as <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span>. A typical solution to this is to
+call <span class="RktSym">yield</span> on every function return, including
+tail-calls (i.e. loops), because every program must do this very
+often.</p><p>However, if primitive functions always call <span class="RktSym">yield</span> and there
+are many such primitive functions, then we&rsquo;re likely to have too many
+context switches. In that case, it&rsquo;s wise to use some sort of &#8220;fuel&#8221;
+counter that indicates how many function calls are allowed before
+switching. We can realize this in the <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span> code:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cfuel-printf~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cfuel-printf~3e~3a1))" class="plainlink" pltdoc="x">&lt;fuel-printf&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">INITIAL-FUEL</span><span class="hspace">&nbsp;</span><span class="RktVal">2</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">FUEL</span><span class="hspace">&nbsp;</span><span class="RktSym">INITIAL-FUEL</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span><span class="hspace">&nbsp;</span><span class="RktPn">. </span><span class="RktSym">args</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/begin.html#(form._((quote._~23~25kernel)._begin0))" class="RktStxLink" pltdoc="x">begin0</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/procedures.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._apply))" class="RktValLink" pltdoc="x">apply</a></span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">racket:printf</a></span><span class="hspace">&nbsp;</span><span class="RktSym">args</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">FUEL</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._sub1))" class="RktValLink" pltdoc="x">sub1</a></span><span class="hspace">&nbsp;</span><span class="RktSym">FUEL</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/when_unless.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._when))" class="RktStxLink" pltdoc="x">when</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/number-types.html#(def._((quote._~23~25kernel)._zero~3f))" class="RktValLink" pltdoc="x">zero?</a></span><span class="hspace">&nbsp;</span><span class="RktSym">FUEL</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">FUEL</span><span class="hspace">&nbsp;</span><span class="RktSym">INITIAL-FUEL</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">yield</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>In this example I used a fuel of two, which renders the following
+output:</p><p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt"><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 0&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 1&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 0&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 1&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 3&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 6&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 2&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 3&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 10&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 4&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 5&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 6&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt"></span></code></pre></td></tr></table></div></figure></span></span></p></td></tr></table></p><p>A nice side-effect of a fuel system like this is that you can give
+different processes different amounts of fuel to represent priorities.</p><p>This is actually how the Racket threading system is implemented,
 although all the continuation capturing, context switching, primitive
 functions, and fuel manipulation is done in the C virtual machine. You
-can see the macros that manage fuel around line 1581 of include/scheme.h
-in the Racket VM source.</p>
-
-<p>Next week, we’ll look at system calls in this infrastructure.</p>
-
-<p>By the way, if you use this code at home, make sure you put the code in
-this order:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/list</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">racket/match</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="nf">prefix-in</span><span class="err"> </span><span class="nv">racket:</span><span class="err"> </span><span class="nv">racket/base</span><span class="p">))</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">snoc</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">append</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="nv">x</span><span class="p">)))</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="nv">&lt;fuel-printf&gt;</span>
-</span><span class='line'>  <span class="nv">&lt;example&gt;</span>
-</span><span class='line'>  <span class="nv">&lt;threading-system&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
+can see the macros that manage fuel around line 1581 of
+include/scheme.h in the Racket VM source.</p><p>Next week, we&rsquo;ll look at system calls in this infrastructure.</p><p>By the way, if you use this code at home, make sure you put the code
+in this order:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3c*~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3c*~3e~3a1))" class="plainlink" pltdoc="x">&lt;*&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/require.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._require))" class="RktStxLink" pltdoc="x">require</a></span><span class="hspace">&nbsp;</span><span class="RktSym">racket/list</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">racket/match</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/require.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._prefix-in))" class="RktStxLink" pltdoc="x">prefix-in</a></span><span class="hspace">&nbsp;</span><span class="RktSym">racket:</span><span class="hspace">&nbsp;</span><span class="RktSym">racket/base</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">snoc</span><span class="hspace">&nbsp;</span><span class="RktSym">l</span><span class="hspace">&nbsp;</span><span class="RktSym">x</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._append))" class="RktValLink" pltdoc="x">append</a></span><span class="hspace">&nbsp;</span><span class="RktSym">l</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._list))" class="RktValLink" pltdoc="x">list</a></span><span class="hspace">&nbsp;</span><span class="RktSym">x</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><a href="#(elem._(chunk._~3cfuel-printf~3e~3a1))" class="plainlink" pltdoc="x">&lt;fuel-printf&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3cexample~3e~3a1))" class="plainlink" pltdoc="x">&lt;example&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3cthreading-system~3e~3a1))" class="plainlink" pltdoc="x">&lt;threading-system&gt;</a></td></tr></table></blockquote></div></p>
 </div>
   
 

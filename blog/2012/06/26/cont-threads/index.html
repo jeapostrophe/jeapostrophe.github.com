@@ -21,6 +21,7 @@ classic uses of them: implementing threads in user-space. <!-- google_ad_client 
   
   <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/06/26/cont-threads">
   <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/racket.css" rel="stylesheet" type="text/css">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
@@ -107,9 +108,7 @@ classic uses of them: implementing threads in user-space. <!-- google_ad_client 
 
 
   <div class="entry-content"><p>After the last post about continuations, I wanted to show one of the
-classic uses of them: implementing threads in user-space.</p>
-
-</div>
+classic uses of them: implementing threads in user-space.</p></div>
   
   
     <div style="text-align: center;">
@@ -126,387 +125,58 @@ classic uses of them: implementing threads in user-space.</p>
   </script>
 </div>
 
-    <div class="entry-content" style="margin-top: 1em;">
-
-
-<p>Let’s look at an example program first:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;example&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">main</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">N</span><span class="err"> </span><span class="mi">5</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">thread</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">N</span><span class="err"> </span><span class="mi">2</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;iter: ~a\n&quot;</span><span class="err"> </span><span class="nv">i</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">yield</span><span class="p">))))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">thread</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">for/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">sum</span><span class="err"> </span><span class="mi">0</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">         </span><span class="p">(</span><span class="err">[</span><span class="nv">i</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">N</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">printf</span><span class="err"> </span><span class="s">&quot;adder: ~a\n&quot;</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">i</span><span class="err"> </span><span class="nv">sum</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">yield</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">i</span><span class="err"> </span><span class="nv">sum</span><span class="p">)))))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In this thread system, there are a few things to notice:</p>
-
-<ul>
-<li><p>You define a main function that starts off the computation.</p></li>
-<li><p>You create threads by calling thread with a thunk.</p></li>
-<li><p>Threads are cooperative and must yield to one another.</p></li>
-</ul>
-
-
-<p>Since we are yielding in a deterministic way, this program has a
-deterministic output as well:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>adder: 0          
-</span><span class='line'>iter: 0           
-</span><span class='line'>adder: 1          
-</span><span class='line'>iter: 1           
-</span><span class='line'>adder: 3          
-</span><span class='line'>iter: 2           
-</span><span class='line'>adder: 6          
-</span><span class='line'>iter: 3           
-</span><span class='line'>adder: 10         
-</span><span class='line'>iter: 4           
-</span><span class='line'>iter: 5           
-</span><span class='line'>iter: 6</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The threading system will be very simple: it keeps a list of threads
-(represented as thunks) that can run and yield captures the context of
-the currently running thread, adds it to the end of that list, and then
-executes the top of the list.</p>
-
-<p>This is straight-forward to express in code:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;thread-basics&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="nv">empty</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">yield</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">ts</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">void</span><span class="p">)</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">next</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">let/cc</span><span class="err"> </span><span class="nv">k</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="p">(</span><span class="nf">snoc</span><span class="err"> </span><span class="nv">rest</span><span class="err"> </span><span class="nv">k</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">       </span><span class="p">(</span><span class="nf">next</span><span class="p">))</span><span class="err">]</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The final four lines are the essence of a context switch:</p>
-
-<ol>
-<li><p>Choose the next context</p></li>
-<li><p>Capture the current context (its stack, registers, etc.)</p></li>
-<li><p>Save the current context in the thread queue</p></li>
-<li><p>Re-establish the next context as the current context</p></li>
-</ol>
-
-
-<p>Every threading system must do each of these four things, although
+    <div class="entry-content" style="margin-top: 1em;"><p>Let&rsquo;s look at an example program first:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cexample~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cexample~3e~3a1))" class="plainlink" pltdoc="x">&lt;example&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">main</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">N</span><span class="hspace">&nbsp;</span><span class="RktVal">5</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for))" class="RktStxLink" pltdoc="x">for</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">i</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._%2B))" class="RktValLink" pltdoc="x">+</a></span><span class="hspace">&nbsp;</span><span class="RktSym">N</span><span class="hspace">&nbsp;</span><span class="RktVal">2</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span><span class="hspace">&nbsp;</span><span class="RktVal">&#8220;iter: ~a\n&#8221;</span><span class="hspace">&nbsp;</span><span class="RktSym">i</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">yield</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for%2Ffold))" class="RktStxLink" pltdoc="x">for/fold</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">sum</span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">i</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktSym">N</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._printf))" class="RktValLink" pltdoc="x">printf</a></span><span class="hspace">&nbsp;</span><span class="RktVal">&#8220;adder: ~a\n&#8221;</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._%2B))" class="RktValLink" pltdoc="x">+</a></span><span class="hspace">&nbsp;</span><span class="RktSym">i</span><span class="hspace">&nbsp;</span><span class="RktSym">sum</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">yield</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._%2B))" class="RktValLink" pltdoc="x">+</a></span><span class="hspace">&nbsp;</span><span class="RktSym">i</span><span class="hspace">&nbsp;</span><span class="RktSym">sum</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>In this thread system, there are a few things to notice:</p><p>- You define a <span class="RktSym">main</span> function that starts off the computation.</p><p>- You create threads by calling <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span> with a thunk.</p><p>- Threads are cooperative and must <span class="RktSym">yield</span> to one another.</p><p>Since we are yielding in a deterministic way, this program has a
+deterministic output as well:</p><p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt"><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 0&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 0&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 1&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 1&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 3&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 2&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 6&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 3&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 10&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 4&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 5&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 6&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt"></span></code></pre></td></tr></table></div></figure></span></span></p></td></tr></table></p><p>The threading system will be very simple: it keeps a list of
+threads (represented as thunks) that can run and <span class="RktSym">yield</span>
+captures the context of the currently running thread, adds it to the
+end of that list, and then executes the top of the list.</p><p>This is straight-forward to express in code:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cthread-basics~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cthread-basics~3e~3a1))" class="plainlink" pltdoc="x">&lt;thread-basics&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._empty))" class="RktValLink" pltdoc="x">empty</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">yield</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match))" class="RktStxLink" pltdoc="x">match</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._list))" class="RktValLink" pltdoc="x">list</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/void.html#(def._((quote._~23~25kernel)._void))" class="RktValLink" pltdoc="x">void</a></span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(form._((lib._racket%2Fprivate%2Fmore-scheme..rkt)._let%2Fcc))" class="RktStxLink" pltdoc="x">let/cc</a></span><span class="hspace">&nbsp;</span><span class="RktSym">k</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">snoc</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="hspace">&nbsp;</span><span class="RktSym">k</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">next</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The final four lines are the essence of a context switch:</p><p>1. Choose the next context</p><p>2. Capture the current context (its stack, registers, etc.)</p><p>3. Save the current context in the thread queue</p><p>4. Re-establish the next context as the current context</p><p>Every threading system must do each of these four things, although
 perhaps in a different order. In Racket, we can express each one in a
-single line.</p>
-
-<p>The only remaining thing is invoking the main function and implementing
-thread.</p>
-
-<p>You might think that this is very obvious and want to write:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;broken-thread&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">thread</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">t</span><span class="err"> </span><span class="nv">ts</span><span class="p">)))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">main</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Unfortunately, this is not correct. The problem is that it fails to ever
-call yield and actually invoke the threads. The program would have no
-output.</p>
-
-<p>Another idea is to automatically yield every time a thread is created:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;yield-thread&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">thread</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">t</span><span class="err"> </span><span class="nv">ts</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">yield</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">main</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The problem with this is that when the main program is finished creating
-the two threads, it has nothing else to do, so it just ends without
-calling yield again. We could add a large number of calls to yield to
-the end of main, but that’s a little absurd, obviously brittle, and
-immoral.</p>
-
-<p>What we really need is something like yield but that doesn’t add the
-current context back on the queue, something that does a context switch
-but exits the current context. For convenience, we shouldn’t require the
-programmer to ever call this (although they may if they want), so we’ll
-implicitly add it to the end of every thread, including the main
-program.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;exit-thread&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">thread</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span><span class="err"> </span><span class="p">(</span><span class="nf">t</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">exit</span><span class="p">))</span><span class="err"> </span><span class="nv">ts</span><span class="p">)))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">exit</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">ts</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">void</span><span class="p">)</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">next</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">next</span><span class="p">)</span><span class="err">]</span><span class="p">))</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">main</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">exit</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This version seems like it should be correct, but it actually has a very
-strange output:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>adder: 0          
-</span><span class='line'>iter: 0           
-</span><span class='line'>adder: 1          
-</span><span class='line'>iter: 1           
-</span><span class='line'>adder: 3          
-</span><span class='line'>iter: 2           
-</span><span class='line'>adder: 6          
-</span><span class='line'>iter: 3           
-</span><span class='line'>adder: 10         
-</span><span class='line'>iter: 4           
-</span><span class='line'>iter: 5           
-</span><span class='line'>iter: 6           
-</span><span class='line'>adder: 1          
-</span><span class='line'>adder: 3          
-</span><span class='line'>adder: 6          
-</span><span class='line'>adder: 10</span></code></pre></td></tr></table></div></figure>
-
-
-<p>For some reason, after the adder ends, and the iterator ends (it has two
-more steps), the adder starts again, but now from one step into its
-computation. How could this be?</p>
-
-<p>Here’s what happens:</p>
-
-<ul>
-<li><p>The main thread creates the iterator, then the adder, then exits,
-invoking the adder (because we add new threads to the front.)</p></li>
-<li><p>The adder does its first round and then invokes the iterator in its
-call to yield.</p></li>
-<li><p>At this point, the continuation of the iterator is the code after the
-first round of the adder. In most cases, the continuation of the call to
-yield is only available in the thread queue, but this case is different,
-because the initial thread thunk is not a continuation that aborts its
-invoking context.</p></li>
-<li><p>Now, later on, when the iterator loop returns (by returning void
-inside the first case of the exit), it returns back to its initial
-continuation, or the second round of the adder.</p></li>
-</ul>
-
-
-<p>In order to fix this, we could make the final call abort the current
-context, so that code wasn’t run, but it would be better to ensure that
-it wasn’t there in the first place.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;best-thread&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">thread</span><span class="err"> </span><span class="nv">t</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span>
-</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">                </span><span class="p">(</span><span class="nf">abort-current-continuation</span>
-</span><span class='line'>  <span class="err">                 </span><span class="p">(</span><span class="nf">default-continuation-prompt-tag</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">                 </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">                   </span><span class="p">(</span><span class="nf">t</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">                   </span><span class="p">(</span><span class="nf">exit</span><span class="p">))))</span>
-</span><span class='line'>  <span class="err">              </span><span class="nv">ts</span><span class="p">)))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">exit</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match</span><span class="err"> </span><span class="nv">ts</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">list</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">void</span><span class="p">)</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">    [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">next</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">set!</span><span class="err"> </span><span class="nv">ts</span><span class="err"> </span><span class="nv">rest</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">     </span><span class="p">(</span><span class="nf">next</span><span class="p">)</span><span class="err">]</span><span class="p">))</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">call-with-continuation-prompt</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="err">λ </span><span class="p">()</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">main</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">   </span><span class="p">(</span><span class="nf">exit</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The function abort-current-continuation destroys the current context and
-goes back to the beginning of the program. This is like calling the
-normal OS exit() in a program: the program ends and returns you to the
-command prompt. However, abort-current-continuation is a generalization
-of that idea. It is more general in two ways:</p>
-
-<ol>
-<li><p>Rather than there being only one &#8220;command prompt&#8221; that you can return
-to, there are many that can be dynamically created, so you need to name
-the one you return to. Our code returns to the default prompt.</p></li>
-<li><p>Rather than only being able to return a number, this function has you
-return a function that will be invoked to discover the value that should
-be returned. This allows you to do something like trampolining, where
-you destroy the current context and start up the computation again with
-a &#8220;fresh&#8221; context (or stack.)</p></li>
-</ol>
-
-
-<p>The other small tweak is that we have to explicitly wrap the call to
-main in the continuation prompt that we’ll abort to. I think of this
-little piece as the &#8220;kernel&#8221; that is the start and end of the life of
-the program.</p>
-
-<p>And there you have it! A small cooperative threading system implemented
-in user-space using continuations!</p>
-
-<p>Next time, we’ll take this as a base and remove the cooperative aspect
-then elaborate the kernel to add system calls! Aren’t you excited?</p>
-
-<p>By the way, if you use this code at home, make sure you put the code in
-this order:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/list</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">racket/match</span><span class="p">)</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">snoc</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="nv">x</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">append</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="p">(</span><span class="nf">list</span><span class="err"> </span><span class="nv">x</span><span class="p">)))</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="nv">&lt;thread-basics&gt;</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="nv">&lt;example&gt;</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="nv">&lt;best-thread&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
+single line.</p><p>The only remaining thing is invoking the <span class="RktSym">main</span> function and
+implementing <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span>.</p><p>You might think that this is very obvious and want to write:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cbroken-thread~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cbroken-thread~3e~3a1))" class="plainlink" pltdoc="x">&lt;broken-thread&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span><span class="hspace">&nbsp;</span><span class="RktSym">t</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">t</span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym">main</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>Unfortunately, this is not correct. The problem is that it fails to
+ever call <span class="RktSym">yield</span> and actually invoke the threads. The program
+would have no output.</p><p>Another idea is to automatically <span class="RktSym">yield</span> every time a thread is
+created:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cyield-thread~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cyield-thread~3e~3a1))" class="plainlink" pltdoc="x">&lt;yield-thread&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span><span class="hspace">&nbsp;</span><span class="RktSym">t</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">t</span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">yield</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym">main</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The problem with this is that when the main program is finished
+creating the two threads, it has nothing else to do, so it just ends
+without calling <span class="RktSym">yield</span> again. We could add a large number of
+calls to <span class="RktSym">yield</span> to the end of main, but that&rsquo;s a little
+absurd, obviously brittle, and immoral.</p><p>What we really need is something like <span class="RktSym">yield</span> but that doesn&rsquo;t
+add the current context back on the queue, something that does a
+context switch but <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span>s the current context. For
+convenience, we shouldn&rsquo;t require the programmer to ever call
+this (although they may if they want), so we&rsquo;ll implicitly add it to
+the end of every thread, including the main program.</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cexit-thread~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cexit-thread~3e~3a1))" class="plainlink" pltdoc="x">&lt;exit-thread&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span><span class="hspace">&nbsp;</span><span class="RktSym">t</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">t</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match))" class="RktStxLink" pltdoc="x">match</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._list))" class="RktValLink" pltdoc="x">list</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/void.html#(def._((quote._~23~25kernel)._void))" class="RktValLink" pltdoc="x">void</a></span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">next</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym">main</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>This version seems like it should be correct, but it actually has a
+very strange output:</p><p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt"><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 0&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 0&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 1&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 1&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 3&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 2&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 6&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 3&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 10&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 4&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 5&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">iter: 6&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 1&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 3&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 6&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt">adder: 10&lt;/span>&lt;/span>&lt;/p>&lt;/td>&lt;/tr>&lt;tr>&lt;td>&lt;p>&lt;span class="stt">&lt;span class="stt"></span></code></pre></td></tr></table></div></figure></span></span></p></td></tr></table></p><p>For some reason, after the adder ends, and the iterator ends (it has
+two more steps), the adder starts again, but now from one step into
+its computation. How could this be?</p><p>Here&rsquo;s what happens:</p><p>- The main thread creates the iterator, then the adder, then exits,
+invoking the adder (because we add new threads to the front.)</p><p>- The adder does its first round and then invokes the iterator in its
+call to <span class="RktSym">yield.</span></p><p>- At this point, the continuation of the iterator is the code after
+the first round of the adder. In most cases, the continuation of the
+call to <span class="RktSym">yield</span> is only available in the thread queue, but this
+case is different, because the initial thread thunk is not a
+continuation that aborts its invoking context.</p><p>- Now, later on, when the iterator loop returns (by returning
+<span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/void.html#(def._((quote._~23~25kernel)._void))" class="RktValLink" pltdoc="x">void</a></span> inside the first case of the <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span>), it returns
+back to its initial continuation, or the second round of the adder.</p><p>In order to fix this, we could make the final call abort the
+current context, so that code wasn&rsquo;t run, but it would be better to
+ensure that it wasn&rsquo;t there in the first place.</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cbest-thread~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cbest-thread~3e~3a1))" class="plainlink" pltdoc="x">&lt;best-thread&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/threads.html#(def._((quote._~23~25kernel)._thread))" class="RktValLink" pltdoc="x">thread</a></span><span class="hspace">&nbsp;</span><span class="RktSym">t</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(def._((quote._~23~25kernel)._abort-current-continuation))" class="RktValLink" pltdoc="x">abort-current-continuation</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(def._((quote._~23~25kernel)._default-continuation-prompt-tag))" class="RktValLink" pltdoc="x">default-continuation-prompt-tag</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">t</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">ts</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match))" class="RktStxLink" pltdoc="x">match</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._list))" class="RktValLink" pltdoc="x">list</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/void.html#(def._((quote._~23~25kernel)._void))" class="RktValLink" pltdoc="x">void</a></span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/set_.html#(form._((quote._~23~25kernel)._set!))" class="RktStxLink" pltdoc="x">set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ts</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">next</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(def._((quote._~23~25kernel)._call-with-continuation-prompt))" class="RktValLink" pltdoc="x">call-with-continuation-prompt</a></span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">main</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Exiting.html#(def._((quote._~23~25kernel)._exit))" class="RktValLink" pltdoc="x">exit</a></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The function <span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(def._((quote._~23~25kernel)._abort-current-continuation))" class="RktValLink" pltdoc="x">abort-current-continuation</a></span> destroys the current
+context and goes back to the beginning of the program. This is like
+calling the normal OS exit() in a program: the program ends and
+returns you to the command prompt. However,
+<span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/cont.html#(def._((quote._~23~25kernel)._abort-current-continuation))" class="RktValLink" pltdoc="x">abort-current-continuation</a></span> is a generalization of that
+idea. It is more general in two ways:</p><p>1. Rather than there being only one &#8220;command prompt&#8221; that you can
+return to, there are many that can be dynamically created, so you need
+to name the one you return to. Our code returns to the default prompt.</p><p>2. Rather than only being able to return a number, this function has
+you return a function that will be invoked to discover the value that
+should be returned. This allows you to do something like trampolining,
+where you destroy the current context and start up the computation
+again with a &#8220;fresh&#8221; context (or stack.)</p><p>The other small tweak is that we have to explicitly wrap the call to
+<span class="RktSym">main</span> in the continuation prompt that we&rsquo;ll abort to. I think
+of this little piece as the &#8220;kernel&#8221; that is the start and end of the
+life of the program.</p><p>And there you have it! A small cooperative threading system
+implemented in user-space using continuations!</p><p>Next time, we&rsquo;ll take this as a base and remove the cooperative aspect
+then elaborate the kernel to add system calls! Aren&rsquo;t you excited?</p><p>By the way, if you use this code at home, make sure you put the code
+in this order:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3c*~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3c*~3e~3a1))" class="plainlink" pltdoc="x">&lt;*&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/require.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._require))" class="RktStxLink" pltdoc="x">require</a></span><span class="hspace">&nbsp;</span><span class="RktSym">racket/list</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">racket/match</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">snoc</span><span class="hspace">&nbsp;</span><span class="RktSym">l</span><span class="hspace">&nbsp;</span><span class="RktSym">x</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._append))" class="RktValLink" pltdoc="x">append</a></span><span class="hspace">&nbsp;</span><span class="RktSym">l</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._list))" class="RktValLink" pltdoc="x">list</a></span><span class="hspace">&nbsp;</span><span class="RktSym">x</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><a href="#(elem._(chunk._~3cthread-basics~3e~3a1))" class="plainlink" pltdoc="x">&lt;thread-basics&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><a href="#(elem._(chunk._~3cexample~3e~3a1))" class="plainlink" pltdoc="x">&lt;example&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><a href="#(elem._(chunk._~3cbest-thread~3e~3a1))" class="plainlink" pltdoc="x">&lt;best-thread&gt;</a></td></tr></table></blockquote></div></p>
 </div>
   
 

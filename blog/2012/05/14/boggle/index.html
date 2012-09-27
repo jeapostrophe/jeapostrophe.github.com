@@ -22,6 +22,7 @@ assignment &hellip;">
   
   <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/05/14/boggle">
   <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/racket.css" rel="stylesheet" type="text/css">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
@@ -110,11 +111,10 @@ assignment &hellip;">
   <div class="entry-content"><p>Boggle is a classic word game that lends itself well to algorithmic
 attacks. A student of mine wanted to show me his solution (as it is an
 assignment in one of BYU early classes), but I have a hard time
-evaluating things like this unless I’ve done them myself. So, I decided
-to make an attempt. I was able to do it in about 19 lines of code, minus
-the 24 to set up the data-structures. Let’s see how it goes&#8230;</p>
-
-</div>
+evaluating things like this unless I&rsquo;ve done them myself. So, I
+decided to make an attempt. I was able to do it in about 19 lines of
+code, minus the 24 to set up the data-structures. Let&rsquo;s see how it
+goes&#8230;</p></div>
   
   
     <div style="text-align: center;">
@@ -131,409 +131,71 @@ the 24 to set up the data-structures. Let’s see how it goes&#8230;</p>
   </script>
 </div>
 
-    <div class="entry-content" style="margin-top: 1em;">
-
-
-<p>Let’s review the rules of Boggle. You have a square board of characters.
-You are trying to find words from a dictionary of valid words. The
-standard word list does not have words under three letters, etc. The
-word may be constructed from any string of adjacent characters—including
-the diagonals—provided it does not use the same board position twice.</p>
-
-<p>The two most important decision we make in the algorithm are
+    <div class="entry-content" style="margin-top: 1em;"><p>Let&rsquo;s review the rules of Boggle. You have a square board of
+characters. You are trying to find words from a dictionary of valid
+words. The standard word list does not have words under three letters,
+etc. The word may be constructed from any string of adjacent
+characters&#8212;<wbr />including the diagonals&#8212;<wbr />provided it does not use the
+same board position twice.</p><p>The two most important decision we make in the algorithm are
 representing the dictionary and representing the board. Once these are
-in place, the result is pretty obvious.</p>
-
-<h1>The board</h1>
-
-<p>Let’s start with the board. We’ll represent it as a hash table mapping
+in place, the result is pretty obvious.</p><p># The board</p><p>Let&rsquo;s start with the board. We&rsquo;ll represent it as a hash table mapping
 coordinates, like (0,0), to the letter at that coordinate. The program
-will generate a random board configuration before solving it.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;board&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">board-n</span><span class="err"> </span><span class="mi">4</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">board</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for*/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">cell-&gt;char</span><span class="err"> </span><span class="p">(</span><span class="nf">hash</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">row</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">board-n</span><span class="p">)</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">       [</span><span class="nv">col</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">board-n</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">hash-set</span><span class="err"> </span><span class="nv">cell-&gt;char</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">row</span><span class="err"> </span><span class="nv">col</span><span class="p">)</span><span class="err"> </span><span class="p">(</span><span class="nf">random-letter</span><span class="p">))))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The standard game of Boggle is played on a 4x4 gird, but we’ll be
-parameterized over board-n.</p>
-
-<p>The hash table doesn’t have any particular order, but that’s fine
-because we’ll be using the coordinates directly. Still, printing out the
-board is pretty convenient:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;printing&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">row</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">board-n</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">col</span><span class="err"> </span><span class="p">(</span><span class="nf">in-range</span><span class="err"> </span><span class="nv">board-n</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">display</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-ref</span><span class="err"> </span><span class="nv">board</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">row</span><span class="err"> </span><span class="nv">col</span><span class="p">))))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">newline</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>At this point, we have six essential lines of code. (I don’t count the
-printer.)</p>
-
-<h1>The dictionary</h1>
-
-<p>The more interesting decision comes from how we’ll represent the
+will generate a random board configuration before solving it.</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cboard~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cboard~3e~3a1))" class="plainlink" pltdoc="x">&lt;board&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">board-n</span><span class="hspace">&nbsp;</span><span class="RktVal">4</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">board</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for*%2Ffold))" class="RktStxLink" pltdoc="x">for*/fold</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">cell-&gt;char</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash))" class="RktValLink" pltdoc="x">hash</a></span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">row</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktSym">board-n</span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktSym">col</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktSym">board-n</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-set))" class="RktValLink" pltdoc="x">hash-set</a></span><span class="hspace">&nbsp;</span><span class="RktSym">cell-&gt;char</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">row</span><span class="hspace">&nbsp;</span><span class="RktSym">col</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">random-letter</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The standard game of Boggle is played on a 4x4 gird, but we&rsquo;ll be
+parameterized over <span class="RktSym">board-n</span>.</p><p>The hash table doesn&rsquo;t have any particular order, but that&rsquo;s fine
+because we&rsquo;ll be using the coordinates directly. Still, printing out
+the board is pretty convenient:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cprinting~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cprinting~3e~3a1))" class="plainlink" pltdoc="x">&lt;printing&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for))" class="RktStxLink" pltdoc="x">for</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">row</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktSym">board-n</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for))" class="RktStxLink" pltdoc="x">for</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">col</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-range))" class="RktValLink" pltdoc="x">in-range</a></span><span class="hspace">&nbsp;</span><span class="RktSym">board-n</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((quote._~23~25kernel)._display))" class="RktValLink" pltdoc="x">display</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-ref))" class="RktValLink" pltdoc="x">hash-ref</a></span><span class="hspace">&nbsp;</span><span class="RktSym">board</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">row</span><span class="hspace">&nbsp;</span><span class="RktSym">col</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Byte_and_String_Output.html#(def._((quote._~23~25kernel)._newline))" class="RktValLink" pltdoc="x">newline</a></span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>At this point, we have six essential lines of code. (I don&rsquo;t count the
+printer.)</p><p># The dictionary</p><p>The more interesting decision comes from how we&rsquo;ll represent the
 dictionary. The core idea is to use a regular expression derivative,
 where the regular expression is accepting when the string is in the
-dictionary. The representation will be tabled and gradually constructed
-by adding the words one at a time.</p>
-
-<p>We’ll define a dictionary as a hash mapping characters to a boolean and
-another dictionary. The boolean will describe if the string is accepted
-(i.e. corresponds to a word) and the dictionary will be the transitions
-from this string prefix. For example, the dictionary that only contains
-&#8220;cat&#8221; and &#8220;cats&#8221; is:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dict-example&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="sc">#\c</span>
-</span><span class='line'>  <span class="err">        </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="no">#f</span>
-</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="sc">#\a</span>
-</span><span class='line'>  <span class="err">                      </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="no">#f</span>
-</span><span class='line'>  <span class="err">                            </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="sc">#\t</span>
-</span><span class='line'>  <span class="err">                                    </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="no">#t</span>
-</span><span class='line'>  <span class="err">                                          </span><span class="p">(</span><span class="nf">hasheq</span><span class="err"> </span><span class="sc">#\s</span>
-</span><span class='line'>  <span class="err">                                                  </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="no">#t</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="p">)))))))))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The following provdes the necessary function for extending an empty
-dictionary like this:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dict&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">empty-dict</span><span class="err"> </span><span class="p">(</span><span class="nf">hasheq</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">empty-entry</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="no">#f</span><span class="err"> </span><span class="nv">empty-dict</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">dict-add</span><span class="err"> </span><span class="nv">d</span><span class="err"> </span><span class="nv">w</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">if</span><span class="err"> </span><span class="p">(</span><span class="nf">empty?</span><span class="err"> </span><span class="nv">w</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">    </span><span class="nv">d</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">hash-update</span><span class="err"> </span><span class="nv">d</span><span class="err"> </span><span class="p">(</span><span class="nf">first</span><span class="err"> </span><span class="nv">w</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">                 </span><span class="p">(</span><span class="nf">match-lambda</span>
-</span><span class='line'>  <span class="err">                  [</span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">word?</span><span class="err"> </span><span class="nv">rest-d</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">                   </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="nf">or</span><span class="err"> </span><span class="nv">word?</span><span class="err"> </span><span class="p">(</span><span class="nf">empty?</span><span class="err"> </span><span class="p">(</span><span class="nf">rest</span><span class="err"> </span><span class="nv">w</span><span class="p">)))</span>
-</span><span class='line'>  <span class="err">                         </span><span class="p">(</span><span class="nf">dict-add</span><span class="err"> </span><span class="nv">rest-d</span><span class="err"> </span><span class="p">(</span><span class="nf">rest</span><span class="err"> </span><span class="nv">w</span><span class="p">)))</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">                 </span><span class="nv">empty-entry</span><span class="p">)))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="nv">d</span><span class="err"> </span><span class="nv">s</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">dict-add</span><span class="err"> </span><span class="nv">d</span><span class="err"> </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="nv">s</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>dict-add* breaks a string into a list of characters, which are read
-one-by-one extending the dictionary gradually. If the rest of the list
-after a given character is ever empty, then the dictionary entry
-corresponds to a complete word.</p>
-
-<p>We can test to make sure this function works by comparing to our
-manually constructed example:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dict-test&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">cat-dict</span><span class="err"> </span><span class="nv">&lt;dict-example&gt;</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">check-equal?</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="nv">empty-dict</span><span class="err"> </span><span class="s">&quot;cat&quot;</span><span class="p">)</span><span class="err"> </span><span class="s">&quot;cats&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="err"> </span><span class="nv">cat-dict</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">check-equal?</span>
-</span><span class='line'>  <span class="err"> </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="nv">empty-dict</span><span class="err"> </span><span class="s">&quot;cats&quot;</span><span class="p">)</span><span class="err"> </span><span class="s">&quot;cat&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="err"> </span><span class="nv">cat-dict</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We can build the whole dictionary from a standard word list, like so:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;dict-parse&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">dict-pth</span><span class="err"> </span><span class="s">&quot;/usr/share/dict/words&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">the-dictionary</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for/fold</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">d</span><span class="err"> </span><span class="nv">empty-dict</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">      </span><span class="p">(</span><span class="err">[</span><span class="nv">w</span><span class="err"> </span><span class="p">(</span><span class="nf">in-lines</span><span class="err"> </span><span class="p">(</span><span class="nf">open-input-file</span><span class="err"> </span><span class="nv">dict-pth</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">dict-add*</span><span class="err"> </span><span class="nv">d</span><span class="err"> </span><span class="nv">w</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The standard dictionary is not Boggle-legal, because it contains words
+dictionary. The representation will be tabled and gradually
+constructed by adding the words one at a time.</p><p>We&rsquo;ll define a dictionary as a hash mapping characters to a boolean
+and another dictionary. The boolean will describe if the string is
+accepted (i.e. corresponds to a word) and the dictionary will be the
+transitions from this string prefix. For example, the dictionary that
+only contains &#8220;cat&#8221; and &#8220;cats&#8221; is:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cdict-example~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cdict-example~3e~3a1))" class="plainlink" pltdoc="x">&lt;dict-example&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#\c</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#f</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#\a</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#f</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#\t</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#t</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#\s</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#t</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The following provdes the necessary function for extending an empty
+dictionary like this:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cdict~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cdict~3e~3a1))" class="plainlink" pltdoc="x">&lt;dict&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">empty-dict</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">empty-entry</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#f</span><span class="hspace">&nbsp;</span><span class="RktSym">empty-dict</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">dict-add</span><span class="hspace">&nbsp;</span><span class="RktSym">d</span><span class="hspace">&nbsp;</span><span class="RktSym">w</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/if.html#(form._((quote._~23~25kernel)._if))" class="RktStxLink" pltdoc="x">if</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._empty~3f))" class="RktValLink" pltdoc="x">empty?</a></span><span class="hspace">&nbsp;</span><span class="RktSym">w</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">d</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((lib._racket%2Fprivate%2Fmore-scheme..rkt)._hash-update))" class="RktValLink" pltdoc="x">hash-update</a></span><span class="hspace">&nbsp;</span><span class="RktSym">d</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._first))" class="RktValLink" pltdoc="x">first</a></span><span class="hspace">&nbsp;</span><span class="RktSym">w</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match-lambda))" class="RktStxLink" pltdoc="x">match-lambda</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">word?</span><span class="hspace">&nbsp;</span><span class="RktSym">rest-d</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/if.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._or))" class="RktStxLink" pltdoc="x">or</a></span><span class="hspace">&nbsp;</span><span class="RktSym">word?</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._empty~3f))" class="RktValLink" pltdoc="x">empty?</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="hspace">&nbsp;</span><span class="RktSym">w</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">dict-add</span><span class="hspace">&nbsp;</span><span class="RktSym">rest-d</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._rest))" class="RktValLink" pltdoc="x">rest</a></span><span class="hspace">&nbsp;</span><span class="RktSym">w</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">empty-entry</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">dict-add*</span><span class="hspace">&nbsp;</span><span class="RktSym">d</span><span class="hspace">&nbsp;</span><span class="RktSym">s</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">dict-add</span><span class="hspace">&nbsp;</span><span class="RktSym">d</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/strings.html#(def._((quote._~23~25kernel)._string-~3elist))" class="RktValLink" pltdoc="x">string-&gt;list</a></span><span class="hspace">&nbsp;</span><span class="RktSym">s</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p><span class="RktSym">dict-add*</span> breaks a string into a list of characters, which
+are read one-by-one extending the dictionary gradually. If the rest of
+the list after a given character is ever empty, then the dictionary
+entry corresponds to a complete word.</p><p>We can test to make sure this function works by comparing to our
+manually constructed example:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cdict-test~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cdict-test~3e~3a1))" class="plainlink" pltdoc="x">&lt;dict-test&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">cat-dict</span><span class="hspace">&nbsp;</span><a href="#(elem._(chunk._~3cdict-example~3e~3a1))" class="plainlink" pltdoc="x">&lt;dict-example&gt;</a><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/rackunit/api.html#(def._((lib._rackunit%2Fmain..rkt)._check-equal~3f))" class="RktValLink" pltdoc="x">check-equal?</a></span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">dict-add*</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">dict-add*</span><span class="hspace">&nbsp;</span><span class="RktSym">empty-dict</span><span class="hspace">&nbsp;</span><span class="RktVal">&#8220;cat&#8221;</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktVal">&#8220;cats&#8221;</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktSym">cat-dict</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/rackunit/api.html#(def._((lib._rackunit%2Fmain..rkt)._check-equal~3f))" class="RktValLink" pltdoc="x">check-equal?</a></span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">dict-add*</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">dict-add*</span><span class="hspace">&nbsp;</span><span class="RktSym">empty-dict</span><span class="hspace">&nbsp;</span><span class="RktVal">&#8220;cats&#8221;</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktVal">&#8220;cat&#8221;</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktSym">cat-dict</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>We can build the whole dictionary from a standard word list, like so:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cdict-parse~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cdict-parse~3e~3a1))" class="plainlink" pltdoc="x">&lt;dict-parse&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">dict-pth</span><span class="hspace">&nbsp;</span><span class="RktVal">&#8220;/usr/share/dict/words&#8221;</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">the-dictionary</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for%2Ffold))" class="RktStxLink" pltdoc="x">for/fold</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">d</span><span class="hspace">&nbsp;</span><span class="RktSym">empty-dict</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">w</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-lines))" class="RktValLink" pltdoc="x">in-lines</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/file-ports.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._open-input-file))" class="RktValLink" pltdoc="x">open-input-file</a></span><span class="hspace">&nbsp;</span><span class="RktSym">dict-pth</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">dict-add*</span><span class="hspace">&nbsp;</span><span class="RktSym">d</span><span class="hspace">&nbsp;</span><span class="RktSym">w</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The standard dictionary is not Boggle-legal, because it contains words
 under three letters, apostrophes, proper names, etc. But the algorithm
-wouldn’t change with a different list.</p>
-
-<p>At this point, we have 18 more lines of essential code, bringing the
-total to 24. (I don’t count the test.)</p>
-
-<h1>The solver</h1>
-
-<p>Now that we have our data-structures ready, it’s a pretty straight path.
-We’ll be exploring the board like a graph, looking for paths where the
-nodes correspond to accepting strings. After visiting a node, we’ll
-remove it from the graph and proceed to all the neighbors, provided that
-the dictionary is not empty from the current path.</p>
-
-<p>The main loop simply starts this process from every possible square with
-the complete board, the complete dictionary, and an empty path:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;main&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">for</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">k</span><span class="err"> </span><span class="p">(</span><span class="nf">in-hash-keys</span><span class="err"> </span><span class="nv">board</span><span class="p">)</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">solutions-from</span><span class="err"> </span><span class="nv">board</span><span class="err"> </span><span class="nv">the-dictionary</span><span class="err"> </span><span class="nv">k</span><span class="err"> </span><span class="nv">empty</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We make use of a slight pun by iterating through the board’s hash keys,
-which correspond to the cell coordinates.</p>
-
-<p>(Solution so far: 2 lines)</p>
-
-<p>The solutions-from function is a bit more complicated.</p>
-
-<p>Its first task will be to determine if a cell is actually on the board
-(i.e. it has not been removed already and was there in the first place):</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;solutions-from&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">solutions-from</span><span class="err"> </span><span class="nv">board</span><span class="err"> </span><span class="nv">dict</span><span class="err"> </span><span class="nv">k</span><span class="err"> </span><span class="nv">path</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-ref</span><span class="err"> </span><span class="nv">board</span><span class="err"> </span><span class="nv">k</span><span class="err"> </span><span class="no">#f</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="nv">c</span>
-</span><span class='line'>  <span class="err">    </span><span class="nv">&lt;step-one&gt;</span>
-</span><span class='line'>  <span class="err">    </span><span class="nv">&lt;step-two&gt;</span>
-</span><span class='line'>  <span class="err">    </span><span class="nv">&lt;step-three&gt;</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>(Solution so far: 5 lines)</p>
-
-<p>If it was there, then we’ll want to know if the new path is a word, what
-the new state machine is, and what the new path is:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;step-one&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">match-define</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">word?</span><span class="err"> </span><span class="nv">new-dict</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">              </span><span class="p">(</span><span class="nf">hash-ref</span><span class="err"> </span><span class="nv">dict</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="nv">empty-entry</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">new-path</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">c</span><span class="err"> </span><span class="nv">path</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>(Solution so far: 8 lines)</p>
-
-<p>If the current path is a word, then we can print it out, which is a bit
-complicated since we’re just storing the path backwards, so we have to
-reverse the list (to make it forwards) and then turn the list of
-characters into a string:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;step-two&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">when</span><span class="err"> </span><span class="nv">word?</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">displayln</span><span class="err"> </span><span class="p">(</span><span class="nf">list-&gt;string</span><span class="err"> </span><span class="p">(</span><span class="nf">reverse</span><span class="err"> </span><span class="nv">new-path</span><span class="p">))))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>(Solution so far: 10 lines)</p>
-
-<p>If it possible to have any more words from this path (i.e. if the new
-dictionary isn’t empty), then we’ll want to remove this node from the
-board and vist all adjacent positions:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;step-three&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">unless</span><span class="err"> </span><span class="p">(</span><span class="nf">zero?</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-count</span><span class="err"> </span><span class="nv">new-dict</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">new-board</span><span class="err"> </span><span class="p">(</span><span class="nf">hash-remove</span><span class="err"> </span><span class="nv">board</span><span class="err"> </span><span class="nv">k</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">match-define</span><span class="err"> </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="nv">row</span><span class="err"> </span><span class="nv">col</span><span class="p">)</span><span class="err"> </span><span class="nv">k</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">for*</span><span class="err"> </span><span class="p">(</span><span class="err">[</span><span class="nv">drow</span><span class="err"> </span><span class="p">(</span><span class="nf">in-list</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="mi">-1</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">1</span><span class="p">))</span><span class="err">]</span>
-</span><span class='line'>  <span class="err">         [</span><span class="nv">dcol</span><span class="err"> </span><span class="p">(</span><span class="nf">in-list</span><span class="err"> </span><span class="o">&#39;</span><span class="p">(</span><span class="mi">-1</span><span class="err"> </span><span class="mi">0</span><span class="err"> </span><span class="mi">1</span><span class="p">))</span><span class="err">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">    </span><span class="p">(</span><span class="nf">solutions-from</span><span class="err"> </span><span class="nv">new-board</span><span class="err"> </span><span class="nv">new-dict</span>
-</span><span class='line'>  <span class="err">                    </span><span class="p">(</span><span class="nf">cons</span><span class="err"> </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">row</span><span class="err"> </span><span class="nv">drow</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">                          </span><span class="p">(</span><span class="nf">+</span><span class="err"> </span><span class="nv">col</span><span class="err"> </span><span class="nv">dcol</span><span class="p">))</span>
-</span><span class='line'>  <span class="err">                    </span><span class="nv">new-path</span><span class="p">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We make some fun abuses for the sake of simplicity. For example, this
-will re-visit the current node, but we’ve already removed it from the
-board, so the body of the function will be skipped. Similarly, we don’t
-care about going off the board, because the same test will find those.
-This is by far the largest block of the solution, but it is still quite
-simple.</p>
-
-<p>This actually concludes the solution, which is a whopping 19 lines!</p>
-
-<h1>The whole program</h1>
-
-<p>The whole program is a mere 43 lines of essential code but is a complete
-and efficient Boggle solver.</p>
-
-<p>Regarding the efficiency, it takes about a 56x56 board to take more than
-1 second, but that time is dominated by printing. When I turn off
+wouldn&rsquo;t change with a different list.</p><p>At this point, we have 18 more lines of essential code, bringing
+the total to 24. (I don&rsquo;t count the test.)</p><p># The solver</p><p>Now that we have our data-structures ready, it&rsquo;s a pretty straight
+path. We&rsquo;ll be exploring the board like a graph, looking for paths
+where the nodes correspond to accepting strings. After visiting a
+node, we&rsquo;ll remove it from the graph and proceed to all the neighbors,
+provided that the dictionary is not empty from the current path.</p><p>The main loop simply starts this process from every possible square
+with the complete board, the complete dictionary, and an empty path:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cmain~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cmain~3e~3a1))" class="plainlink" pltdoc="x">&lt;main&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for))" class="RktStxLink" pltdoc="x">for</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">k</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-hash-keys))" class="RktValLink" pltdoc="x">in-hash-keys</a></span><span class="hspace">&nbsp;</span><span class="RktSym">board</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">solutions-from</span><span class="hspace">&nbsp;</span><span class="RktSym">board</span><span class="hspace">&nbsp;</span><span class="RktSym">the-dictionary</span><span class="hspace">&nbsp;</span><span class="RktSym">k</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._empty))" class="RktValLink" pltdoc="x">empty</a></span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>We make use of a slight pun by iterating through the board&rsquo;s hash
+keys, which correspond to the cell coordinates.</p><p>(Solution so far: 2 lines)</p><p>The <span class="RktSym">solutions-from</span> function is a bit more complicated.</p><p>Its first task will be to determine if a cell is actually on the
+board (i.e. it has not been removed already and was there in the first
+place):</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3csolutions-from~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3csolutions-from~3e~3a1))" class="plainlink" pltdoc="x">&lt;solutions-from&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">solutions-from</span><span class="hspace">&nbsp;</span><span class="RktSym">board</span><span class="hspace">&nbsp;</span><span class="RktSym">dict</span><span class="hspace">&nbsp;</span><span class="RktSym">k</span><span class="hspace">&nbsp;</span><span class="RktSym">path</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">c</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-ref))" class="RktValLink" pltdoc="x">hash-ref</a></span><span class="hspace">&nbsp;</span><span class="RktSym">board</span><span class="hspace">&nbsp;</span><span class="RktSym">k</span><span class="hspace">&nbsp;</span><span class="RktVal">#f</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/when_unless.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._when))" class="RktStxLink" pltdoc="x">when</a></span><span class="hspace">&nbsp;</span><span class="RktSym">c</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#(elem._(chunk._~3cstep-one~3e~3a1))" class="plainlink" pltdoc="x">&lt;step-one&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#(elem._(chunk._~3cstep-two~3e~3a1))" class="plainlink" pltdoc="x">&lt;step-two&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#(elem._(chunk._~3cstep-three~3e~3a1))" class="plainlink" pltdoc="x">&lt;step-three&gt;</a><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>(Solution so far: 5 lines)</p><p>If it was there, then we&rsquo;ll want to know if the new path is a
+word, what the new state machine is, and what the new path is:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cstep-one~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cstep-one~3e~3a1))" class="plainlink" pltdoc="x">&lt;step-one&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match-define))" class="RktStxLink" pltdoc="x">match-define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">word?</span><span class="hspace">&nbsp;</span><span class="RktSym">new-dict</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-ref))" class="RktValLink" pltdoc="x">hash-ref</a></span><span class="hspace">&nbsp;</span><span class="RktSym">dict</span><span class="hspace">&nbsp;</span><span class="RktSym">c</span><span class="hspace">&nbsp;</span><span class="RktSym">empty-entry</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">new-path</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">c</span><span class="hspace">&nbsp;</span><span class="RktSym">path</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>(Solution so far: 8 lines)</p><p>If the current path is a word, then we can print it out, which is a
+bit complicated since we&rsquo;re just storing the path backwards, so we
+have to reverse the list (to make it forwards) and then turn the list
+of characters into a string:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cstep-two~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cstep-two~3e~3a1))" class="plainlink" pltdoc="x">&lt;step-two&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/when_unless.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._when))" class="RktStxLink" pltdoc="x">when</a></span><span class="hspace">&nbsp;</span><span class="RktSym">word?</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Writing.html#(def._((lib._racket%2Fprivate%2Fmisc..rkt)._displayln))" class="RktValLink" pltdoc="x">displayln</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/strings.html#(def._((quote._~23~25kernel)._list-~3estring))" class="RktValLink" pltdoc="x">list-&gt;string</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Fprivate%2Flist..rkt)._reverse))" class="RktValLink" pltdoc="x">reverse</a></span><span class="hspace">&nbsp;</span><span class="RktSym">new-path</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>(Solution so far: 10 lines)</p><p>If it possible to have any more words from this path (i.e. if the new
+dictionary isn&rsquo;t empty), then we&rsquo;ll want to remove this node from the
+board and vist all adjacent positions:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cstep-three~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cstep-three~3e~3a1))" class="plainlink" pltdoc="x">&lt;step-three&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/when_unless.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._unless))" class="RktStxLink" pltdoc="x">unless</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/number-types.html#(def._((quote._~23~25kernel)._zero~3f))" class="RktValLink" pltdoc="x">zero?</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-count))" class="RktValLink" pltdoc="x">hash-count</a></span><span class="hspace">&nbsp;</span><span class="RktSym">new-dict</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">new-board</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-remove))" class="RktValLink" pltdoc="x">hash-remove</a></span><span class="hspace">&nbsp;</span><span class="RktSym">board</span><span class="hspace">&nbsp;</span><span class="RktSym">k</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match-define))" class="RktStxLink" pltdoc="x">match-define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">row</span><span class="hspace">&nbsp;</span><span class="RktSym">col</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktSym">k</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for*))" class="RktStxLink" pltdoc="x">for*</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">drow</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-list))" class="RktValLink" pltdoc="x">in-list</a></span><span class="hspace">&nbsp;</span><span class="RktVal">&#8217;</span><span class="RktVal">(</span><span class="RktVal"><span class="nobreak">-1</span></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="hspace">&nbsp;</span><span class="RktVal">1</span><span class="RktVal">)</span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktSym">dcol</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/sequences.html#(def._((lib._racket%2Fprivate%2Fbase..rkt)._in-list))" class="RktValLink" pltdoc="x">in-list</a></span><span class="hspace">&nbsp;</span><span class="RktVal">&#8217;</span><span class="RktVal">(</span><span class="RktVal"><span class="nobreak">-1</span></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="hspace">&nbsp;</span><span class="RktVal">1</span><span class="RktVal">)</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">solutions-from</span><span class="hspace">&nbsp;</span><span class="RktSym">new-board</span><span class="hspace">&nbsp;</span><span class="RktSym">new-dict</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._%2B))" class="RktValLink" pltdoc="x">+</a></span><span class="hspace">&nbsp;</span><span class="RktSym">row</span><span class="hspace">&nbsp;</span><span class="RktSym">drow</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._%2B))" class="RktValLink" pltdoc="x">+</a></span><span class="hspace">&nbsp;</span><span class="RktSym">col</span><span class="hspace">&nbsp;</span><span class="RktSym">dcol</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">new-path</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>We make some fun abuses for the sake of simplicity. For example, this
+will re-visit the current node, but we&rsquo;ve already removed it from the
+board, so the body of the function will be skipped. Similarly, we
+don&rsquo;t care about going off the board, because the same test will find
+those. This is by far the largest block of the solution, but it is
+still quite simple.</p><p>This actually concludes the solution, which is a whopping 19 lines!</p><p># The whole program</p><p>The whole program is a mere 43 lines of essential code but is a
+complete and efficient Boggle solver.</p><p>Regarding the efficiency, it takes about a 56x56 board to take more
+than 1 second, but that time is dominated by printing. When I turn off
 printing (but not the construction of the string to be printed), it is
-under a second until about 110x110.</p>
-
-<p>The major wins are:</p>
-
-<ol>
-<li><p>A good data-structure for the dictionary, corresponding to top-notch
-regular expression matching theory.</p></li>
-<li><p>A functional representation of the board, so we can safely remove
-nodes from the board without doing any bookkeeping or undo-ing.</p></li>
-<li><p>A snoc-list of the path backwards to maximize sharing. (Exercise:
-Change the code so that it doesn’t need to do any allocation for
-successes. Right now it has to allocate another list and then convert it
-into a string. Try to print out a list backwards without allocation.)</p></li>
-<li><p>Eliminating duplicate work: it never explores any path more than
+under a second until about 110x110.</p><p>The major wins are:</p><p>1. A good data-structure for the dictionary, corresponding to
+top-notch regular expression matching theory.</p><p>2. A functional representation of the board, so we can safely remove
+nodes from the board without doing any bookkeeping or undo-ing.</p><p>3. A snoc-list of the path backwards to maximize sharing. (Exercise:
+Change the code so that it doesn&rsquo;t need to do any allocation for
+successes. Right now it has to allocate another list and then convert
+it into a string. Try to print out a list backwards without
+allocation.)</p><p>4. Eliminating duplicate work: it never explores any path more than
 once, but will discover the same word through multiple paths, if
-possible.</p></li>
-</ol>
-
-
-<p>Returning to the student, he sent me about 700 lines of complicated and
-inefficent C++ code and was working on a new version that was currently
-500 lines and broken. Maybe this will be a good push in the right
-direction?</p>
-
-<p>By the way, if you use this code at home, make sure you put the code in
-this order:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='scheme'><span class='line'><span class="nv">&lt;*&gt;</span> <span class="nv">::=</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">(</span><span class="nf">require</span><span class="err"> </span><span class="nv">racket/list</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">racket/match</span>
-</span><span class='line'>  <span class="err">         </span><span class="nv">rackunit</span><span class="p">)</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="nv">letters</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">string-&gt;list</span><span class="err"> </span><span class="s">&quot;abcdefghijklmnopqrstuvwxyz&quot;</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">random-list-ref</span><span class="err"> </span><span class="nv">l</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">list-ref</span><span class="err"> </span><span class="nv">l</span><span class="err"> </span><span class="p">(</span><span class="nf">random</span><span class="err"> </span><span class="p">(</span><span class="nf">length</span><span class="err"> </span><span class="nv">l</span><span class="p">))))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">define</span><span class="err"> </span><span class="p">(</span><span class="nf">random-letter</span><span class="p">)</span>
-</span><span class='line'>  <span class="err">  </span><span class="p">(</span><span class="nf">random-list-ref</span><span class="err"> </span><span class="nv">letters</span><span class="p">))</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="nv">&lt;board&gt;</span>
-</span><span class='line'>  <span class="nv">&lt;printing&gt;</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">newline</span><span class="p">)</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="nv">&lt;dict&gt;</span>
-</span><span class='line'>  <span class="nv">&lt;dict-test&gt;</span>
-</span><span class='line'>  <span class="nv">&lt;dict-parse&gt;</span>
-</span><span class='line'>  <span class="err"> </span>
-</span><span class='line'>  <span class="nv">&lt;solutions-from&gt;</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">time</span><span class="err"> </span><span class="nv">&lt;main&gt;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
+possible.</p><p>Returning to the student, he sent me about 700 lines of complicated
+and inefficent C++ code and was working on a new version that was
+currently 500 lines and broken. Maybe this will be a good push in the
+right direction?</p><p>By the way, if you use this code at home, make sure you put the code in this
+order:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3c*~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3c*~3e~3a1))" class="plainlink" pltdoc="x">&lt;*&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/require.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._require))" class="RktStxLink" pltdoc="x">require</a></span><span class="hspace">&nbsp;</span><span class="RktSym">racket/list</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">racket/match</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">rackunit</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">letters</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/strings.html#(def._((quote._~23~25kernel)._string-~3elist))" class="RktValLink" pltdoc="x">string-&gt;list</a></span><span class="hspace">&nbsp;</span><span class="RktVal">&#8220;abcdefghijklmnopqrstuvwxyz&#8221;</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">random-list-ref</span><span class="hspace">&nbsp;</span><span class="RktSym">l</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._list-ref))" class="RktValLink" pltdoc="x">list-ref</a></span><span class="hspace">&nbsp;</span><span class="RktSym">l</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._random))" class="RktValLink" pltdoc="x">random</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._length))" class="RktValLink" pltdoc="x">length</a></span><span class="hspace">&nbsp;</span><span class="RktSym">l</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">random-letter</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">random-list-ref</span><span class="hspace">&nbsp;</span><span class="RktSym">letters</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><a href="#(elem._(chunk._~3cboard~3e~3a1))" class="plainlink" pltdoc="x">&lt;board&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3cprinting~3e~3a1))" class="plainlink" pltdoc="x">&lt;printing&gt;</a></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Byte_and_String_Output.html#(def._((quote._~23~25kernel)._newline))" class="RktValLink" pltdoc="x">newline</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><a href="#(elem._(chunk._~3cdict~3e~3a1))" class="plainlink" pltdoc="x">&lt;dict&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3cdict-test~3e~3a1))" class="plainlink" pltdoc="x">&lt;dict-test&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3cdict-parse~3e~3a1))" class="plainlink" pltdoc="x">&lt;dict-parse&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><a href="#(elem._(chunk._~3csolutions-from~3e~3a1))" class="plainlink" pltdoc="x">&lt;solutions-from&gt;</a></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/time.html#(form._((lib._racket%2Fprivate%2Fmore-scheme..rkt)._time))" class="RktStxLink" pltdoc="x">time</a></span><span class="hspace">&nbsp;</span><a href="#(elem._(chunk._~3cmain~3e~3a1))" class="plainlink" pltdoc="x">&lt;main&gt;</a><span class="RktPn">)</span></td></tr></table></blockquote></div></p>
 </div>
   
 
