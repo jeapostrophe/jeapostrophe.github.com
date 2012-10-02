@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: CPP | Jay McCarthy]]></title>
+  <link href="http://jeapostrophe.github.com/blog/categories/cpp/atom.xml" rel="self"/>
+  <link href="http://jeapostrophe.github.com/"/>
+  <updated>2012-10-02T10:05:25-06:00</updated>
+  <id>http://jeapostrophe.github.com/</id>
+  <author>
+    <name><![CDATA[Jay McCarthy]]></name>
+    <email><![CDATA[jay.mccarthy@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[The Multi-language Nirvana]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/10/02/multi-language-nirvana/"/>
+    <updated>2012-10-02T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/10/02/multi-language-nirvana</id>
+    <content type="html"><![CDATA[<p>A student and I are working on a
+<a href="https://github.com/ChaseWhite3/linear-logic">verified
+linear-logic theorem prover</a>, in Coq. We came up with a very cute way
+to integrate many languages in the production of this tool and this
+post is about that multi-language nirvana.</p>
+
+
+<!-- more -->
+
+
+<p>The first language we use in this project is
+<a href="http://coq.inria.fr/">Coq</a>, the wonderful proof assistant that
+I used for my dissertation and use whenever possible. The main linear
+logic theorem prover is
+<a href="https://github.com/ChaseWhite3/linear-logic/blob/master/basic.v">written
+in Coq</a>. It&rsquo;s divided into three pieces: (1)
+<a href="https://github.com/ChaseWhite3/linear-logic/blob/master/basic.v#L35">an
+embedding of linear logic</a> as an inductive theory; (2)
+<a href="https://github.com/ChaseWhite3/linear-logic/blob/master/basic.v#L289">a
+set of decision procedures</a>, one for each kind of linear logic proof,
+that independently reach true conclusions, assuming an oracle that can
+handle all other kinds of proofs; and (3)
+<a href="https://github.com/ChaseWhite3/linear-logic/blob/master/basic.v#L799">the
+glue that ties them all together</a> that we prove sound overall.</p>
+
+
+<p>The set up gives us a function that when given a linear logic problem,
+expressed as a list of assumptions, it will return a list of all
+formulas that can be proved from it. However, we&rsquo;d like to run this
+program efficiently with <a href="http://caml.inria.fr/">Ocaml</a>, so we
+<a href="https://github.com/ChaseWhite3/linear-logic/blob/master/basic.v#L941">extract
+it</a>, giving the normal Ocaml types as replacements for the normal Coq
+types, such as booleans and lists.</p>
+
+
+<p>However, this program isn&rsquo;t really useful by itself, because it needs
+to (a) have a specified problem and (b) be called with input and then
+the output printed in some way. Rather than go through the pain of
+creating a module, we use the wonderful
+<a href="https://en.wikipedia.org/wiki/C_preprocessor">C preprocessor</a>
+to stitch together
+<a href="https://github.com/ChaseWhite3/linear-logic/blob/master/linearLogic.ml.in">these
+various pieces</a>: the prover, the problem specification, and the code
+that calls them.</p>
+
+
+<p>However, it is inconvenient to specify the problem directly in the
+Ocaml data type syntax, because it is very verbose. We&rsquo;d prefer to
+specify it using
+<a href="https://github.com/ChaseWhite3/linear-logic/blob/master/small.rktd">simple
+S-expressions</a>. So, we combine that with a simple
+<a href="http://www.racket-lang.org/">Racket</a> program
+<a href="https://github.com/ChaseWhite3/linear-logic/blob/master/roomer-ll.rkt">that
+re-formats the S-expression as Ocaml</a>.</p>
+
+
+<p>The beautiful
+<a href="https://www.gnu.org/software/make/manual/make.html">make
+language</a> is used to
+<a href="https://github.com/ChaseWhite3/linear-logic/blob/master/Makefile">manage
+this process</a> and keep everything in sync whenever we change one of
+the pieces.</p>
+
+
+<p>I like this little program because it shows how convenient it can be
+to use many different languages, each for its own little purpose. The
+only way that this could be better, I think, would be if all the
+languages were actually just Racket underneath. Maybe some day...</p>
+
+]]></content>
+  </entry>
+  
+</feed>
