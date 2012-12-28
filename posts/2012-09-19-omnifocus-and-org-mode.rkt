@@ -1,4 +1,4 @@
-#lang scribble/lp
+#lang scribble/manual
 @(require (planet ryanc/scriblogify/scribble-util)
           (for-label racket/base
                      rackunit
