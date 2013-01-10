@@ -1,17 +1,11 @@
 #lang scribble/lp
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "An LZ78 Implementation"
-comments: true
-categories:
-- Compression
-- Racket
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{An LZ78 Implementation}
+@categories["Compression" "Racket"]
 
 For a long time I've known about and relied on the LZ77/78 compression
 algorithms. Once when I was in middle school, I told a friend an idea
@@ -48,7 +42,7 @@ previously seen, then there will be no right-hand side of the output
 pair. You could add a special character to indicate that. I decided to
 output just the phrase reference, in that case.
 
-@blogsection{Compression}
+@section{Compression}
 
 My compression code looks like this:
 
@@ -150,7 +144,7 @@ In this example, the final dictionary looks like this:
                             (hasheq B (cons 3 (hasheq A (cons 8 (hasheq))))
                                     A (cons 5 (hasheq B (cons 6 (hasheq)))))))))]
 
-@blogsection{Decompression}
+@section{Decompression}
 
 Naturally, decompression is dual to compression. It will also maintain
 a dictionary, but it will have the opposite information: rather than
@@ -224,7 +218,7 @@ In the example, the dictionary is:
 
 And that's it!
 
-@blogsection{Further work}
+@section{Further work}
 
 One strange thing about this implementation is that the output is just
 a stream of pairs rather than bytes. The easiest way to encode it as

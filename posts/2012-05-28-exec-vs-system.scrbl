@@ -1,10 +1,8 @@
 #lang scribble/manual
-@(require (for-label racket/base
+@(require "post.rkt"
+          (for-label racket/base
                      rackunit
                      racket/list))
-
-@(define (categories . _) (void))
-@(define (the-jump . _) (void))
 
 @title{exec and Tail-call Optimization}
 @categories["Systems"]

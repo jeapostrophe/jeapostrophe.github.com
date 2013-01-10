@@ -1,17 +1,11 @@
 #lang scribble/lp
-@(require (for-label racket/base
+@(require "post.rkt"
+          (for-label racket/base
                      rackunit
                      racket/list))
-@literal{
----
-layout: post
-title: "Stupid Interview Questions - Introduction + Reversing a Doubly Linked List"
-comments: true
-categories: 
-- Stupid Interview Questions
-- Racket
----
-}
+
+@title{Stupid Interview Questions - Introduction + Reversing a Doubly Linked List}
+@categories["Stupid Interview Questions" "Racket"]
 
 Stupid interviews ask applicants to write programs on whiteboards or
 pieces of paper without the resources that are normally available when
@@ -29,7 +23,7 @@ How do you reverse a doubly linked list?
 
 @(the-jump)
 
-@blogsection{The Obvious}
+@section{The Obvious}
 
 The naive implementation looks like this:
 
@@ -125,7 +119,7 @@ the way, this assumes we have this definition of doubly-linked-lists:
 But, remember, my whole goal is to show silly ways to "solve" these
 interview problems... so let's think of a trick.
 
-@blogsection{The Trick}
+@section{The Trick}
 
 An important trick that functional programmers should always be ready
 to employ is delaying. Rather than actually doing work, just record
@@ -169,7 +163,7 @@ new functions:
         make-rdll rdll-cons! rdll-snoc!
         rdll-fold rdll-rfold rdll-reverse!)]
 
-@blogsection{Conclusion}
+@section{Conclusion}
 
 This idea is the basis of a lot of efficient functional data
 structures. For example, if you want to make @racket[append] fast,
@@ -180,7 +174,7 @@ are called "conc" lists.}) If you want to make
 from the head and one starting from the tail---and deal with one going
 empty when you get to it.
 
-@blogsection{Exercises}
+@section{Exercises}
 
 1. In this code, I've used a functional/structure oriented
 approach. In this case, an object-oriented approach could be more
@@ -195,7 +189,7 @@ the O(1) reversibility. (Hint: The hard part is telling each node that
 the list is reversed simultaneously.) (Spoiler: Have them store a
 pointer to a flag rather than a flag itself.)
 
-@blogsection{Whole Program}
+@section{Whole Program}
 
 By the way, if you use this code at home, make sure you put the code in this
 order:

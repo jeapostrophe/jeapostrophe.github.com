@@ -1,17 +1,11 @@
 #lang scribble/manual
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "DrDr and its archives"
-comments: true
-categories:
-- Racket
-- Systems
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{DrDr and its archives}
+@categories["Racket" "Systems"]
 
 After I developed @link["http://drdr.racket-lang.org"]{DrDr}, it was running
 smoothly for a couple hundred revisions, when suddenly it stopped
@@ -22,7 +16,7 @@ In this post, I discuss how I found and fixed the problem.
 
 @(the-jump)
 
-@blogsection{Background on DrDr}
+@section{Background on DrDr}
 
 DrDr is an continuous integration system for Racket. Every time a push
 is made to our repository, DrDr will download it, compile it,
@@ -56,7 +50,7 @@ Makefile that creates and records these files as it goes. So when
 there's a crash, there's no in-memory state that needs to be saved or
 recovered... it's all written to the filesystem immediately.)
 
-@blogsection{Running out of space...}
+@section{Running out of space...}
 
 This means that on every push to our repository, DrDr creates about
 18,000 files. Every file is very small, typically less than 50 bytes,
@@ -75,7 +69,7 @@ inodes for that 220G space.
 After a few hundred revisions, I had run out of inodes and was in
 trouble.
 
-@blogsection{Saving space}
+@section{Saving space}
 
 Most archive and compression formats are designed for saving
 space. They normally also save inodes... because 10,000 files can be
@@ -105,7 +99,7 @@ After a brief investigation of other formats and failing to find any
 efficient format, I decided to write my own. Essentially, I needed
 something more like a filesystem.
 
-@blogsection{DrDr's Archive Format}
+@section{DrDr's Archive Format}
 
 The
 @link["https://github.com/plt/racket/blob/master/collects/meta/drdr/archive.rkt"]{entire
@@ -141,7 +135,7 @@ The code that does the lookup is a bit longer---47 lines---because it
 has quite a lot of error handling in case there's some sort of
 problem.
 
-@blogsection{The outcome}
+@section{The outcome}
 
 After implementing this, it was a simple matter to write a script to
 archive everything that had been produced. (I deleted the last

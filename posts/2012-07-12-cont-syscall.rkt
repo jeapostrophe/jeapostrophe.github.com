@@ -1,24 +1,15 @@
 #lang scribble/lp
-@(require (for-label (except-in racket/base
+@(require "post.rkt"
+          (for-label (except-in racket/base
                                 thread
                                 exit
                                 printf)
                      (prefix-in racket: racket/base)
                      rackunit
                      racket/list))
-@literal{
----
-layout: post
-title: "Domain-Specific Operating Systems: Threads, System Calls, and Continuations"
-comments: true
-categories:
-- Racket
-- Continuations
-- Threads
-- Concurrency
-- Domain-Specific Operating Systems
----
-}
+
+@title{Domain-Specific Operating Systems: Threads, System Calls, and Continuations}
+@categories["Racket" "Continuations" "Threads" "Concurrency" "Domain-Specific Operating Systems"]
 
 In the past few posts I've been writing about threading system that
 are based on continuations in user-land. This post I'll extend that

@@ -2,17 +2,11 @@
 @(require (for-label (except-in racket/base
                                 eval)
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "System F: Interpreter and Type Checker"
-comments: true
-categories:
-- Racket
-- Lambda Calculus
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{System F: Interpreter and Type Checker}
+@categories["Racket" "Lambda Calculus"]
 
 System F is a very powerful programming and type system. It is fun to
 make an interpreter for, but I think it is even more fun to write such

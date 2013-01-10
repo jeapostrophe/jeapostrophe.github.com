@@ -1,21 +1,11 @@
 #lang scribble/manual
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
+                     racket/list)
+          "post.rkt")
 
-@literal{
----
-layout: post
-title: "The Multi-language Nirvana"
-comments: true
-categories:
-- Coq
-- Ocaml
-- Racket
-- Make
-- CPP
----
-}
+@title{The Multi-language Nirvana}
+@categories["Coq" "Ocaml" "Racket" "Make" "CPP"]
 
 A student and I are working on a
 @link["https://github.com/ChaseWhite3/linear-logic"]{verified

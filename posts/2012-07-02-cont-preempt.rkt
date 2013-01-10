@@ -5,19 +5,11 @@
                                 printf)
                      (prefix-in racket: racket/base)
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "Preemptive Threads with Continuations"
-comments: true
-categories:
-- Racket
-- Continuations
-- Threads
-- Concurrency
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{Preemptive Threads with Continuations}
+@categories["Racket" "Continuations" "Threads" "Concurrency"]
 
 Last week, we covered cooperative threading with continuations. This
 week we'll change the infrastructure to mimic preemption.

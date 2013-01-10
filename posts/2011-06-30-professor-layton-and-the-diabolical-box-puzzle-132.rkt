@@ -1,17 +1,11 @@
 #lang scribble/lp
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "Professor Layton and the Diabolical Box, Puzzle #132"
-comments: true
-categories:
-- Puzzles
-- Racket
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{Professor Layton and the Diabolical Box, Puzzle #132}
+@categories["Puzzles" "Racket"]
 
 I try to solve a puzzle of some kind every morning. I use
 @link["https://en.wikipedia.org/wiki/Sudoku"]{Sudoku},

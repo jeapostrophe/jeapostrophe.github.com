@@ -1,20 +1,11 @@
 #lang scribble/manual
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
+                     racket/list)
+          "post.rkt")
 
-@literal{
----
-layout: post
-title: "Switching from OmniFocus to Org-Mode"
-comments: true
-categories:
-- Linux
-- Apple
-- OmniGroup
-- Emacs
----
-}
+@title{Switching from OmniFocus to Org-Mode}
+@categories["Linux" "Apple" "OmniGroup" "Emacs"]
 
 One of my joys in life is keeping a TODO list and checking off
 stuff. When I was young, I used plain text files mainly, but when I

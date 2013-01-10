@@ -5,19 +5,11 @@
                                 printf)
                      (prefix-in racket: racket/base)
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "Cooperative Threads with Continuations"
-comments: true
-categories:
-- Racket
-- Continuations
-- Threads
-- Concurrency
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{Cooperative Threads with Continuations}
+@categories["Racket" "Continuations" "Threads" "Concurrency"]
 
 After the last post about continuations, I wanted to show one of the
 classic uses of them: implementing threads in user-space.

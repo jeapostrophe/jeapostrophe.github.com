@@ -1,17 +1,11 @@
 #lang scribble/lp
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "A Boggle Solver"
-comments: true
-categories:
-- Puzzles
-- Racket
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{A Boggle Solver}
+@categories["Puzzles" "Racket"]
 
 Boggle is a classic word game that lends itself well to algorithmic
 attacks. A student of mine wanted to show me his solution (as it is an
@@ -34,7 +28,7 @@ The two most important decision we make in the algorithm are
 representing the dictionary and representing the board. Once these are
 in place, the result is pretty obvious.
 
-@blogsection{The board}
+@section{The board}
 
 Let's start with the board. We'll represent it as a hash table mapping
 coordinates, like (0,0), to the letter at that coordinate. The program
@@ -64,7 +58,7 @@ the board is pretty convenient:
 At this point, we have six essential lines of code. (I don't count the
 printer.)
 
-@blogsection{The dictionary}
+@section{The dictionary}
 
 The more interesting decision comes from how we'll represent the
 dictionary. The core idea is to use a regular expression derivative,
@@ -139,7 +133,7 @@ wouldn't change with a different list.
 At this point, we have 18 more lines of essential code, bringing
 the total to 24. (I don't count the test.)
 
-@blogsection{The solver}
+@section{The solver}
 
 Now that we have our data-structures ready, it's a pretty straight
 path. We'll be exploring the board like a graph, looking for paths
@@ -220,7 +214,7 @@ still quite simple.
 
 This actually concludes the solution, which is a whopping 19 lines!
 
-@blogsection{The whole program}
+@section{The whole program}
 
 The whole program is a mere 43 lines of essential code but is a
 complete and efficient Boggle solver.

@@ -1,17 +1,11 @@
 #lang scribble/manual
-@(require (for-label racket/base
+@(require "post.rkt"
+(for-label racket/base
                      rackunit
                      racket/list))
 
-@literal{
----
-layout: post
-title: "The Optimal Shower"
-comments: true
-categories:
-- Efficiency
----
-}
+@title{The Optimal Shower}
+@categories["Efficiency"]
 
 One of my goals in life is to do things very efficiently and get a lot
 done. But throughout my whole five-year marriage, my wife has always

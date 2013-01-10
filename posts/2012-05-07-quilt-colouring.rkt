@@ -1,17 +1,11 @@
 #lang scribble/lp
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "Quilt Colouring"
-comments: true
-categories:
-- Puzzles
-- Racket
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{Quilt Colouring}
+@categories["Puzzles" "Racket"]
 
 I got this email from my wife:
 

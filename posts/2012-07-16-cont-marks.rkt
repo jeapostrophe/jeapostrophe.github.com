@@ -1,18 +1,11 @@
 #lang scribble/lp
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "Continuation Marks, part I: Dynamic Wind"
-comments: true
-categories:
-- Racket
-- Continuations
-- Continuation Marks
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{Continuation Marks, part I: Dynamic Wind}
+@categories["Racket" "Continuations" "Continuation Marks"]
 
 One of my favourite features of Racket is also one of its most unique
 features: continuation marks.

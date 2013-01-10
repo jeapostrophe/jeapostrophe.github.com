@@ -1,17 +1,11 @@
 #lang scribble/lp
-@(require (for-label racket/base
+@(require "post.rkt"
+          (for-label racket/base
                      rackunit
                      racket/list))
-@literal{
----
-layout: post
-title: "Professor Layton and the Last Specter, Puzzle #146"
-comments: true
-categories:
-- Puzzles
-- Racket
----
-}
+
+@title{Professor Layton and the Last Specter, Puzzle #146}
+@categories["Puzzles" "Racket"]
 
 This is for @link["http://tinyurl.com/7yefk76"]{Puzzle 146}. Here is
 the puzzle:

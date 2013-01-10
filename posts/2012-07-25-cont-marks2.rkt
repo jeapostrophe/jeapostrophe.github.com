@@ -1,18 +1,11 @@
 #lang scribble/lp
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "Continuation Marks, part II: Parameters"
-comments: true
-categories:
-- Racket
-- Continuations
-- Continuation Marks
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{Continuation Marks, part II: Parameters}
+@categories["Racket" "Continuations" "Continuation Marks"]
 
 Last week I started discussing continuation marks with a medium-sized
 diversion into @racket[dynamic-wind] as a way to delimited the effects

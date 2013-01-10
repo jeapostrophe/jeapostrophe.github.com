@@ -2,17 +2,11 @@
 @(require (for-label racket/base
                      tests/eli-tester
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "Delimited Pipes"
-comments: true
-categories:
-- Racket
-- Continuations
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{Delimited Pipes}
+@categories["Racket" "Continuations"]
 
 I love continuations. We couldn't do much of anything on a computer
 without them. But, I love first-class access to

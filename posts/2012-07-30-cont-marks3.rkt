@@ -1,18 +1,11 @@
 #lang scribble/lp
-@(require (for-label racket/base
+@(require "post.rkt"
+          (for-label racket/base
                      rackunit
                      racket/list))
-@literal{
----
-layout: post
-title: "Continuation Marks, part III: Marks themselves"
-comments: true
-categories:
-- Racket
-- Continuations
-- Continuation Marks
----
-}
+
+@title{Continuation Marks, part III: Marks themselves}
+@categories["Racket" "Continuations" "Continuation Marks"]
 
 The last two weeks we've seen the basic ideas behind continuation
 marks, but we've never actually used them. This week we show the

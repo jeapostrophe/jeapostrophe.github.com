@@ -17,7 +17,6 @@
         (with-syntax
             ([(post-inc ...)
               (for/list ([p (in-list (directory-list posts-path))]
-                         [i (in-range 1)]
                          #:when (file-exists? (build-path posts-path p)))
                 (with-syntax ([include-it
                                (if (regexp-match #rx"rkt" (path->string p))

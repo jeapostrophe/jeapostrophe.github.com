@@ -2,17 +2,11 @@
 @(require (for-label (except-in racket/base
                                 eval)
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "System F: Interpreter and Type Checker, HOAS style"
-comments: true
-categories:
-- Racket
-- Lambda Calculus
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{System F: Interpreter and Type Checker, HOAS style}
+@categories["Racket" "Lambda Calculus"]
 
 Last time we implemented the obvious version of a System F interpreter
 and type-checker. But, it was annoying to have to implement

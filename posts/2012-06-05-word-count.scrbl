@@ -1,17 +1,11 @@
 #lang scribble/manual
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "LaTeX and Word Counts"
-comments: true
-categories:
-- LaTeX
-- Mathematics
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{LaTeX and Word Counts}
+@categories["LaTeX" "Mathematics"]
 
 A few years ago, a proposal came to a committee I was on to limit the
 documents we evaluated based on their word count, rather than their
@@ -36,7 +30,7 @@ document and report it when the document was turned in.
 I, however, like all True Computer Scientists use LaTeX (and Scribble)
 to prepare my documents, via rendering to PostScript or PDF.
 
-@blogsection{Word Counts from PostScript}
+@section{Word Counts from PostScript}
 
 You may think that you could just count the words directly from the
 PostScript. This is not the case, however.
@@ -59,7 +53,7 @@ But, is it really surprising that it is hard to learn higher-level
 things about a program from its compiled form? What if we looked
 directly at the LaTeX?
 
-@blogsection{Word Counts from LaTeX}
+@section{Word Counts from LaTeX}
 
 Unfortunately, LaTeX is a Lambda-complete language due to its advanced
 macro system. By writing macros, you can add new output (words) to the
@@ -75,7 +69,7 @@ I wanted to demonstrate this to those on the committee, so I wrote a
 short example program that had a very difficult to discover word
 count.
 
-@blogsection{The Collatz Conjecture}
+@section{The Collatz Conjecture}
 
 The Collatz Conjecture, proposed in 1937, states that if you take any
 natural number, n, and repeat on either n/2 if n is even or 3n+1 if n
@@ -89,7 +83,7 @@ sequences include 1.) For example, the sequence for 6 is 6, 3, 10, 5,
 The Collatz Conjecture has not been proved, nor has any
 counter-example been discovered.
 
-@blogsection{The Collatz Sequence in LaTeX}
+@section{The Collatz Sequence in LaTeX}
 
 Below is a short LaTeX file that renders to the Collatz sequence of a
 random integer between 0 and 1,000,000,000:
@@ -129,7 +123,7 @@ This 27 line program demonstrates the absurd power of LaTeX. When you
 run it, sometimes you get pages and pages of numbers. Other times, the
 number of words will be so small it fits on just a few lines.
 
-@blogsection{Word Counts from LaTeX (redux)}
+@section{Word Counts from LaTeX (redux)}
 
 The beauty of this program is that you can't tell how many words will
 be in the output by looking at the program source or the output,
@@ -155,7 +149,7 @@ This document appears to have six words to the human eye, but I am
 highly skeptical of any analysis that would decide that from the seven
 word-like tokens in the source.
 
-@blogsection{The Resolution}
+@section{The Resolution}
 
 Naturally, this argument swayed the rest of the committee and we stuck
 with page limits rather than switching to word limits.

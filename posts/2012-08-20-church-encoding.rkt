@@ -1,18 +1,11 @@
 #lang scribble/lp
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "Church Encoding"
-comments: true
-categories:
-- Racket
-- Lambda Calculus
-- Coq
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{Church Encoding}
+@categories["Racket" "Lambda Calculus" "Coq"]
 
 One of my favourite ideas in the Lambda Calculus in Church
 Encoding. This is the basis of how the Lambda Calculus, with only
@@ -26,7 +19,7 @@ express all computations. A natural question is how this simple
 language can represent things like numbers, lists, and other complex
 data structures?
 
-@blogsection{Booleans}
+@section{Booleans}
 
 I think it is actually easier to start with the most basic of
 data-structures: the boolean.
@@ -97,7 +90,7 @@ where we must use functions like IF, whereas the "clever" way is based
 on the understanding that booleans *are* IF, so we don't need to call
 it.
 
-@blogsection{Natural numbers}
+@section{Natural numbers}
 
 Let's do something a little bit more complicated: numbers.
 

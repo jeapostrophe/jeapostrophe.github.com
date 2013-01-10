@@ -1,18 +1,11 @@
 #lang scribble/manual
 @(require (for-label racket/base
                      rackunit
-                     racket/list))
-@literal{
----
-layout: post
-title: "Linux on a MacBook Air and Nvidia Projector Woes"
-comments: true
-categories:
-- Linux
-- Apple
-- Nvidia
----
-}
+                     racket/list)
+          "post.rkt")
+
+@title{Linux on a MacBook Air and Nvidia Projector Woes}
+@categories["Linux" "Apple" "Nvidia"]
 
 When I was quite young, in middle school, I switched from Windows to
 Linux. I initially used Red Hat, but fairly quickly converted to
