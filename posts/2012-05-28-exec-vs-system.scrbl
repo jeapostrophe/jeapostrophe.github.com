@@ -1,17 +1,13 @@
 #lang scribble/manual
-@(require (planet ryanc/scriblogify/scribble-util)
-          (for-label racket/base
+@(require (for-label racket/base
                      rackunit
                      racket/list))
-@literal{
----
-layout: post
-title: "exec and Tail-call Optimization"
-comments: true
-categories:
-- Systems
----
-}
+
+@(define (categories . _) (void))
+@(define (the-jump . _) (void))
+
+@title{exec and Tail-call Optimization}
+@categories["Systems"]
 
 I'm often bothered by programs that fail to use @tt{exec} properly and
 instead use @tt{system}. In this article, we'll review the difference

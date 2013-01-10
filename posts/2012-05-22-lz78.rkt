@@ -1,6 +1,5 @@
 #lang scribble/lp
-@(require (planet ryanc/scriblogify/scribble-util)
-          (for-label racket/base
+@(require (for-label racket/base
                      rackunit
                      racket/list))
 @literal{
