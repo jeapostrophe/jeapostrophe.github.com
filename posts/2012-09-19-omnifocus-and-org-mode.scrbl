@@ -11,7 +11,7 @@ One of my joys in life is keeping a TODO list and checking off
 stuff. When I was young, I used plain text files mainly, but when I
 got to graduate school, I used more automatic approaches.
 
-In this post, I discuss my journey through various TODO list manager,
+In this post, I discuss my journey through various TODO list managers,
 culminating in my switch from OmniFocus to Org-Mode.
 
 @(the-jump)
