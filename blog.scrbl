@@ -1,19 +1,15 @@
 #lang scribble/base
 
 @(begin
-   (require (for-syntax racket/base))
+   (require (for-syntax racket/base)
+            scribble/manual
+            "post-help.rkt")
 
    (begin-for-syntax
      (require racket/runtime-path
               racket/file
-              syntax/strip-context)
-     (define-runtime-path posts-path "posts")
-     (define-runtime-path lp-posts-path "lp-posts")
-     (make-directory* lp-posts-path)
-     (unless (link-exists? (build-path lp-posts-path "post.rkt"))
-       (make-file-or-directory-link
-        (build-path posts-path "post.rkt")
-        (build-path lp-posts-path "post.rkt"))))
+              syntax/strip-context
+              "post-help.rkt"))
 
    (define-syntax (include-posts stx)
      (syntax-case stx ()
@@ -23,9 +19,11 @@
               (for/list ([p (in-list (sort (directory-list posts-path)
                                            string-ci<=?
                                            #:key path->string))])
+                (define ps (path->string p))
+                (define tag (filename->tag ps))
                 (define full-p (build-path posts-path p))
                 (cond
-                  [(file-exists? full-p)
+                  [(and tag (file-exists? full-p))
                    (define the-path
                      (cond
                        [(regexp-match #rx"rkt" (path->string p))
@@ -56,3 +54,10 @@
 @emph{'Cowards die many times before their deaths, The valiant never taste of death but once.'}
 
 @(include-posts)
+
+@(for/list ([p (in-list (sort (directory-list posts-path)
+                              string-ci>?
+                              #:key path->string))])
+   (define ps (path->string p))
+   (define tag (filename->tag ps))
+   (when tag @t{@secref[tag]}))

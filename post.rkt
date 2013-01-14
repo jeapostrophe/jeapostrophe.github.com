@@ -2,17 +2,11 @@
 (require (for-syntax racket/base
                      racket/match
                      syntax/parse
-                     unstable/syntax)
+                     unstable/syntax
+                     "post-help.rkt")
          (prefix-in sb: 
                     (combine-in scribble/base
                                 scribble/manual)))
-
-(begin-for-syntax
-  (define (string-take* s n)
-    (list->string
-     (for/list ([c (in-string s)]
-                [i (in-range n)])
-       c))))
 
 (define-syntax (title stx)
   (syntax-parse stx
@@ -23,7 +17,7 @@
                    fname)
      (with-syntax 
          ([(fname year month day code) (list fname year month day code)]
-          [tag (format "~a-~a-~a-~a" year month day (string-take* code 8))])
+          [tag (filename->tag fname)])
        (quasisyntax/loc stx
          (begin
            (sb:title
@@ -35,6 +29,6 @@
 (define (categories . l)
   @sb:t{@sb:bold{Categories:} @(map (λ (c) @sb:elem{@sb:secref[c] }) l)})
 
-(define (the-jump . _) (void))
+(define (the-jump . _) @sb:centered{-})
 
 (provide (all-defined-out))
