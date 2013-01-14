@@ -27,6 +27,7 @@
            @sb:margin-note{The source for this post is online at @sb:link[(format "https://github.com/jeapostrophe/jeapostrophe.github.com/tree/source/posts/~a" fname)]{@|fname|}.})))]))
 
 (define (categories . l)
+  ;; XXX Create a file/directory with category assocs
   @sb:t{@sb:bold{Categories:} @(map (λ (c) @sb:elem{@sb:secref[c] }) l)})
 
 (define (the-jump . _) @sb:centered{-})
