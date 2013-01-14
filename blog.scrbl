@@ -2,8 +2,6 @@
 
 @(begin
    (require (for-syntax racket/base))
-   ;; XXX subtitle
-   (define (subtitle . a) (void))
 
    (begin-for-syntax
      (require racket/runtime-path
@@ -55,6 +53,6 @@
             (begin post-inc ...)))])))
 
 @title{Jay McCarthy}
-@subtitle{'Cowards die many times before their deaths, The valiant never taste of death but once.'}
+@emph{'Cowards die many times before their deaths, The valiant never taste of death but once.'}
 
 @(include-posts)

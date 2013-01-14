@@ -1,9 +1,11 @@
-#lang racket/base
+#lang at-exp racket/base
 (require (for-syntax racket/base
                      racket/match
                      syntax/parse
                      unstable/syntax)
-         (prefix-in sb: scribble/base))
+         (prefix-in sb: 
+                    (combine-in scribble/base
+                                scribble/manual)))
 
 (begin-for-syntax
   (define (string-take* s n)
@@ -19,12 +21,16 @@
      (match-define (regexp #rx"^(....)-(..)-(..)-(.*)\\.(rkt|scrbl)$"
                            (list _ year month day code ext))
                    fname)
-     (with-syntax ([tag (format "~a-~a-~a-~a" year month day (string-take* code 8))])
+     (with-syntax 
+         ([(fname year month day code) (list fname year month day code)]
+          [tag (format "~a-~a-~a-~a" year month day (string-take* code 8))])
        (quasisyntax/loc stx
-         (sb:title
-          #:tag tag
-          (format "~a-~a-~a: " #,year #,month #,day)
-          content ...)))]))
+         (begin
+           (sb:title
+            #:tag tag
+            (format "~a-~a-~a: " year month day)
+            content ...)
+           @sb:margin-note{The source for this post is online at @sb:link[(format "https://github.com/jeapostrophe/jeapostrophe.github.com/tree/source/posts/~a" fname)]{@|fname|}})))]))
 (define (categories . _) (void))
 (define (the-jump . _) (void))
 
