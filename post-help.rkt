@@ -6,6 +6,8 @@
 (define-runtime-path here-path ".")
 (define posts-path (build-path here-path "posts"))
 (make-directory* posts-path)
+(define categories-path (build-path here-path "categories"))
+(make-directory* categories-path)
 
 (define (string-take* s n)
   (list->string

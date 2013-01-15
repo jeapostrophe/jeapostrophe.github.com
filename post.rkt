@@ -4,6 +4,9 @@
                      syntax/parse
                      unstable/syntax
                      "post-help.rkt")
+         racket/file
+         racket/list
+         "post-help.rkt"
          (prefix-in sb: 
                     (combine-in scribble/base
                                 scribble/manual)))
@@ -24,11 +27,28 @@
             #:tag tag
             (format "~a-~a-~a: " year month day)
             content ...)
+           (current-tag tag)
            @sb:margin-note{The source for this post is online at @sb:link[(format "https://github.com/jeapostrophe/jeapostrophe.github.com/tree/source/posts/~a" fname)]{@|fname|}.})))]))
 
+(define current-tag (make-parameter #f))
+
 (define (categories . l)
-  ;; XXX Create a file/directory with category assocs
-  @sb:t{@sb:bold{Categories:} @(map (λ (c) @sb:elem{@sb:secref[c] }) l)})
+  (define (per-cat c)
+    (define cat-path (build-path categories-path c))
+    (define old
+      (if (file-exists? cat-path)
+        (file->value cat-path)
+        empty))
+    (define new
+      (sort 
+       (remove-duplicates 
+        (cons (current-tag) old))
+       string-ci>?))
+    (write-to-file new cat-path
+                   #:exists 'replace)
+    @sb:elem{@sb:secref[c] })
+
+  @sb:t{@sb:bold{Categories:} @(map per-cat l)})
 
 (define (the-jump . _) @sb:centered{-})
 

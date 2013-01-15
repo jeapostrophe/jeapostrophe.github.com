@@ -3,6 +3,7 @@
 @(begin
    (require (for-syntax racket/base)
             scribble/manual
+            racket/file
             "post-help.rkt")
 
    (begin-for-syntax
@@ -44,18 +45,37 @@
                    (define path-string
                      (path->string the-path))
                    (replace-context
-                    stx
-                    (quasisyntax/loc stx
-                      (include-section (file #,path-string))))]
+                     stx
+                     (quasisyntax/loc stx
+                       (include-section (file #,path-string))))]
                   [else
                    #'(void)]))])
           (syntax/loc stx
-            (begin post-inc ...)))])))
+            (begin post-inc ...)))]))
+
+   (define-syntax (include-categories stx)
+     (quasisyntax/loc stx
+       (begin
+         #,@(apply 
+             append
+             (for/list ([p (in-list (sort (directory-list categories-path)
+                                          string-ci<=?
+                                          #:key path->string))])
+               (define ps (path->string p))
+               (define tags (file->value (build-path categories-path p)))
+               (cons (quasisyntax/loc stx @subsection[#:tag #,ps #,ps])
+                     (map (λ (tag) (quasisyntax/loc stx
+                                     @t{@secref[#,tag]}))
+                          tags))))))))
 
 @title{Jay McCarthy}
 @emph{'Cowards die many times before their deaths, The valiant never taste of death but once.'}
 
-@(include-posts)
+@section{Categories}
+
+@(include-categories)
+
+@section{Archive}
 
 @(for/list ([p (in-list (sort (directory-list posts-path)
                               string-ci>?
@@ -63,3 +83,5 @@
    (define ps (path->string p))
    (define tag (filename->tag ps))
    (when tag @t{@secref[tag]}))
+
+@(include-posts)
