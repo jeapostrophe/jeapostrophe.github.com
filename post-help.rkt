@@ -6,15 +6,6 @@
 (define-runtime-path here-path ".")
 (define posts-path (build-path here-path "posts"))
 (make-directory* posts-path)
-(define lp-posts-path (build-path here-path "lp-posts"))
-(make-directory* lp-posts-path)
-;; XXX Remove need for these links (perhaps by having .auto .scrbls?)
-(for* ([d (in-list (list posts-path lp-posts-path))]
-       [p (in-list '("post.rkt" "post-help.rkt"))])
-  (unless (link-exists? (build-path d p))
-    (make-file-or-directory-link
-     (build-path here-path p)
-     (build-path d p))))
 
 (define (string-take* s n)
   (list->string

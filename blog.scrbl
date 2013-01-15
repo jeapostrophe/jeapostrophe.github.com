@@ -27,8 +27,10 @@
                    (define the-path
                      (cond
                        [(regexp-match #rx"rkt" (path->string p))
-                        (define scrbl-p (path-add-suffix p #".scrbl"))
-                        (define the-p (build-path lp-posts-path scrbl-p))
+                        (define scrbl-p 
+                          (format ".auto.~a.scrbl" 
+                                  (path->string p)))
+                        (define the-p (build-path posts-path scrbl-p))
                         (with-output-to-file the-p
                           #:exists 'replace
                           (λ ()

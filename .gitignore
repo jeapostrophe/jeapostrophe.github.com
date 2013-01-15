@@ -1,5 +1,3 @@
 compiled
 /blog
-/lp-posts
-/posts/post.rkt
-/posts/post-help.rkt
+/posts/.auto*.scrbl
