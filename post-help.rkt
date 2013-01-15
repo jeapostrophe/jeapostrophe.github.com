@@ -22,4 +22,10 @@
      (format "~a-~a-~a-~a" year month day (string-take* code 8))]
     [_ #f]))
 
+(define (all-posts)
+   (filter
+    (λ (ps) (filename->tag ps))
+    (sort (map path->string (directory-list posts-path))
+          string-ci>?)))
+
 (provide (all-defined-out))

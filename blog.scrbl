@@ -12,47 +12,6 @@
               syntax/strip-context
               "post-help.rkt"))
 
-   (define-syntax (include-posts stx)
-     (syntax-case stx ()
-       [(_)
-        (with-syntax
-            ([(post-inc ...)
-              (for/list ([p (in-list (sort (directory-list posts-path)
-                                           string-ci<=?
-                                           #:key path->string))])
-                (define ps (path->string p))
-                (define tag (filename->tag ps))
-                (define full-p (build-path posts-path p))
-                (cond
-                  [(and tag (file-exists? full-p))
-                   (define the-path
-                     (cond
-                       [(regexp-match #rx"rkt" (path->string p))
-                        (define scrbl-p 
-                          (format ".auto.~a.scrbl" 
-                                  (path->string p)))
-                        (define the-p (build-path posts-path scrbl-p))
-                        (with-output-to-file the-p
-                          #:exists 'replace
-                          (λ ()
-                            (printf "#lang scribble/base\n")
-                            (printf "@(require scribble/lp-include)\n")
-                            (printf "@lp-include[(file ~v)]\n"
-                                    (path->string full-p))))
-                        the-p]
-                       [else
-                        full-p]))
-                   (define path-string
-                     (path->string the-path))
-                   (replace-context
-                     stx
-                     (quasisyntax/loc stx
-                       (include-section (file #,path-string))))]
-                  [else
-                   #'(void)]))])
-          (syntax/loc stx
-            (begin post-inc ...)))]))
-
    (define-syntax (include-categories stx)
      (quasisyntax/loc stx
        (begin
@@ -69,19 +28,31 @@
                           tags))))))))
 
 @title{Jay McCarthy}
-@emph{'Cowards die many times before their deaths, The valiant never taste of death but once.'}
 
-@section{Categories}
+@centered{@emph{'Cowards die many times before their deaths, @(linebreak) The valiant never taste of death but once.'}}
+
+This is the blog of Jay McCarthy, an assistant professor at
+@link["http://byu.edu/"]{Brigham Young University} in the
+@link["http://cs.byu.edu/"]{Computer Science Department}. I work on
+@link["http://racket-lang.org/"]{the Racket programming language}.
+
+If you are a student looking for information on my classes, or someone
+looking for my publications, please visit my
+@link["http://faculty.cs.byu.edu/~jay/home/"]{home page}.
+
+If you'd like to read older posts, you may like to browse my
+@seclink["categories"]{category list} or
+@seclink["archive"]{complete archives}.
+
+@(define RECENT-POSTS 8)
+
+My last @(number->string RECENT-POSTS) posts were:
+@itemize[(for/list ([ps (in-list (all-posts))]
+                    [i (in-range RECENT-POSTS)])
+           (item (secref (filename->tag ps))))]
+
+@section[#:tag "categories"]{Categories}
 
 @(include-categories)
 
-@section{Archive}
-
-@(for/list ([p (in-list (sort (directory-list posts-path)
-                              string-ci>?
-                              #:key path->string))])
-   (define ps (path->string p))
-   (define tag (filename->tag ps))
-   (when tag @t{@secref[tag]}))
-
-@(include-posts)
+@include-section["posts.scrbl"]

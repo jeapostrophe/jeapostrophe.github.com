@@ -24,7 +24,9 @@
        (quasisyntax/loc stx
          (begin
            (sb:title
+            #:style '(toc-hidden)
             #:tag tag
+            #:version ""
             (format "~a-~a-~a: " year month day)
             content ...)
            (current-tag tag)
