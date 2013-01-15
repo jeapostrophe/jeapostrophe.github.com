@@ -9,7 +9,8 @@
          "post-help.rkt"
          (prefix-in sb: 
                     (combine-in scribble/base
-                                scribble/manual)))
+                                scribble/manual
+                                scribble/decode)))
 
 (define-syntax (title stx)
   (syntax-parse stx
@@ -29,6 +30,8 @@
             #:version ""
             (format "~a-~a-~a: " year month day)
             content ...)
+           (sb:author
+            @sb:secref["top"])
            (current-tag tag)
            @sb:margin-note{The source for this post is online at @sb:link[(format "https://github.com/jeapostrophe/jeapostrophe.github.com/tree/source/posts/~a" fname)]{@|fname|}.})))]))
 

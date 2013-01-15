@@ -1,7 +1,8 @@
-#lang racket/base
+#lang at-exp racket/base
 (require racket/runtime-path
          racket/file
-         racket/match)
+         racket/match
+         scribble/base)
 
 (define-runtime-path here-path ".")
 (define posts-path (build-path here-path "posts"))

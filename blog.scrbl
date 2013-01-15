@@ -27,7 +27,7 @@
                                      @t{@secref[#,tag]}))
                           tags))))))))
 
-@title{Jay McCarthy}
+@title[#:tag "top"]{Jay McCarthy}
 
 @centered{@emph{'Cowards die many times before their deaths, @(linebreak) The valiant never taste of death but once.'}}
 
@@ -36,13 +36,24 @@ This is the blog of Jay McCarthy, an assistant professor at
 @link["http://cs.byu.edu/"]{Computer Science Department}. I work on
 @link["http://racket-lang.org/"]{the Racket programming language}.
 
-If you are a student looking for information on my classes, or someone
-looking for my publications, please visit my
-@link["http://faculty.cs.byu.edu/~jay/home/"]{home page}.
+@itemize[
 
-If you'd like to read older posts, you may like to browse my
-@seclink["categories"]{category list} or
-@seclink["archive"]{complete archives}.
+@item{For course information, visit my
+@link["http://faculty.cs.byu.edu/~jay/home/"]{home page}.}
+
+@item{For publications, visit my
+@link["http://faculty.cs.byu.edu/~jay/home/"]{home page}.}
+
+@item{For software projects, visit my
+@link["http://www.github.com/jeapostrophe"]{GitHub page}.}
+
+@item{For pithy remarks, follow me on Twitter:
+@link["http://twitter.com/jeapostrophe"]{@"@"jeapostrophe}.}
+
+@item{For older posts, browse by @seclink["categories"]{category} or
+@seclink["archive"]{date}.}
+
+]
 
 @(define RECENT-POSTS 8)
 
@@ -50,6 +61,10 @@ My last @(number->string RECENT-POSTS) posts were:
 @itemize[(for/list ([ps (in-list (all-posts))]
                     [i (in-range RECENT-POSTS)])
            (item (secref (filename->tag ps))))]
+
+XXX RSS
+
+XXX comment blocks
 
 @section[#:tag "categories"]{Categories}
 
