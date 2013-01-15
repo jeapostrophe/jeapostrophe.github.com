@@ -2,7 +2,7 @@
 @(require (for-label racket/base
                      rackunit
                      racket/list)
-          "post.rkt")
+          "../post.rkt")
 
 @title{An LZ78 Implementation}
 @categories["Compression" "Racket"]

@@ -1,5 +1,5 @@
 #lang scribble/lp
-@(require "post.rkt"
+@(require "../post.rkt"
           (for-label (except-in racket/base
                                 thread
                                 exit

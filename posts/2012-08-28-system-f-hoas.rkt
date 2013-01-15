@@ -3,7 +3,7 @@
                                 eval)
                      rackunit
                      racket/list)
-          "post.rkt")
+          "../post.rkt")
 
 @title{System F: Interpreter and Type Checker}
 @categories["Racket" "Lambda Calculus"]

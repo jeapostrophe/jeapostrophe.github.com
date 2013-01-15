@@ -2,7 +2,7 @@
 @(require (for-label racket/base
                      rackunit
                      racket/list)
-          "post.rkt")
+          "../post.rkt")
 
 @title{Continuation Marks, part I: Dynamic Wind}
 @categories["Racket" "Continuations" "Continuation Marks"]

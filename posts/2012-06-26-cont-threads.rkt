@@ -6,7 +6,7 @@
                      (prefix-in racket: racket/base)
                      rackunit
                      racket/list)
-          "post.rkt")
+          "../post.rkt")
 
 @title{Cooperative Threads with Continuations}
 @categories["Racket" "Continuations" "Threads" "Concurrency"]

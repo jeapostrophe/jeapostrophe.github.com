@@ -2,7 +2,7 @@
 @(require (for-label racket/base
                      rackunit
                      racket/list)
-          "post.rkt")
+          "../post.rkt")
 
 @title{The Multi-language Nirvana}
 @categories["Coq" "Ocaml" "Racket" "Make" "CPP"]

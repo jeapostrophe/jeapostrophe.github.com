@@ -2,7 +2,7 @@
 @(require (for-label racket/base
                      rackunit
                      racket/list)
-          "post.rkt")
+          "../post.rkt")
 
 @title{Linux on a MacBook Air and Nvidia Projector Woes}
 @categories["Linux" "Apple" "Nvidia"]

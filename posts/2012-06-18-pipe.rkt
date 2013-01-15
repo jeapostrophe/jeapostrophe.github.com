@@ -3,7 +3,7 @@
                      tests/eli-tester
                      rackunit
                      racket/list)
-          "post.rkt")
+          "../post.rkt")
 
 @title{Delimited Pipes}
 @categories["Racket" "Continuations"]

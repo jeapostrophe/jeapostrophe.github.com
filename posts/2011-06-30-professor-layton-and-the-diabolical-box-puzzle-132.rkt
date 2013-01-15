@@ -2,7 +2,7 @@
 @(require (for-label racket/base
                      rackunit
                      racket/list)
-          "post.rkt")
+          "../post.rkt")
 
 @title{Professor Layton and the Diabolical Box, Puzzle #132}
 @categories["Puzzles" "Racket"]

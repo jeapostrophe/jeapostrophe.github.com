@@ -1,5 +1,5 @@
 #lang scribble/manual
-@(require "post.rkt"
+@(require "../post.rkt"
           (for-label racket/base
                      rackunit
                      racket/list))
