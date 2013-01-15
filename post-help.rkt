@@ -2,7 +2,8 @@
 (require racket/runtime-path
          racket/file
          racket/match
-         scribble/base)
+         scribble/base
+         scribble/tag)
 
 (define-runtime-path here-path ".")
 (define posts-path (build-path here-path "posts"))
@@ -28,5 +29,11 @@
     (λ (ps) (filename->tag ps))
     (sort (map path->string (directory-list posts-path))
           string-ci>?)))
+
+(define (catref c)
+  (secref c #:tag-prefixes (list "cat")))
+
+(define (postref p)
+  (secref "post" #:tag-prefixes (list p)))
 
 (provide (all-defined-out))

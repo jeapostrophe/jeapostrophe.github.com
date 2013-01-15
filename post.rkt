@@ -26,7 +26,8 @@
          (begin
            (sb:title
             #:style '(toc-hidden)
-            #:tag tag
+            #:tag "post"
+            #:tag-prefix tag
             #:version ""
             (format "~a-~a-~a: " year month day)
             content ...)
@@ -51,7 +52,7 @@
        string-ci>?))
     (write-to-file new cat-path
                    #:exists 'replace)
-    @sb:elem{@sb:secref[c] })
+    @sb:elem{@catref[c] })
 
   @sb:t{@sb:bold{Categories:} @(map per-cat l)})
 

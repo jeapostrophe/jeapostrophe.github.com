@@ -57,6 +57,6 @@
 
 @(for/list ([ps (in-list (all-posts))])
    (define tag (filename->tag ps))
-   @t{@secref[tag]})
+   @t{@postref[tag]})
 
 @(include-posts)
