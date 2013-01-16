@@ -1,10 +1,6 @@
 #lang scribble/base
 
 @(begin
-   ;; XXX Make atom feed
-
-   ;; XXX Make comment blocks
-
    (require (for-syntax racket/base)
             scribble/manual
             racket/file
@@ -35,10 +31,11 @@
 
 @centered{@emph{``Cowards die many times before their deaths, @(linebreak) The valiant never taste of death but once.''}}
 
-This is the blog of Jay McCarthy, an assistant professor at
-@link["http://byu.edu/"]{Brigham Young University} in the
-@link["http://cs.byu.edu/"]{Computer Science Department}. I work on
-@link["http://racket-lang.org/"]{the Racket programming language}.
+This is the blog of @link["http://faculty.cs.byu.edu/~jay/home/"]{Jay
+McCarthy}, an assistant professor at @link["http://byu.edu/"]{Brigham
+Young University} in the @link["http://cs.byu.edu/"]{Computer Science
+Department}. I work on @link["http://racket-lang.org/"]{the Racket
+programming language}.
 
 @itemize[
 
@@ -55,20 +52,18 @@ This is the blog of Jay McCarthy, an assistant professor at
 @link["http://twitter.com/jeapostrophe"]{@"@"jeapostrophe}.}
 
 @item{For older posts, browse by @seclink["categories"
-#:tag-prefixes (list "cat")]{category} or @seclink["archive"]{date}.}
+#:tag-prefixes (list "cat-")]{category} or @seclink["archive"]{date}.}
 
 @item{For continual updates, subscribe to @link["atom.xml"]{my Atom feed}.}
 
 ]
-
-@(define RECENT-POSTS 6)
 
 My last @(number->string RECENT-POSTS) posts were:
 @itemize[(for/list ([ps (in-list (all-posts))]
                     [i (in-range RECENT-POSTS)])
            (item (postref (filename->tag ps))))]
 
-@section[#:tag "categories" #:tag-prefix "cat"]{Categories}
+@section[#:tag "categories" #:tag-prefix "cat-"]{Categories}
 
 @(include-categories)
 

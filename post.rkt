@@ -6,6 +6,7 @@
                      "post-help.rkt")
          racket/file
          racket/list
+         racket/format
          "post-help.rkt"
          (prefix-in sb: 
                     (combine-in scribble/base
@@ -27,10 +28,14 @@
            (sb:title
             #:style '(toc-hidden)
             #:tag "post"
-            #:tag-prefix tag
+            #:tag-prefix (format "~a-" tag)
             #:version ""
             (format "~a-~a-~a: " year month day)
             content ...)
+           (display-to-file 
+            (~a content ...)
+            (build-path titles-path tag)
+            #:exists 'replace)
            (sb:author
             @sb:secref["top"])
            (current-tag tag)

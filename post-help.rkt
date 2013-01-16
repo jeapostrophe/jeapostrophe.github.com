@@ -10,6 +10,8 @@
 (make-directory* posts-path)
 (define categories-path (build-path here-path "categories"))
 (make-directory* categories-path)
+(define titles-path (build-path here-path "titles"))
+(make-directory* titles-path)
 
 (define (string-take* s n)
   (list->string
@@ -31,9 +33,11 @@
           string-ci>?)))
 
 (define (catref c)
-  (secref c #:tag-prefixes (list "cat")))
+  (secref c #:tag-prefixes (list "cat-")))
 
 (define (postref p)
-  (secref "post" #:tag-prefixes (list p)))
+  (secref "post" #:tag-prefixes (list (format "~a-" p))))
+
+(define RECENT-POSTS 6)
 
 (provide (all-defined-out))
