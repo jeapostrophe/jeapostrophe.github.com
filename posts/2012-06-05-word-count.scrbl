@@ -167,3 +167,5 @@ length integers.
 Thus we see that LaTeX will always dominate Word. (And, of course,
 since Scribble allows embedding Racket directly, potentially
 non-terminating documents like this are much easier to write.)
+
+@(the-end)

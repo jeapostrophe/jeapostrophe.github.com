@@ -128,3 +128,5 @@ shell forever. (dmenu is programmed correctly, though.)
 
 So, raise your right arm and say with me: "I will always exec in
 tail-position!"
+
+@(the-end)

@@ -200,3 +200,5 @@ in this order:
          (let () <speed-test>))
 
        (printf "Done\n")]
+
+@(the-end)

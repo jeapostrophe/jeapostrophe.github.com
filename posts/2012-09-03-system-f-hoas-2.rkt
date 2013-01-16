@@ -210,3 +210,5 @@ in this order:
                       (TYNUM))
         (check-equal? (type-of <type-error>)
                       #f)]
+
+@(the-end)

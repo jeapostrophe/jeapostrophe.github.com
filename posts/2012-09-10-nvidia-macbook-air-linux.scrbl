@@ -137,3 +137,5 @@ microphone doesn't work and sometimes (maybe once every three weeks)
 the X server will segfault, normally right after coming back from
 sleep. This last thing is the worst because there's no way to reset
 the video settings, so I have to reboot. The saga will continue...
+
+@(the-end)
