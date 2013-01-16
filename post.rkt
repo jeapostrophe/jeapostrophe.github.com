@@ -65,4 +65,11 @@
 
 (define (the-end . _) @sb:centered{XXX comments})
 
+(require racket/path
+         scribblings/quick/keep)
+(define (keeplink file . more)
+  (define the-link 
+    (format "~a" (file-name-from-path file)))
+  (apply sb:link the-link (keep-file file) more))
+
 (provide (all-defined-out))

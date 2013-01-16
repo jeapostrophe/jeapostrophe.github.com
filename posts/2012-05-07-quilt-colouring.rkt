@@ -153,11 +153,10 @@ edges.
          (error 'quilt-colouring "dot failed :("))]
 
 You can see the dot file here:
-@link["/downloads/code/tmp/2012-05-07-quilt-colouring.graph.dot"]{dot
-file}, but unfortunately the picture wasn't very helpful. You can see
-it here:
-@image[#:scale 0.20 "posts/tmp/2012-05-07-quilt-colouring.graph.dot.png"]{graph
-PNG}
+@keeplink["posts/tmp/2012-05-07-quilt-colouring.graph.dot"]{dot file},
+but unfortunately the picture wasn't very helpful. You can see it
+here: @image[#:scale
+0.20 "posts/tmp/2012-05-07-quilt-colouring.graph.dot.png"]{graph PNG}
 
 Now that I have the edges, I can create an adjacency list really
 simply:

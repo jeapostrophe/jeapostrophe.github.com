@@ -74,9 +74,9 @@ immediately.
 
 With this concept in mind, I created two MP3s:
 
-* @link["/downloads/code/tmp/2012-08-06-shower.mp3"]{The Shower Song}
-
-* @link["/downloads/code/tmp/2012-08-06-shower-hair.mp3"]{The Shower Song (w/ hair)}
+@itemize[
+@item{@keeplink["posts/tmp/2012-08-06-shower.mp3"]{The Shower Song}}
+@item{@keeplink["posts/tmp/2012-08-06-shower-hair.mp3"]{The Shower Song (w/ hair)}}]
 
 As my background music, I used the soundtrack for Mega Man 2 for the
 NES, by Capcom. For the announcer, I used the espeak system. For the
