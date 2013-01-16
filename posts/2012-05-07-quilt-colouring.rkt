@@ -135,7 +135,7 @@ edges.
        (define-runtime-path the-graph-path 
          "tmp/2012-05-07-quilt-colouring.graph.dot")
        (define-runtime-path the-graph-png-path 
-         "tmp/2012-05-07-quilt-colouring.graph.png")
+         "tmp/2012-05-07-quilt-colouring.graph.dot.png")
        (with-output-to-file
            the-graph-path
          #:exists 'replace
@@ -156,8 +156,8 @@ You can see the dot file here:
 @link["/downloads/code/tmp/2012-05-07-quilt-colouring.graph.dot"]{dot
 file}, but unfortunately the picture wasn't very helpful. You can see
 it here:
-@link["/downloads/code/tmp/2012-05-07-quilt-colouring.graph.png"]{graph
-PNG}.
+@image[#:scale 0.20 "posts/tmp/2012-05-07-quilt-colouring.graph.dot.png"]{graph
+PNG}
 
 Now that I have the edges, I can create an adjacency list really
 simply:
@@ -291,7 +291,7 @@ the end.
 
 You can see an example colouring:
 
-@link["/downloads/code/tmp/2012-05-07-quilt-colouring.png"]{here}
+@image["posts/tmp/2012-05-07-quilt-colouring.png"]{example colouring}
 
 When she finishes the quilt, I'll update this post with a picture of
 what she went with.
