@@ -22,7 +22,7 @@
                                           #:key path->string))])
                (define ps (path->string p))
                (define tags (file->value (build-path categories-path p)))
-               (cons (quasisyntax/loc stx @subsection[#:tag #,ps #,ps])
+               (cons (quasisyntax/loc stx @subsection[#:tag #,ps #:style 'unnumbered #,ps])
                      (map (λ (tag) (quasisyntax/loc stx
                                      @t{@postref[#,tag]}))
                           tags))))))))
@@ -63,7 +63,7 @@ My last @(number->string RECENT-POSTS) posts were:
                     [i (in-range RECENT-POSTS)])
            (item (postref (filename->tag ps))))]
 
-@section[#:tag "categories" #:tag-prefix "cat-"]{Categories}
+@section[#:tag "categories" #:tag-prefix "cat-" #:style 'unnumbered]{Categories}
 
 @(include-categories)
 

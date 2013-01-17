@@ -29,7 +29,7 @@
        (quasisyntax/loc stx
          (begin
            (sb:title
-            #:style (google-analytics 'toc-hidden)
+            #:style (google-analytics 'toc-hidden 'unnumbered)
             #:tag "post"
             #:tag-prefix (format "~a-" tag)
             #:version ""

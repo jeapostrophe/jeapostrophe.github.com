@@ -54,7 +54,7 @@
             (begin post-inc ...)))])))
 
 @title[#:tag "archive" 
-       #:style (google-analytics 'toc)]{Archive}
+       #:style (google-analytics 'toc 'unnumbered)]{Archive}
 
 @(for/list ([ps (in-list (all-posts))])
    (define tag (filename->tag ps))
