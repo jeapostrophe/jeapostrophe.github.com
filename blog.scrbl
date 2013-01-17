@@ -39,10 +39,10 @@ programming language}.
 
 @itemize[
 
-@item{For course information, visit my
+@item{For course and other teaching information, visit my
 @link["http://faculty.cs.byu.edu/~jay/home/"]{home page}.}
 
-@item{For publications, visit my
+@item{For publications and other professional activities, visit my
 @link["http://faculty.cs.byu.edu/~jay/home/"]{home page}.}
 
 @item{For software projects, visit my
