@@ -10,6 +10,8 @@
          "post-help.rkt"
          (prefix-in sb: 
                     (combine-in scribble/base
+                                scribble/core
+                                scribble/html-properties
                                 scribble/manual
                                 scribble/decode)))
 
@@ -63,7 +65,21 @@
 
 (define (the-jump . _) @sb:centered{-})
 
-(define (the-end . _) @sb:centered{XXX comments})
+(define (the-end . _)
+  (sb:element (sb:style #f (list (sb:alt-tag "div")
+                                 (sb:attributes 
+                                  (list (cons 'id "disqus_thread")))))
+              ;; XXX add script
+              (sb:element 
+               (sb:style #f 
+                         (list 
+                          (sb:script-property 
+                           "text/javascript"
+                           "XXX script")))
+               (list "Please enable JavaScript to view the "
+                     (sb:link "http://disqus.com/?ref_noscript"
+                              "comments powered by Disqus")
+                     "."))))
 
 (require racket/path
          scribblings/quick/keep)
