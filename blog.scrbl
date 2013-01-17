@@ -27,7 +27,7 @@
                                      @t{@postref[#,tag]}))
                           tags))))))))
 
-@title[#:tag "top"]{Jay McCarthy}
+@title[#:tag "top" #:style (google-analytics)]{Jay McCarthy}
 
 @centered{@emph{``Cowards die many times before their deaths, @(linebreak) The valiant never taste of death but once.''}}
 

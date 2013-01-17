@@ -29,7 +29,7 @@
        (quasisyntax/loc stx
          (begin
            (sb:title
-            #:style '(toc-hidden)
+            #:style (google-analytics 'toc-hidden)
             #:tag "post"
             #:tag-prefix (format "~a-" tag)
             #:version ""
@@ -69,7 +69,6 @@
 (define (the-jump . _) @sb:centered{-})
 
 (define DISQUS_SHORTNAME "jeapostrophe")
-(define BLOG_URL "http://jeapostrophe.github.com")
 
 (define (the-end . _)
   (match-define (list year month day code) (current-finfo))
@@ -88,9 +87,9 @@
        "text/javascript"
        (list (format "var disqus_shortname = '~a';\n" DISQUS_SHORTNAME)
              (format "var disqus_identifier = '~a/blog/~a/~a/~a/~a/';\n"
-                     BLOG_URL year month day src-filename)
+                     *BLOG-URL* year month day src-filename)
              (format "var disqus_url = '~a/~a';\n"
-                     BLOG_URL actual-filename)
+                     *BLOG-URL* actual-filename)
              "var disqus_script = 'embed.js';\n"
              "(function () {\n"
              "var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;\n"

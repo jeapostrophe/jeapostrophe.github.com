@@ -53,7 +53,8 @@
           (syntax/loc stx
             (begin post-inc ...)))])))
 
-@title[#:tag "archive" #:style '(toc)]{Archive}
+@title[#:tag "archive" 
+       #:style (google-analytics 'toc)]{Archive}
 
 @(for/list ([ps (in-list (all-posts))])
    (define tag (filename->tag ps))

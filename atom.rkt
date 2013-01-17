@@ -6,9 +6,6 @@
          xml
          "post-help.rkt")
 
-(define *BLOG-TITLE* "Jay McCarthy")
-(define *BLOG-URL* "http://jeapostrophe.github.com")
-
 (define (atom! path)
   (with-output-to-file
       path
