@@ -1,1 +1,0 @@
-("5.3.0.8" ("69b170a9b65981cd90b169f9045dd5a6287e3687" . "bf40c51a6f6c4ef257eb740643b347c65048de94") (collects #"rackunit" #"main.rkt") (collects #"racket" #"match.rkt") (collects #"racket" #"port.rkt") (collects #"scribble" #"lp" #"lang" #"lang.rkt") (collects #"racket" #"list.rkt") (collects #"racket" #"stream.rkt") (collects #"scribble" #"lp" #"lang" #"reader.rkt"))
