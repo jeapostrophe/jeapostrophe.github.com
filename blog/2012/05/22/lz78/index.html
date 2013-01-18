@@ -1,0 +1,456 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>An LZ78 Implementation - Jay McCarthy</title>
+  <meta name="author" content="Jay McCarthy">
+
+  
+  <meta name="description" content="For a long time I&rsquo;ve known about and relied on the LZ77/78 compression
+algorithms. Once when I was in middle school, I told a friend an idea
+I &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jeapostrophe.github.com/blog/2012/05/22/lz78">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/racket.css" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Jay McCarthy" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30131476-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Jay McCarthy</a></h1>
+  
+    <h2>'Cowards die many times before their deaths, The valiant never taste of death but once.'</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jeapostrophe.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="http://faculty.cs.byu.edu/~jay/home/">Publications</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">An LZ78 Implementation</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-22T00:00:00-06:00" pubdate data-updated="true">May 22<span>nd</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>For a long time I&rsquo;ve known about and relied on the LZ77/78 compression
+algorithms. Once when I was in middle school, I told a friend an idea
+I had about compression, and the friend&#8212;<wbr />who was in college at the
+time&#8212;<wbr />said it sounded exactly like LZ77. I don&rsquo;t remember what my
+idea was, but I do remember that incident.</p><p>Despite this long connection, I&rsquo;d never implemented the algorithm
+before. I sought to rectify that situation.</p></div>
+  
+  
+    <div style="text-align: center;">
+  <script type="text/javascript"><!--
+   google_ad_client = "ca-pub-8940021471694041";
+   /* jeapostrophe - body */
+   google_ad_slot = "2685812826";
+   google_ad_width = 728;
+   google_ad_height = 90;
+   //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</div>
+
+    <div class="entry-content" style="margin-top: 1em;"><p>First, I read about the algorithm on Wikipedia. The
+<a href="https://en.wikipedia.org/wiki/LZ77">article</a> is pretty
+informative. I&rsquo;ll briefly recap it.</p><p>As you read through the content to compress, you keep track of a
+dictionary of previously seen phrases. Whenever you discover a yet
+undiscovered phrase, add it to the dictionary and encode it as the
+previously-seen prefix and the new character. Decoding works in
+reverse. Since the very first character of the encoded output is
+necessarily not in the dictionary, its prefix will be empty and it
+will establish the first phrase. As you read the encoding, you
+maintain the same dictionary and decode by following the
+phrase-reference backwards and then emitting the new character.</p><p>For an implementation, the signature of the function is pretty
+straight-forward: it takes a character source, which I&rsquo;ll use an
+input-port for, and it returns a list of pairs of the previously seen
+reference and the new character.</p><p>However, there&rsquo;s one hitch. If the last phrase of the input is
+previously seen, then there will be no right-hand side of the output
+pair. You could add a special character to indicate that. I decided to
+output just the phrase reference, in that case.</p><h3><a name="(part._.Compression)"></a>Compression</h3><p>My compression code looks like this:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3ccompress~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3ccompress~3e~3a1))" class="plainlink" pltdoc="x">&lt;compress&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">compress</span><span class="hspace">&nbsp;</span><span class="RktSym">ip</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><a href="#(elem._(chunk._~3cnext-unseen~3e~3a1))" class="plainlink" pltdoc="x">&lt;next-unseen&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/let.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._let))" class="RktStxLink" pltdoc="x">let</a></span><span class="hspace">&nbsp;</span><span class="RktSym">outer-loop</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">next</span><span class="hspace">&nbsp;</span><span class="RktVal">1</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match))" class="RktStxLink" pltdoc="x">match</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">next-unseen</span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym">?</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/number-types.html#(def._((quote._~23~25kernel)._number~3f))" class="RktValLink" pltdoc="x">number?</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ref</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/streams.html#(form._((lib._racket%2Fstream..rkt)._stream))" class="RktStxLink" pltdoc="x">stream</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ref</span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/if.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._and))" class="RktStxLink" pltdoc="x">and</a></span><span class="hspace">&nbsp;</span><span class="RktSym">W</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ref</span><span class="hspace">&nbsp;</span><span class="RktSym">c</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/streams.html#(form._((lib._racket%2Fstream..rkt)._stream-cons))" class="RktStxLink" pltdoc="x">stream-cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">W</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">outer-loop</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._add1))" class="RktValLink" pltdoc="x">add1</a></span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>The main work all happens in <span class="RktSym">next-unseen</span> which takes the
+reference that the next phrase will be given and either returns a
+number, for the final reference in the stream, or a cons of the last
+reference and the new character, which is added to the output and then
+the compression continues. The dictionary itself is totally maintained
+by the <span class="RktSym">next-unseen</span> function.</p><p><span class="RktSym">next-unseen</span> runs in a loop keeping track of the current
+dictionary and prefix phrase reference. At each iteration it reads a
+byte from the input. There are then three cases:</p><p>1. The input is empty, in which case, the last seen phrase reference
+is returned.</p><p>2. The current dictionary has a reference starting with that byte, in
+which case, the prefix phrase is extended. This means the loop is
+continued with a new dictionary and a new prefix phrase. For example,
+if the current phrase is A, named 1, and the next input is B, and AB
+is previously seen and named 2, then the dictionary will have a
+mapping in it from B to a new dictionary and the number 2, which are
+used in the next iteration of the loop.</p><p>3. The current dictionary does *not* have a reference for this byte,
+meaning that we&rsquo;ve encoded a new phrase. In that case, we can add this
+byte to current dictionary and allocate a new name for it, then return
+that new name.</p><p>Here&rsquo;s that in code:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cnext-unseen~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cnext-unseen~3e~3a1))" class="plainlink" pltdoc="x">&lt;next-unseen&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">top-dict</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._make-hasheq))" class="RktValLink" pltdoc="x">make-hasheq</a></span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">next-unseen</span><span class="hspace">&nbsp;</span><span class="RktSym">this</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/let.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._let))" class="RktStxLink" pltdoc="x">let</a></span><span class="hspace">&nbsp;</span><span class="RktSym">loop</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">dict</span><span class="hspace">&nbsp;</span><span class="RktSym">top-dict</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._last))" class="RktValLink" pltdoc="x">last</a></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">b</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Byte_and_String_Input.html#(def._((quote._~23~25kernel)._read-byte))" class="RktValLink" pltdoc="x">read-byte</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ip</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/if.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._cond))" class="RktStxLink" pltdoc="x">cond</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/port-ops.html#(def._((quote._~23~25kernel)._eof-object~3f))" class="RktValLink" pltdoc="x">eof-object?</a></span><span class="hspace">&nbsp;</span><span class="RktSym">b</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._last))" class="RktValLink" pltdoc="x">last</a></span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-ref))" class="RktValLink" pltdoc="x">hash-ref</a></span><span class="hspace">&nbsp;</span><span class="RktSym">dict</span><span class="hspace">&nbsp;</span><span class="RktSym">b</span><span class="hspace">&nbsp;</span><span class="RktVal">#f</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/if.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._~3d~3e))" class="RktStxLink" pltdoc="x">=&gt;</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">next</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">loop</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cdr))" class="RktValLink" pltdoc="x">cdr</a></span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="RktPn">)</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._car))" class="RktValLink" pltdoc="x">car</a></span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/if.html#(form._((lib._racket%2Fprivate%2Fletstx-scheme..rkt)._else))" class="RktStxLink" pltdoc="x">else</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-set!))" class="RktValLink" pltdoc="x">hash-set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">dict</span><span class="hspace">&nbsp;</span><span class="RktSym">b</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">this</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._make-hasheq))" class="RktValLink" pltdoc="x">make-hasheq</a></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._last))" class="RktValLink" pltdoc="x">last</a></span><span class="hspace">&nbsp;</span><span class="RktSym">b</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>This code uses a similar dictionary structure to my Boggle solver,
+from the previous blog post. However, in this code, it&rsquo;s mutable
+because the dictionary is extended as we go and it would be tedious to
+thread the state.</p><p>I&rsquo;m kind of amazed that the compression can fit in 23 lines!</p><p>Here&rsquo;s a little example:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3ccompress-example~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3ccompress-example~3e~3a1))" class="plainlink" pltdoc="x">&lt;compress-example&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">some-input</span><span class="hspace">&nbsp;</span><span class="RktVal">#&#8221;AABABBBABAABABBBABBABB&#8221;</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">compressed</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">compress</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/stringport.html#(def._((quote._~23~25kernel)._open-input-bytes))" class="RktValLink" pltdoc="x">open-input-bytes</a></span><span class="hspace">&nbsp;</span><span class="RktSym">some-input</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">A</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/characters.html#(def._((quote._~23~25kernel)._char-~3einteger))" class="RktValLink" pltdoc="x">char-&gt;integer</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#\A</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/characters.html#(def._((quote._~23~25kernel)._char-~3einteger))" class="RktValLink" pltdoc="x">char-&gt;integer</a></span><span class="hspace">&nbsp;</span><span class="RktVal">#\B</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/rackunit/api.html#(def._((lib._rackunit%2Fmain..rkt)._check-equal~3f))" class="RktValLink" pltdoc="x">check-equal?</a></span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/streams.html#(def._((lib._racket%2Fstream..rkt)._stream-~3elist))" class="RktValLink" pltdoc="x">stream-&gt;list</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktSym">compressed</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._list))" class="RktValLink" pltdoc="x">list</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="hspace">&nbsp;</span><span class="RktSym">A</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">1</span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">2</span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">2</span><span class="hspace">&nbsp;</span><span class="RktSym">A</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">5</span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">4</span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">3</span><span class="hspace">&nbsp;</span><span class="RktSym">A</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">7</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>In this example, the final dictionary looks like this:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3ccompress-example-dict~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3ccompress-example-dict~3e~3a1))" class="plainlink" pltdoc="x">&lt;compress-example-dict&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktSym">B</span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">4</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">7</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktSym">A</span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">1</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="hspace">&nbsp;</span><span class="RktSym">B</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">2</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">3</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="hspace">&nbsp;</span><span class="RktSym">A</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">8</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">A</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">5</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">6</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><h3><a name="(part._.Decompression)"></a>Decompression</h3><p>Naturally, decompression is dual to compression. It will also maintain
+a dictionary, but it will have the opposite information: rather than
+mapping characters to references and suffixes, it will map references
+to characters and prefixes.</p><p>The code is considerably simpler because there is a single
+dictionary (rather than a structured one) and the decompression is a
+fold over the input stream, rather than a more generative loop.</p><p>Here&rsquo;s the core of it:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cdecompress~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cdecompress~3e~3a1))" class="plainlink" pltdoc="x">&lt;decompress&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">decompress</span><span class="hspace">&nbsp;</span><span class="RktSym">str</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktSym">dict</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._make-hasheq))" class="RktValLink" pltdoc="x">make-hasheq</a></span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><a href="#(elem._(chunk._~3coutput-from-dict~3e~3a1))" class="plainlink" pltdoc="x">&lt;output-from-dict&gt;</a></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/for.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._for%2Ffold))" class="RktStxLink" pltdoc="x">for/fold</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">next</span><span class="hspace">&nbsp;</span><span class="RktVal">1</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktPn">[</span><span class="RktSym">p</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/streams.html#(def._((lib._racket%2Fstream..rkt)._in-stream))" class="RktValLink" pltdoc="x">in-stream</a></span><span class="hspace">&nbsp;</span><span class="RktSym">str</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match))" class="RktStxLink" pltdoc="x">match</a></span><span class="hspace">&nbsp;</span><span class="RktSym">p</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ref</span><span class="hspace">&nbsp;</span><span class="RktSym">b</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-set!))" class="RktValLink" pltdoc="x">hash-set!</a></span><span class="hspace">&nbsp;</span><span class="RktSym">dict</span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="hspace">&nbsp;</span><span class="RktSym">p</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">output-from-dict</span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/generic-numbers.html#(def._((quote._~23~25kernel)._add1))" class="RktValLink" pltdoc="x">add1</a></span><span class="hspace">&nbsp;</span><span class="RktSym">next</span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym">?</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/number-types.html#(def._((quote._~23~25kernel)._number~3f))" class="RktValLink" pltdoc="x">number?</a></span><span class="hspace">&nbsp;</span><span class="RktSym">ref</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">output-from-dict</span><span class="hspace">&nbsp;</span><span class="RktSym">ref</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">next</span><span class="RktPn">]</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>Basically, each element of the stream is either a new dictionary
+entry, in which case we remember it and output it, or it&rsquo;s just a
+reference and we output without remembering. Pretty simple. (We could
+use a functional hash, but there&rsquo;s no benefit here.)</p><p>When you get a reference and need to output it, it&rsquo;s also quite easy:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3coutput-from-dict~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3coutput-from-dict~3e~3a1))" class="plainlink" pltdoc="x">&lt;output-from-dict&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/define.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._define))" class="RktStxLink" pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">output-from-dict</span><span class="hspace">&nbsp;</span><span class="RktSym">this</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/match.html#(form._((lib._racket%2Fmatch..rkt)._match))" class="RktStxLink" pltdoc="x">match</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hash-ref))" class="RktValLink" pltdoc="x">hash-ref</a></span><span class="hspace">&nbsp;</span><span class="RktSym">dict</span><span class="hspace">&nbsp;</span><span class="RktSym">this</span><span class="hspace">&nbsp;</span><span class="RktVal">#f</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktVal">#f</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/void.html#(def._((quote._~23~25kernel)._void))" class="RktValLink" pltdoc="x">void</a></span><span class="RktPn">)</span><span class="RktPn">]</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">[</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._last))" class="RktValLink" pltdoc="x">last</a></span><span class="hspace">&nbsp;</span><span class="RktSym">this-b</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">output-from-dict</span><span class="hspace">&nbsp;</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((lib._racket%2Flist..rkt)._last))" class="RktValLink" pltdoc="x">last</a></span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/Byte_and_String_Output.html#(def._((quote._~23~25kernel)._write-byte))" class="RktValLink" pltdoc="x">write-byte</a></span><span class="hspace">&nbsp;</span><span class="RktSym">this-b</span><span class="RktPn">)</span><span class="RktPn">]</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>Either the reference isn&rsquo;t in the dictionary, so you stop, or it is,
+so you output its prefix and then the byte associated with it. We use
+the stack as our data-structure to keep track of bytes to write,
+because the dictionary stores the prefixes, not the suffixes.</p><p>The whole decompression is just 20 lines. Wow!</p><p>We can check that the output is the same as the input:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cdecompress-example~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cdecompress-example~3e~3a1))" class="plainlink" pltdoc="x">&lt;decompress-example&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/rackunit/api.html#(def._((lib._rackunit%2Fmain..rkt)._check-equal~3f))" class="RktValLink" pltdoc="x">check-equal?</a></span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/port-lib.html#(def._((lib._racket%2Fport..rkt)._with-output-to-bytes))" class="RktValLink" pltdoc="x">with-output-to-bytes</a></span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/lambda.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._~ce~bb))" class="RktStxLink" pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">decompress</span><span class="hspace">&nbsp;</span><span class="RktSym">compressed</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span><span class="RktSym">some-input</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>In the example, the dictionary is:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3cdecompress-example-dict~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3cdecompress-example-dict~3e~3a1))" class="plainlink" pltdoc="x">&lt;decompress-example-dict&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/hashtables.html#(def._((quote._~23~25kernel)._hasheq))" class="RktValLink" pltdoc="x">hasheq</a></span><span class="hspace">&nbsp;</span><span class="RktVal">8</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">3</span><span class="hspace">&nbsp;</span><span class="RktSym">A</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">7</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">4</span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">6</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">5</span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">5</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">2</span><span class="hspace">&nbsp;</span><span class="RktSym">A</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">4</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">3</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">2</span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">2</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">1</span><span class="hspace">&nbsp;</span><span class="RktSym">B</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">1</span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/pairs.html#(def._((quote._~23~25kernel)._cons))" class="RktValLink" pltdoc="x">cons</a></span><span class="hspace">&nbsp;</span><span class="RktVal">0</span><span class="hspace">&nbsp;</span><span class="RktSym">A</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>And that&rsquo;s it!</p><h3><a name="(part._.Further_work)"></a>Further work</h3><p>One strange thing about this implementation is that the output is just
+a stream of pairs rather than bytes. The easiest way to encode it as
+bytes is to write each pair as two bytes. That&rsquo;s not totally correct,
+however, because the number of prefixes may exceed the number of
+bytes, so you&rsquo;ll need to use the length of the input log-2 for the
+number of bits per reference. You can do a little bit better by having
+the decoder keep track of this number during decoding and gradually
+use more bits.</p><p>It is interesting to think of what kinds of input this algorithm fails
+to compress. It&rsquo;s those without common prefixes. For example, if you
+had all the bytes from 0 to 255, then the output would be double (plus
+one! Why?) the input. If you then added each byte to every other byte,
+then you&rsquo;d double again.</p><p>Another surprising thing about the algorithm is that the dictionary is
+just as long as the compressed output because the compressed output IS
+the dictionary. The compression algorithm is inherently non-random
+access because you need to read it linearly to know the context of the
+prefix references.</p><p>This was a very fun thing to implement. I hope you enjoy it!</p><p>By the way, if you use this code at home, make sure you put the code
+in this order:</p><p><div class="SIntrapara"><a name="(elem._(chunk._~3c*~3e~3a1))"></a><span style="font-weight: bold"><span style="font-style: italic"><a href="#(elem._(chunk._~3c*~3e~3a1))" class="plainlink" pltdoc="x">&lt;*&gt;</a></span> ::=</span></div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://pre.racket-lang.org/docs/html/reference/require.html#(form._((lib._racket%2Fprivate%2Fbase..rkt)._require))" class="RktStxLink" pltdoc="x">require</a></span><span class="hspace">&nbsp;</span><span class="RktSym">rackunit</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">racket/list</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">racket/match</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">racket/stream</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktSym">racket/port</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;</span></td></tr><tr><td><a href="#(elem._(chunk._~3ccompress~3e~3a1))" class="plainlink" pltdoc="x">&lt;compress&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3ccompress-example~3e~3a1))" class="plainlink" pltdoc="x">&lt;compress-example&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3ccompress-example-dict~3e~3a1))" class="plainlink" pltdoc="x">&lt;compress-example-dict&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3cdecompress~3e~3a1))" class="plainlink" pltdoc="x">&lt;decompress&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3cdecompress-example~3e~3a1))" class="plainlink" pltdoc="x">&lt;decompress-example&gt;</a></td></tr><tr><td><a href="#(elem._(chunk._~3cdecompress-example-dict~3e~3a1))" class="plainlink" pltdoc="x">&lt;decompress-example-dict&gt;</a></td></tr></table></blockquote></div></p>
+</div>
+  
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jay McCarthy</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-22T00:00:00-06:00" pubdate data-updated="true">May 22<span>nd</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/compression/'>Compression</a>, <a class='category' href='/blog/categories/racket/'>Racket</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://jeapostrophe.github.com/blog/2012/05/22/lz78/" data-via="jeapostrophe" data-counturl="http://jeapostrophe.github.com/blog/2012/05/22/lz78/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/14/boggle/" title="Previous Post: A Boggle Solver">&laquo; A Boggle Solver</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/05/28/exec-vs-system/" title="Next Post: exec and Tail-call Optimization">exec and Tail-call Optimization &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+<div style="text-align: center;">
+  <script type="text/javascript"><!--
+   google_ad_client = "ca-pub-8940021471694041";
+   /* jeapostrophe - body */
+   google_ad_slot = "2685812826";
+   google_ad_width = 728;
+   google_ad_height = 90;
+   //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</div>
+
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>I am an assistant professor at <a href="http://byu.edu">Brigham Young University</a> in the
+  <a href="http://cs.byu.edu">Computer Science department</a>. I work
+  on the <a href="http://racket-lang.org/">Racket</a> programming
+  language</a>.</p>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/10/02/multi-language-nirvana/">The Multi-language Nirvana</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/19/omnifocus-and-org-mode/">Switching from OmniFocus to Org-Mode</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/10/nvidia-macbook-air-linux/">Linux on a MacBook Air and Nvidia Projector Woes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/03/system-f-hoas-2/">System F: Interpreter and Type Checker, HOAS style</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/28/system-f-hoas/">System F: Interpreter and Type Checker</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("jeapostrophe", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/jeapostrophe" class="twitter-follow-button" data-show-count="false">Follow @jeapostrophe</a>
+  
+</section>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/101670206687664104937?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+<section style="text-align: center;">
+  <script type="text/javascript"><!--
+    google_ad_client = "ca-pub-8940021471694041";
+    /* jeapostrophe - side */
+    google_ad_slot = "3412706495";
+    google_ad_width = 200;
+    google_ad_height = 200;
+    //-->
+  </script>
+  <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/jeapostrophe">@jeapostrophe</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'jeapostrophe',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Jay McCarthy -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jaymccarthy';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jeapostrophe.github.com/blog/2012/05/22/lz78/';
+        var disqus_url = 'http://jeapostrophe.github.com/blog/2012/05/22/lz78/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

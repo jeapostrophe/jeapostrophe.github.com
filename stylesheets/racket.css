@@ -1,0 +1,356 @@
+/* ============================================================
+   from scribble.css
+   ============================================================ */
+
+/* Monospace: */
+.stt, .hspace {
+  font-family: monospace;
+}
+
+/* ---------------------------------------- */
+
+.SIntrapara {
+  display: block;
+  margin: 1em 0;
+}
+
+/* Needed for browsers like Opera, and eventually for HTML 4 conformance.
+   This means that multiple paragraphs in a table element do not have a space
+   between them. */
+table p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* ---------------------------------------- */
+/* Main */
+
+table td {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ---------------------------------------- */
+/* Navigation */
+
+/* ---------------------------------------- */
+/* Version */
+
+/* ---------------------------------------- */
+/* Margin notes */
+
+/* ---------------------------------------- */
+/* Table of contents, inline */
+
+/* ---------------------------------------- */
+/* Table of contents, left margin */
+
+/* ---------------------------------------- */
+/* Some inline styles */
+
+.indexlink {
+  text-decoration: none;
+}
+
+.nobreak {
+  white-space: nowrap;
+}
+
+/*
+.stt {
+}
+
+pre { margin-left: 2em; }
+blockquote { margin-left: 2em; }
+
+ol          { list-style-type: decimal; }
+ol ol       { list-style-type: lower-alpha; }
+ol ol ol    { list-style-type: lower-roman; }
+ol ol ol ol { list-style-type: upper-alpha; }
+
+i {
+}
+*/
+
+.SCodeFlow {
+  display: block;
+  margin-left: 1em;
+  margin-bottom: 0em;
+  margin-right: 1em;
+  margin-top: 0em;
+  white-space: nowrap;  
+}
+
+.SVInsetFlow {
+  display: block;
+  margin-left: 0em;
+  margin-bottom: 0em;
+  margin-right: 0em;
+  margin-top: 0em;
+}
+
+.SubFlow {
+  display: block;
+  margin: 0em;
+}
+
+.boxed {
+  width: 100%;
+  background-color: #E8E8FF;
+}
+
+.hspace {
+  /* ryanc: I think I needed to add these for some reason... */
+  font-family: monospace;
+  white-space: pre;
+}
+
+.slant {
+  font-style: oblique;
+}
+
+.badlink {
+  text-decoration: underline;
+  color: red;
+}
+
+.plainlink {
+  text-decoration: none;
+  color: blue;
+}
+
+.techoutside       { text-decoration: underline; color: #b0b0b0; }
+.techoutside:hover { text-decoration: underline; color: blue; }
+
+/* .techinside:hover doesn't work with FF, .techinside:hover>
+   .techinside doesn't work with IE, so use both (and IE doesn't
+   work with inherit in the second one, so use blue directly) */
+.techinside                    { color: black; }
+.techinside:hover              { color: blue; }
+.techoutside:hover>.techinside { color: inherit; }
+
+.SCentered {
+  text-align: center;
+}
+
+.imageleft {
+  float: left;
+  margin-right: 0.3em;
+}
+
+.Smaller{
+  font-size: 82%;
+}
+
+.Larger{
+  font-size: 122%;
+}
+
+/* A hack, inserted to break some Scheme ids: */
+.mywbr {
+  width: 0;
+  font-size: 1px;
+}
+
+.compact li p {
+  margin: 0em;
+  padding: 0em;
+}
+
+.noborder img {
+  border: 0;
+}
+
+/* ============================================================
+   from racket.css
+   ============================================================ */
+
+/* See the beginning of "scribble.css". */
+
+/* Monospace: */
+.RktIn, .RktRdr, .RktPn, .RktMeta,
+.RktMod, .RktKw, .RktVar, .RktSym,
+.RktRes, .RktOut, .RktCmt, .RktVal {
+  font-family: monospace;
+  white-space: inherit;
+}
+
+/* ---------------------------------------- */
+/* Inherited methods, left margin */
+
+/* ---------------------------------------- */
+/* Racket text styles */
+
+.RktIn {
+  color: #cc6633;
+  background-color: #eeeeee;
+}
+
+.RktInBG {
+  background-color: #eeeeee;
+}
+
+.RktRdr {
+}
+
+.RktPn {
+  color: #843c24;
+}
+
+.RktMeta {
+  color: black;
+}
+
+.RktMod {
+  color: black;
+}
+
+.RktOpt {
+  color: black;
+}
+
+.RktKw {
+  color: black;
+  /* font-weight: bold; */
+}
+
+.RktErr {
+  color: red;
+  font-style: italic;
+}
+
+.RktVar {
+  color: #262680;
+  font-style: italic;
+}
+
+.RktSym {
+  color: #262680;
+}
+
+.RktValLink {
+  text-decoration: none;
+  color: blue !important;
+}
+
+.RktModLink {
+  text-decoration: none;
+  color: blue !important;
+}
+
+.RktStxLink {
+  text-decoration: none;
+  color: black !important;
+  /* font-weight: bold; */
+}
+
+.RktRes {
+  color: #0000af;
+}
+
+.RktOut {
+  color: #960096;
+}
+
+.RktCmt {
+  color: #c2741f;
+}
+
+.RktVal {
+  color: #228b22;
+}
+
+/* ---------------------------------------- */
+/* Some inline styles */
+
+.together {
+  width: 100%;
+}
+
+.prototype, .argcontract, .RBoxed {
+  white-space: nowrap;
+}
+
+.prototype td {
+  vertical-align: text-top;
+}
+.longprototype td {
+  vertical-align: bottom;
+}
+
+.RktBlk {
+  white-space: inherit;
+  text-align: left;
+}
+
+.RktBlk tr {
+  white-space: inherit;
+}
+
+.RktBlk td {
+  vertical-align: baseline;
+  white-space: inherit;
+}
+
+.argcontract td {
+  vertical-align: text-top;
+}
+
+.highlighted {
+  background-color: #ddddff;
+}
+
+.defmodule {
+  width: 100%;
+  background-color: #F5F5DC;
+}
+
+.specgrammar {
+  float: right;
+}
+
+.RBibliography td {
+  vertical-align: text-top;
+}
+
+.leftindent {
+ margin-left: 1em;
+ margin-right: 0em;
+}
+
+.insetpara {
+ margin-left: 1em;
+ margin-right: 1em;
+}
+
+.Rfilebox {
+}
+
+.Rfiletitle {
+  text-align: right;
+  margin: 0em 0em 0em 0em;
+}
+
+.Rfilename {
+  border-top: 1px solid #6C8585;
+  border-right: 1px solid #6C8585;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  background-color: #ECF5F5;
+}
+
+.Rfilecontent {
+  margin: 0em 0em 0em 0em;
+}
+
+/* ============================================================
+   ad hoc extra styles you may need
+   ============================================================ */
+
+/* Some blog styles like to "frame" images. */
+img {
+  margin: 0px !important;
+  padding: 0px !important;
+  border: 0px !important;
+  background: none !important;
+}

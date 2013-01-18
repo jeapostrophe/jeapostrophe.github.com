@@ -1,0 +1,1 @@
+("5.3.0.10" ("743c96863c0f7d4ee97967e5367e830e82d85151" . "ee93796dd68e1f52c27836dafeb952af9530a7dc") (collects #"racket" #"match.rkt") (collects #"scribble" #"lp" #"lang" #"lang.rkt") (collects #"racket" #"list.rkt") (collects #"tests" #"eli-tester.rkt") (collects #"scribble" #"lp" #"lang" #"reader.rkt"))

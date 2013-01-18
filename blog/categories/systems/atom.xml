@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Systems | Jay McCarthy]]></title>
+  <link href="http://jeapostrophe.github.com/blog/categories/systems/atom.xml" rel="self"/>
+  <link href="http://jeapostrophe.github.com/"/>
+  <updated>2012-10-02T10:05:25-06:00</updated>
+  <id>http://jeapostrophe.github.com/</id>
+  <author>
+    <name><![CDATA[Jay McCarthy]]></name>
+    <email><![CDATA[jay.mccarthy@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[DrDr and its archives]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/08/13/drdr-archive/"/>
+    <updated>2012-08-13T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/08/13/drdr-archive</id>
+    <content type="html"><![CDATA[<p>After I developed <a href="http://drdr.racket-lang.org">DrDr</a>, it was running
+smoothly for a couple hundred revisions, when suddenly it stopped
+working. I investigated and found that I couldn&rsquo;t create any
+files... had I really run out of space on the 220G hard drive?</p>
+
+
+<p>In this post, I discuss how I found and fixed the problem.</p>
+
+
+<!-- more -->
+
+
+<h3><a name="(part._.Background_on_.Dr.Dr)"></a>Background on DrDr</h3>
+
+
+<p>DrDr is an continuous integration system for Racket. Every time a push
+is made to our repository, DrDr will download it, compile it,
+and "test" every single file in the code base. In this case, "test"
+just means compile, load, and run. Some files, such as
+<span class="stt">collects/tests/web-server/run-all-tests.rkt</span> are test suites that
+run a huge number of tests, whereas others, like
+<span class="stt">collects/xml/xml.rkt</span> are simply implementations that have no
+run-time behavior. DrDr records data about every file&rsquo;s run&#8212;<wbr />how long
+it took, what the output was, what the exit code was, etc&#8212;<wbr />and
+reports it to the Racket community. (This has turned out to be a
+really good idea because DrDr needs virtually no cooperation with the
+files being tested. Racket developers are free to write tests of any
+kind with any library. They just have to ensure that failures are
+written to STDERR and/or the file exits with a code other than 0.)</p>
+
+
+<p>In all, DrDr tests about 8,700 different files and runs for about an
+hour and ten minutes per push. (It&rsquo;s a 12-core machine and gets about
+4x parallel speed-up from that.)</p>
+
+
+<p>DrDr is designed to be extremely efficient and crash-resistant. It
+uses the filesystem as a database and associated two data files with
+every source file (and directory). The first is a log of the recorded
+information and the second is an "analysis" of the log that determines
+how many changes, unclean exits, timeouts, etc there were in the
+file (or directory.) This allows the Web view to simply read one file
+and print out the analysis data without doing any search. (The
+crash-resistance comes from it using these files (or rather their
+lack) as a work list of things to do. It&rsquo;s almost like a giant
+Makefile that creates and records these files as it goes. So when
+there&rsquo;s a crash, there&rsquo;s no in-memory state that needs to be saved or
+recovered... it&rsquo;s all written to the filesystem immediately.)</p>
+
+
+<h3><a name="(part._.Running_out_of_space___)"></a>Running out of space...</h3>
+
+
+<p>This means that on every push to our repository, DrDr creates about
+18,000 files. Every file is very small, typically less than 50 bytes,
+because most "tests" have no errors and no output. There&rsquo;s no danger
+of running out of space like that... right?</p>
+
+
+<p>If you know anything about file-systems, you should know that there&rsquo;s
+a thing called on "inode". When I explain it to students, I say this:
+your file-system is like a giant filing cabinet, it has a finite
+amount of volume it can organize and a finite number of folders to put
+things in, you can run out of either and your file-system won&rsquo;t be
+usable. The volume is the space (220G) and the folders are the
+inodes&#8212;<wbr />the names for file blocks. On my ext4 partition, I have 14M
+inodes for that 220G space.</p>
+
+
+<p>After a few hundred revisions, I had run out of inodes and was in
+trouble.</p>
+
+
+<h3><a name="(part._.Saving_space)"></a>Saving space</h3>
+
+
+<p>Most archive and compression formats are designed for saving
+space. They normally also save inodes... because 10,000 files can be
+put into 1 zip file... but that&rsquo;s not normally their primary
+purpose. (Naturally, Unix tradition has done a great job of separating
+these tasks: tar turns many files into one that can be compressed
+independently.)</p>
+
+
+<p>Based on that, I thought of just tarring the files and reading the tar
+file to find the file data when the Web application requested
+it. Unfortunately, tar was not designed for easy access to arbitrary
+files.</p>
+
+
+<p>A tar file is basically a linked list where one file&rsquo;s header contains
+a link to the next file (actually the file size, but that&rsquo;s also a
+pointer to the next block.) So if you are looking for a particular
+file in the archive, you have to do an O(n) search. In DrDr&rsquo;s case, n
+is 18,000.</p>
+
+
+<p>Other popular formats, such as zip or DAR, are just a little bit
+better. They have a single catalog for the entire archive&#8212;<wbr />a list
+of the files with pointers to their location in the archive. Still an
+O(n) search, but at least it plays better with the block cache by
+limiting seeking, etc.</p>
+
+
+<p>After a brief investigation of other formats and failing to find any
+efficient format, I decided to write my own. Essentially, I needed
+something more like a filesystem.</p>
+
+
+<h3><a name="(part._.Dr.Dr_s_.Archive_.Format)"></a>DrDr&rsquo;s Archive Format</h3>
+
+
+<p>The
+<a href="https://github.com/plt/racket/blob/master/collects/meta/drdr/archive.rkt">entire
+archive code</a> is a mere 150 lines of code.</p>
+
+
+<p>I had the advantage of not needing to keep track of permission or any
+UNIX attributes. In addition, I didn&rsquo;t need to deal with modifying the
+files, just recording them.</p>
+
+
+<p>The entire process of turning a directory into an archive is 28
+lines. Here&rsquo;s how it works:</p>
+
+
+<p>- Think of the file as a heap of values in some order</p>
+
+
+<p>- Go through all files and directories and append them one after
+another in this heap.</p>
+
+
+<p>- Encode directories as hash tables that map their contents&rsquo; paths to
+where they start and how long they are.</p>
+
+
+<p>- Ensure that you write directories after their contents (so you
+actually know where the files will start)</p>
+
+
+<p>- Write out the root directory hash as the first thing</p>
+
+
+<p>And that&rsquo;s it. It&rsquo;s a very obvious encoding of a filesystem. It gives
+us O(log n) number of accesses to find the file. All but one of those
+will be the reading of a Racket hash table that has another O(log
+n) (where n is the number of files in that directory) number of
+operations until we find the sub-directory.</p>
+
+
+<p>The code that does the lookup is a bit longer&#8212;<wbr />47 lines&#8212;<wbr />because it
+has quite a lot of error handling in case there&rsquo;s some sort of
+problem.</p>
+
+
+<h3><a name="(part._.The_outcome)"></a>The outcome</h3>
+
+
+<p>After implementing this, it was a simple matter to write a script to
+archive everything that had been produced. (I deleted the last
+revision to give me enough inodes to work with.) I decided to only use
+this archive format for pushes other than the first one hundred.</p>
+
+
+<p>This worked really nice. (Although, unfortunately, about a year ago I
+had a hard-drive crash and couldn&rsquo;t recover the data. Not super
+important, but a little annoying.)</p>
+
+
+<p>In the past year, we&rsquo;ve had 2,111 pushes, generated 75 G of data, with
+about 31 M per archived push and 150 M per non-archived push.</p>
+
+
+<p>It&rsquo;s experiences with beautiful, simple code like this, that make me
+say: I love Racket.</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[exec and Tail-call Optimization]]></title>
+    <link href="http://jeapostrophe.github.com/blog/2012/05/28/exec-vs-system/"/>
+    <updated>2012-05-28T00:00:00-06:00</updated>
+    <id>http://jeapostrophe.github.com/blog/2012/05/28/exec-vs-system</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m often bothered by programs that fail to use <span class="stt">exec</span> properly and
+instead use <span class="stt">system</span>. In this article, we&rsquo;ll review the difference
+and relate it to tail-call optimization.</p>
+
+
+<!-- more -->
+
+
+<p>In Unix, there&rsquo;s not really a way to start a totally new
+process. Instead, every process comes into being by another process
+duplicating itself with fork(). The two processes are identical at
+that point, except that the fork() call returns 0 to the child and the
+child&rsquo;s PID to the parent. Using this information, the two can behave
+differently.</p>
+
+
+<p>Often, what the child will do is change the program entirely by
+loading a system binary and executing its main function. That task is
+taken care of by the exec function, which receives the path to the
+binary, plus the arguments, and, optionally, the environment.</p>
+
+
+<p>Most programming languages give you access to a function named exec
+which is a wrapper for this functionality. Its also likely that they
+will also give a function named system that behaves almost the
+same. It&rsquo;s main difference is that it returns the exit code of the
+program when it exits and it invokes the shell to parse the
+command-line arguments and look up the binary&rsquo;s full path.</p>
+
+
+<p>If your program calls system in tail-position, meaning that the
+program does nothing with the exit code nor does anything else after
+ward, then you are wasting memory. In particular, the memory of the
+parent process which has nothing to do. You should have just exec&rsquo;d,
+not forked and then exec&rsquo;d.</p>
+
+
+<p>Here&rsquo;s an example:</p>
+
+
+<blockquote class="Rfilebox"></blockquote>
+
+
+<p class="Rfiletitle"><span class="Rfilename"><span class="stt">"bad.sh"</span></span></p>
+
+
+<blockquote class="Rfilecontent"><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt">#!/bin/bash</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt"></span></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt"><span class="stt">x=${1:-10}</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt"></span></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt"><span class="stt">if [ $x -eq 0 ] ; then</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">read</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">echo done</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt">else</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">./bad.sh $(expr $x - 1)</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt">fi</span></span></p></td></tr></table></blockquote>
+
+
+<p>The process tree for this bad code looks like this:</p>
+
+
+<p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt">/bin/zsh</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;</span><span class="stt">\_ bash bad.sh</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 9</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 8</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 7</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 6</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 5</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 4</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 3</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 2</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 1</span></span></p></td></tr><tr><td><p><span class="stt">|<span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">\_ bash bad.sh 0</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;</span><span class="stt">\_ ps f</span></span></p></td></tr></table></p>
+
+
+<p>Compared to:</p>
+
+
+<blockquote class="Rfilebox"></blockquote>
+
+
+<p class="Rfiletitle"><span class="Rfilename"><span class="stt">"good.sh"</span></span></p>
+
+
+<blockquote class="Rfilecontent"><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt">#!/bin/bash</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt"></span></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt"><span class="stt">x=${1:-10}</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt"></span></span><span class="hspace">&nbsp;</span></p></td></tr><tr><td><p><span class="stt"><span class="stt">if [ $x -eq 0 ] ; then</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">read</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">echo done</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt">else</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="stt">exec ./good.sh $(expr $x - 1)</span></span></p></td></tr><tr><td><p><span class="stt"><span class="stt">fi</span></span></p></td></tr></table></blockquote>
+
+
+<p>(Notice that line 9 is different&#8212;<wbr />we&rsquo;ve explicitly used exec.)</p>
+
+
+<p>This good code has a process tree like:</p>
+
+
+<p><table cellspacing="0"><tr><td><p><span class="stt"><span class="stt">/bin/zsh</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;</span><span class="stt">\_ bash good.sh 0</span></span></p></td></tr><tr><td><p><span class="stt"><span class="hspace">&nbsp;</span><span class="stt">\_ ps f</span></span></p></td></tr></table></p>
+
+
+<p>This is very similar to the concept of safe-for-space, or tail-call
+optimization, in programming languages. As you can see, unfortunately
+bash is not safe-for-space by default. That is, it doesn&rsquo;t keep track
+of when a call is in tail-position and automatically use exec rather
+than system.</p>
+
+
+<p>It&rsquo;s not just a problem with bash either, I&rsquo;ve never known any shell
+that can run this program correctly.</p>
+
+
+<p>In most cases, this is not problematic because the stack is unlikely
+to grow very large and the executed program is unlikely to run for a
+long time. However, it most often shows up as a problem with X11
+window managers and menu programs.</p>
+
+
+<p>Your Xsession initialization should always exec your window manager,
+because there&rsquo;s nothing else it needs to do afterward.</p>
+
+
+<p>An X11 menu program should also use exec to run the program, otherwise
+whenever you start, for example Emacs, the shell that started it will
+persist for the entire time you are running Emacs (presumably the
+entire time you are at the computer.) In addition, you should exec
+your menu program so that the shell that starts it is replaced as
+well.</p>
+
+
+<p>For example, the default Xmonad configuration does not do this
+correctly and will invoke dmenu without an exec, leaving around the
+shell forever. (dmenu is programmed correctly, though.)</p>
+
+
+<p>So, raise your right arm and say with me: "I will always exec in
+tail-position!"</p>
+
+]]></content>
+  </entry>
+  
+</feed>
