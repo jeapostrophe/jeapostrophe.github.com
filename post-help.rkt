@@ -47,7 +47,7 @@
     (append more
             (list
              (head-extra
-              `(link ([href "/atom.xml"]
+              `(link ([href "atom.xml"]
                       [rel "alternate"]
                       [title ,*BLOG-TITLE*]
                       [type "application/atom+xml"])))

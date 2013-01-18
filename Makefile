@@ -7,7 +7,11 @@ CATS=categories
 
 FLAGS=++xref-in setup/xref load-collections-xref --redirect-main "http://docs.racket-lang.org/"
 
-all:blog/index.html blog/atom.xml
+.PHONY: all build preview remake clean deploy
+
+all: build
+
+build: blog/index.html blog/atom.xml
 
 $(TITLES) blog/index.html: $(POSTS) $(BLOG) $(LIB)
 	raco make $(BLOG)
@@ -20,5 +24,22 @@ blog/atom.xml: $(ATOM) $(POSTS) $(TITLES)
 	raco make $(ATOM)
 	racket -t $(ATOM) -- $@
 
-clean:
-	rm -fr blog $(CATS) $(TITLES) posts/.auto*
+remake:
+	rm -f blog/index.html
+
+clean: remake
+	rm -fr $(CATS) $(TITLES) posts/.auto*
+
+deploy: build
+	git add .
+	git commit -m "Update" . || true
+	git push
+	git gc
+	cd blog ; \
+		git add . ; \
+		git commit -m "Update" . || true ; \
+		git push ; \
+		git gc
+
+preview: build
+	rk ~/Dev/scm/github.jeapostrophe/exp/dir-serve.rkt blog

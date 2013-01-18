@@ -23,9 +23,8 @@
               (link ([href ,*BLOG-URL*]))
               (updated ,(format "~a-~a-~aT00:00:00-00:00"
                                 last-year last-month last-day))
-              (id ,*BLOG-URL*)
-              ,@(for/list ([p (in-list (all-posts))]
-                           [i (in-range RECENT-POSTS)])
+              (id ,(format "~a/" *BLOG-URL*))
+              ,@(for/list ([p (in-list (all-posts))])
                   (define pd (filename->tag p))
                   (match-define
                    (regexp #rx"^(....)-(..)-(..)-"
@@ -45,10 +44,8 @@
                     (content ([type "html"])
                              ,(cdata #f #f
                                      (format "<![CDATA[~a]]>"
-                                             (file->string
-                                              (build-path here-path
-                                                          "blog"
-                                                          html-n))))))))))))
+                                             (xexpr->string
+                                              `(p "For the complete post, please visit " (a ([href ,this-url]) ,this-url) "."))))))))))))
 
 (module+ main
   (command-line

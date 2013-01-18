@@ -68,7 +68,7 @@
 
 (define (the-jump . _) @sb:centered{-})
 
-(define DISQUS_SHORTNAME "jeapostrophe")
+(define DISQUS_SHORTNAME "jaymccarthy")
 
 (define (the-end . _)
   (match-define (list year month day code) (current-finfo))
