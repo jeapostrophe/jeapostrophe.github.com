@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8" /><title>2013-01-21: The Early Bird Special Schedule</title><link rel="stylesheet" type="text/css" href="scribble.css" title="default" /><link rel="stylesheet" type="text/css" href="scribble-style.css" title="default" /><script type="text/javascript" src="scribble-common.js"></script><!--[if IE 6]><style type="text/css">.SIEHidden { overflow: hidden; }</style><![endif]--><link href="atom.xml" rel="alternate" title="Jay McCarthy" type="application/atom+xml" /><script type="text/javascript">var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30131476-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();</script></head><body id="scribble-racket-lang-org"><div class="tocset"><div class="tocview"><div class="tocviewlist" style="margin-bottom: 1em;"><div class="tocviewtitle"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_0&quot;);">&#9658;</a></td><td></td><td><a href="index.html" class="tocviewlink" data-pltdoc="x">Jay Mc<span class="mywbr"> </span>Carthy</a></td></tr></table></div><div class="tocviewsublisttop" style="display: none;" id="tocview_0"><table cellspacing="0" cellpadding="0"><tr><td align="right"></td><td><a href="cat-categories.html" class="tocviewlink" data-pltdoc="x">Categories</a></td></tr><tr><td align="right"></td><td><a href="archive.html" class="tocviewselflink" data-pltdoc="x">Archive</a></td></tr></table></div></div><div class="tocviewlist"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;">&bull;</td><td></td><td><a href="archive.html" class="tocviewlink" data-pltdoc="x">Archive</a></td></tr></table></div></div></div><div class="maincolumn"><div class="main"><div class="navsettop"><span class="navleft">&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="2012-10-02-multi-la-post.html" title="backward to &quot;2012-10-02: The Multi-language Nirvana&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="archive.html" title="up to &quot;Archive&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<span class="nonavigation">next &rarr;</span></span>&nbsp;</div><h4><a name="(part._post)"></a>2013-01-21: The Early Bird Special Schedule</h4><div class="SAuthorListBox"><span class="SAuthorList"><p class="author"><a href="index.html" data-pltdoc="x">Jay McCarthy</a></p></span></div><p><div class="SIntrapara"></div><div class="SIntrapara"><blockquote class="refpara"><blockquote class="refcolumn"><blockquote class="refcontent"><p>The source for this post is online at <a href="https://github.com/jeapostrophe/jeapostrophe.github.com/tree/source/posts/2013-01-21-schedule.scrbl">2013-01-21-schedule.scrbl</a>.</p></blockquote></blockquote></blockquote></div><div class="SIntrapara"><span style="font-weight: bold">Categories:</span> <a href="cat-categories.html#%28part._.Efficiency%29" data-pltdoc="x">Efficiency</a> <a href="cat-categories.html#%28part._.Family%29" data-pltdoc="x">Family</a> </div></p><p>I&rsquo;ve recently started having a new schedule that optimizes a lot of
+different things in my life. In this post, I describe the schedule and
+how I implemented it.</p><blockquote class="SCentered"><p>-</p></blockquote><p>As long as I can remember, I&rsquo;ve been an early-riser. I remember waking
+up hours before I needed to in elementary school so I could watch
+cartoons before school. When I was doing my undergrad degree, I
+preferred to take as many early classes as possible. When I was in
+grad school, I tried to be in my office reliably at 9am. Throughout
+this whole time, I tried to sleep from 10pm to 6am.</p><p>When I started professing, I continued that tradition and tried to be
+in around 9am, as well. However, since I was walking, it would take
+about 45 minutes to get in, so sometimes I would arrive around 9:15am,
+since I would typically leave at 8:30am. I would work for about three
+hours, then have lunch (normally about 40 minutes), then work for
+another three hours, before walking home around 4pm, so I would arrive
+back at my house at 5pm for dinner with my family. All together, I
+worked about six hours a day (a little more usually though, but rarely
+more than seven hours).</p><p>This was a fine schedule, but during the Christmas break, I was
+thinking about how the majority of my free time was when my kids were
+asleep. I was "free" between 6am and 8:30am (although really I was
+working out, reading my scriptures before leaving, etc) and then at
+night from 5pm to 10pm. Of these seven-ish hours, my kids were only
+awake for about two of them: 7am to 8am and 5pm to 6:30pm. The first
+hour didn&rsquo;t really count though, because I was busy getting ready for
+work and they were busy waking up. The second hour wasn&rsquo;t significant
+either because we had dinner and then we were putting them to
+bed. (I&rsquo;d like to note, however, that I had a lot of time to devote to
+the kids on the weekend.)</p><p>In the middle of the break I decided to try something new: I would
+wake up at 4am and go immediately to work, so I&rsquo;d arrive around
+5am. Rather than walking, I would run, so I could cut down on my
+travel time (and improve my fitness) a bit. I would then work for
+about seven hours and run back home for lunch around noon. After that,
+I&rsquo;d shower and be with my kids the rest of the day. After they went to
+bed at 6:30pm-ish, I&rsquo;d have time for myself (and my wife) until about
+8:45pm, when I got ready to go to sleep by 9pm.</p><p><div class="SIntrapara">This new schedule has the following features:
+</div><div class="SIntrapara"><ul><li><p>I sleep for 1 hour less. I don&rsquo;t think this is a major problem
+or difference, because I wasn&rsquo;t reliably going to bed at 10pm
+anyways.</p></li><li><p>I work for almost the exact same amount of time, but lean
+towards my previous maximum. In addition, I don&rsquo;t break for lunch, so
+I work more contiguously. (Lest you be worried for my students, I
+still give very liberal office hours: 7am to noon, every day.)</p></li><li><p>I work during the morning when there are very few interruptions
+or distractions.</p></li><li><p>I run more and feel much more fit. I used to run on Monday,
+Wednesday, and Friday for about 3 miles, but now I run every
+day (except the weekend) for 2.6 miles twice.</p></li><li><p>I spent almost six hours of quality time with my
+kids. Occasionally they take naps or have other activities, so that
+time can be own free time.</p></li><li><p>I still have two hours of totally free time for movies, etc in
+the evening with my wife.</p></li><li><p>My wife is happier too, because she goes to bed at the same time
+as me, but can sleep in later and enjoy more sleep than she used
+to. But still, she can wake up before the kids and get herself ready
+for the day.</p></li></ul></div></p><p>This has been an amazing and life-changing innovation in our
+family. It&rsquo;s great.</p><p>I used a few pieces of technology to help me in this change:</p><ul><li><p>The <a href="http://dailyroutineapp.com/">Daily Routine</a> iPhone
+app helped me figure out what I would be doing on an hourly basis and
+helps me keep to my intended schedule.</p></li><li><p>The <a href="http://www.clifbar.com/food/products_builders/">Clif
+Builder&rsquo;s Bar</a> feeds me in the morning and sometimes as a morning
+snack, so I don&rsquo;t need to spend a lot of time eating or getting things
+ready in the morning, yet still have the energy to run and work.</p></li><li><p>The <a href="http://runkeeper.com/">RunKeeper</a> iPhone app keeps
+track of my running stats, so I can improve my times and ensure I&rsquo;m
+not dawdling on my runs home.</p></li><li><p>A new <a href="http://www.fitbit.com/">FitBit</a> tracker and scale
+keeps track of my fitness and wight, so I can make sure I&rsquo;m not losing
+too much weight from running too much (or gaining too much weight from
+being home and snacking more.)</p></li></ul><p>I started with this new schedule almost a month ago and I don&rsquo;t see
+any reason I won&rsquo;t do it for a very long time. It&rsquo;s been a great
+blessing and I highly recommend it.</p><p><div id="disqus_thread"><script type="text/javascript">
+var disqus_shortname = 'jaymccarthy';
+var disqus_identifier = 'http://jeapostrophe.github.com/blog/2013/01/21/schedule/';
+var disqus_url = 'http://jeapostrophe.github.com/2013-01-21-schedule-post.html';
+var disqus_script = 'embed.js';
+(function () {
+var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+
+</script><noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript></div></p><div class="navsetbottom"><span class="navleft">&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="2012-10-02-multi-la-post.html" title="backward to &quot;2012-10-02: The Multi-language Nirvana&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="archive.html" title="up to &quot;Archive&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<span class="nonavigation">next &rarr;</span></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
