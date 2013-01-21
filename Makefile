@@ -1,4 +1,4 @@
-POSTS=posts/*
+POSTS=posts
 ATOM=atom.rkt
 LIB=post.rkt post-help.rkt posts.scrbl
 BLOG=blog.scrbl
@@ -13,7 +13,7 @@ all: build
 
 build: blog/index.html blog/atom.xml
 
-$(TITLES) blog/index.html: $(POSTS) $(BLOG) $(LIB)
+$(TITLES) blog/index.html: $(POSTS)/*scrbl $(POSTS)/*rkt $(BLOG) $(LIB)
 	raco make $(BLOG)
 	scribble --htmls --dest . $(FLAGS) $(BLOG)
 	rm -f compiled/blog*
@@ -25,10 +25,10 @@ blog/atom.xml: $(ATOM) $(POSTS) $(TITLES)
 	racket -t $(ATOM) -- $@
 
 remake:
-	rm -f blog/index.html
+	rm -fr blog/index.html $(POSTS)/compiled
 
 clean: remake
-	rm -fr $(CATS) $(TITLES) posts/.auto*
+	rm -fr $(CATS) $(TITLES) $(POSTS)/.auto*
 
 deploy: build
 	git add .
