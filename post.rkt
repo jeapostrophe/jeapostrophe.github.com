@@ -106,4 +106,4 @@
     (format "~a" (file-name-from-path file)))
   (apply sb:link the-link (keep-file file) more))
 
-(provide (all-defined-out))
+(provide postref postlink (all-defined-out))

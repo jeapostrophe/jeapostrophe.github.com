@@ -40,6 +40,9 @@
 (define (postref p)
   (secref "post" #:tag-prefixes (list (format "~a-" p))))
 
+(define (postlink p . more)
+  (apply seclink "post" #:tag-prefixes (list (format "~a-" p)) more))
+
 (define RECENT-POSTS 6)
 
 (define (google-analytics . more)
