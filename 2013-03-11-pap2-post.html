@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8" /><title>2013-03-11: Player as Programmer II: Fun</title><link rel="stylesheet" type="text/css" href="scribble.css" title="default" /><link rel="stylesheet" type="text/css" href="racket.css" title="default" /><link rel="stylesheet" type="text/css" href="scribble-style.css" title="default" /><script type="text/javascript" src="scribble-common.js"></script><!--[if IE 6]><style type="text/css">.SIEHidden { overflow: hidden; }</style><![endif]--><link href="atom.xml" rel="alternate" title="Jay McCarthy" type="application/atom+xml" /><script type="text/javascript">var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30131476-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();</script></head><body id="scribble-racket-lang-org"><div class="tocset"><div class="tocview"><div class="tocviewlist" style="margin-bottom: 1em;"><div class="tocviewtitle"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_0&quot;);">&#9658;</a></td><td></td><td><a href="index.html" class="tocviewlink" data-pltdoc="x">Jay Mc<span class="mywbr"> &nbsp;</span>Carthy</a></td></tr></table></div><div class="tocviewsublisttop" style="display: none;" id="tocview_0"><table cellspacing="0" cellpadding="0"><tr><td align="right"></td><td><a href="cat-categories.html" class="tocviewlink" data-pltdoc="x">Categories</a></td></tr><tr><td align="right"></td><td><a href="archive.html" class="tocviewselflink" data-pltdoc="x">Archive</a></td></tr></table></div></div><div class="tocviewlist"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;">&bull;</td><td></td><td><a href="archive.html" class="tocviewlink" data-pltdoc="x">Archive</a></td></tr></table></div><div class="tocviewlist"><table cellspacing="0" cellpadding="0"><tr><td style="width: 1em;"><a href="javascript:void(0);" title="Expand/Collapse" class="tocviewtoggle" onclick="TocviewToggle(this,&quot;tocview_2&quot;);">&#9658;</a></td><td></td><td><a href="" class="tocviewselflink" data-pltdoc="x">2013-<wbr></wbr>03-<wbr></wbr>11:<span class="mywbr"> &nbsp;</span> Player as Programmer II:<span class="mywbr"> &nbsp;</span> Fun</a></td></tr></table><div class="tocviewsublistbottom" style="display: none;" id="tocview_2"><table cellspacing="0" cellpadding="0"><tr><td align="right">1&nbsp;</td><td><a href="#%28part._.Only_.Fun_to_.Write%29" class="tocviewlink" data-pltdoc="x">Only Fun to Write</a></td></tr><tr><td align="right">2&nbsp;</td><td><a href="#%28part._.Story_.Heavy_.Games__.Fun_to_.Write_%29" class="tocviewlink" data-pltdoc="x">Story Heavy Games:<span class="mywbr"> &nbsp;</span> Fun to Write?</a></td></tr><tr><td align="right">3&nbsp;</td><td><a href="#%28part._.Next_.Time%29" class="tocviewlink" data-pltdoc="x">Next Time</a></td></tr></table></div></div></div><div class="tocsub"><div class="tocsubtitle">On this page:</div><table class="tocsublist" cellspacing="0"><tr><td><span class="tocsublinknumber">2<tt>&nbsp;</tt></span><a href="#(part._.Story_.Heavy_.Games__.Fun_to_.Write_)" class="tocsubseclink" data-pltdoc="x">Story Heavy Games:<span class="mywbr"> &nbsp;</span> Fun to Write?</a></td></tr><tr><td><span class="tocsublinknumber">3<tt>&nbsp;</tt></span><a href="#(part._.Next_.Time)" class="tocsubseclink" data-pltdoc="x">Next Time</a></td></tr></table></div></div><div class="maincolumn"><div class="main"><div class="navsettop"><span class="navleft">&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="2013-03-04-player-a-post.html" title="backward to &quot;2013-03-04: Player as Programmer&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="archive.html" title="up to &quot;Archive&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<span class="nonavigation">next &rarr;</span></span>&nbsp;</div><h4><a name="(part._post)"></a>2013-03-11: Player as Programmer II: Fun</h4><div class="SAuthorListBox"><span class="SAuthorList"><p class="author"><a href="index.html" data-pltdoc="x">Jay McCarthy</a></p></span></div><p><div class="SIntrapara"></div><div class="SIntrapara"><blockquote class="refpara"><blockquote class="refcolumn"><blockquote class="refcontent"><p>The source for this post is online at <a href="https://github.com/jeapostrophe/jeapostrophe.github.com/tree/source/posts/2013-03-11-pap2.scrbl">2013-03-11-pap2.scrbl</a>.</p></blockquote></blockquote></blockquote></div><div class="SIntrapara"><span style="font-weight: bold">Categories:</span> <a href="cat-categories.html#%28part._.Games%29" data-pltdoc="x">Games</a> </div></p><p><a href="2013-03-04-player-a-post.html" data-pltdoc="x">Last week</a> I introduced the basic
+framework I use to understand video games. In particular, I discussed
+how I see them as either "stateless" functions:</p><blockquote class="SCodeFlow"><p><span class="RktPn">(</span><span class="RktSym">GameState</span><span class="hspace">&nbsp;</span><span class="RktSym"><span class="nobreak">-&gt;</span></span><span class="hspace">&nbsp;</span><span class="RktSym">PlayerAction</span><span class="RktPn">)</span></p></blockquote><p><div class="SIntrapara">Or, "stateful" functions:
+</div><div class="SIntrapara"><blockquote class="SCodeFlow"><p><span class="RktPn">(</span><span class="RktSym">PlayerMemory</span><span class="hspace">&nbsp;</span><span class="RktSym">GameState</span><span class="hspace">&nbsp;</span><span class="RktSym"><span class="nobreak">-&gt;</span></span><span class="hspace">&nbsp;</span><span class="RktSym">PlayerMemory</span><span class="hspace">&nbsp;</span><span class="RktSym">PlayerAction</span><span class="RktPn">)</span></p></blockquote></div></p><p>In this post I use these notions to describe what makes a game "fun".</p><blockquote class="SCentered"><p>-</p></blockquote><p>It is important to realize that playing a game engages you with the
+function in two ways: you must write the functions (into your brain)
+and then you must run the function (using your brain).</p><h5>1<tt>&nbsp;</tt><a name="(part._.Only_.Fun_to_.Write)"></a>Only Fun to Write</h5><p>For some games, it is very amusing to write the function. For example,
+young children like to play Tic-Tac-Toe, in part (I believe), because
+they enjoy discovering which function is the correct one. In contrast,
+adults rarely like to play Tic-Tac-Toe because they&rsquo;ve figured out the
+correct function and just run it routinely.</p><p>There are other games with this same structure that can provide
+entertainment for longer, but ultimately fail. I include Sudoku and
+most Solitaire derivatives in this category, because it is relatively
+easy to master <span style="font-style: italic">the</span> strategy and then be done with game.</p><p>Other games don&rsquo;t even have this property. My favourite example is the
+card game War, where the <span class="RktSym">PlayerAction</span> type has only one
+element: meaning that there do not exist different functions to play
+the game, because the game lacks any player choice.</p><p>In general, games that are only fun to write lack the property
+of "replayability". I find that almost all "puzzle" games are in this
+category, because once you figure out the puzzle, there is no
+enjoyment afterwards. Nevertheless, this does not mean that they are
+terrible. I greatly enjoy the Professor Layton games and games like
+Picross.</p><p><span style="font-weight: bold">Summary:</span> The best games are fun to write <span style="font-style: italic">and</span> to execute.</p><h5>2<tt>&nbsp;</tt><a name="(part._.Story_.Heavy_.Games__.Fun_to_.Write_)"></a>Story Heavy Games: Fun to Write?</h5><p><div class="SIntrapara">Another kind of game that is commonly seen as lacking replayability
+are games that have a very heavy story component. In these games, the
+player extracts enjoyment for seeing unique game states:
+</div><div class="SIntrapara"><blockquote class="SCodeFlow"><table cellspacing="0" class="RktBlk"><tr><td><span class="RktPn">(</span><span class="RktSym"><a href="http://docs.racket-lang.org/reference/define.html#%28form._%28%28lib._racket%2Fprivate%2Fbase..rkt%29._define%29%29" class="RktStxLink" data-pltdoc="x">define</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">fun</span><span class="hspace">&nbsp;</span><span class="RktSym">game</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym">integral</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktSym">game</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://docs.racket-lang.org/reference/lambda.html#%28form._%28%28lib._racket%2Fprivate%2Fbase..rkt%29._~ce~bb%29%29" class="RktStxLink" data-pltdoc="x">&#955;</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">game-state</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktPn">(</span><span class="RktSym"><a href="http://docs.racket-lang.org/reference/if.html#%28form._%28%28quote._~23~25kernel%29._if%29%29" class="RktStxLink" data-pltdoc="x">if</a></span><span class="hspace">&nbsp;</span><span class="RktPn">(</span><span class="RktSym">is-unique?</span><span class="hspace">&nbsp;</span><span class="RktSym">game-state</span><span class="RktPn">)</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">1</span></td></tr><tr><td><span class="hspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="RktVal">0</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span><span class="RktPn">)</span></td></tr></table></blockquote></div></p><p>Traditional PC adventure games are classic examples of this: the
+puzzles are identical between runs and the fun is from viewing new
+scenarios, dialogue, cut-scenes, etc. Many older games lack any "real"
+choice, because there is only one linear sequence of game states that
+is possible, modulo puzzle failure. In fact, walkthroughs for these
+games often give instructions about how to fail in every unique way,
+so you can "see" everything in one playthrough.</p><p>When games like this offer different paths, it is common to hear
+complaints that the game forces too much "busy work" on the player who
+wants to see something new. The most common complaint of this form is
+when you can&rsquo;t skip cut-scenes.  Some modern games of this variety,
+such as
+<a href="http://en.wikipedia.org/wiki/999:_Nine_Hours,_Nine_Persons,_Nine_Doors">999:
+Nine Hours, Nine Persons, Nine Doors</a> and its sequel, have tools to
+quickly skip pieces of the game that you&rsquo;ve already experienced to
+optimize replays.</p><p>Traditionally the other genre where this lack of replayability is very
+common is Japanese roleplaying games (JRPGs). As a common example,
+many believe that the player actions of a game like
+<a href="http://en.wikipedia.org/wiki/Dragon_Quest">Dragon Quest</a> are
+boring ("Press X to Win") and the only enjoyment is the unraveling
+story. In the PlayStation-era, non-skippable cut-scenes were an
+incredibly common complaint against these games.</p><p>If a game allows skipping of story segments, it should ensure that
+necessary information to make progress in the game (such as where to
+go next) is displayed some other way.</p><p>I find it very disappointing that some modern trendy games totally
+lose the joy of playing the game in favour of experiencing the
+story. Games like Journey, the Walking Dead, or Dear Esther are
+described to be devoid of interesting gameplay and rest entirely on
+their story.</p><p>As an aside, I think the stories in most games are pretty bland and
+pathetic from a literary perspective, so I recommend that you don&rsquo;t
+limit your intake of fiction to just games, because you&rsquo;ll be sampling
+from a trivial repertoire.</p><p><span style="font-weight: bold">Summary:</span> Story is a liability when creating a fun game, because
+it takes attention away from the gameplay and is inherently
+un-replayable, no matter how good it is.</p><h5>3<tt>&nbsp;</tt><a name="(part._.Next_.Time)"></a>Next Time</h5><p>Next week we will continue with the analysis of which functions are
+fun to execute and discuss how the concept of "level" influences this
+framework.</p><p><div id="disqus_thread"><script type="text/javascript">
+var disqus_shortname = 'jaymccarthy';
+var disqus_identifier = 'http://jeapostrophe.github.com/blog/2013/03/11/pap2/';
+var disqus_url = 'http://jeapostrophe.github.com/2013-03-11-pap2-post.html';
+var disqus_script = 'embed.js';
+(function () {
+var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+
+</script><noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript></div></p><div class="navsetbottom"><span class="navleft">&nbsp;&nbsp;</span><span class="navright">&nbsp;&nbsp;<a href="2013-03-04-player-a-post.html" title="backward to &quot;2013-03-04: Player as Programmer&quot;" data-pltdoc="x">&larr; prev</a>&nbsp;&nbsp;<a href="archive.html" title="up to &quot;Archive&quot;" data-pltdoc="x">up</a>&nbsp;&nbsp;<span class="nonavigation">next &rarr;</span></span>&nbsp;</div></div></div><div id="contextindicator">&nbsp;</div></body></html>
