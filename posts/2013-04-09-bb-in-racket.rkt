@@ -222,6 +222,15 @@ items with values from 1 to 10 and weights of either 10 or 5:
 Our branch and bound finds an optimum by only looking at 1,709
 candidates out of the 1,073,741,824 (2^30) options.
 
+@bold{Exercise:} This knapsack instance has a problem: the bound and
+split operations do not work in constant time, because they sum the
+values and weights of different lists. Change the code to cache these
+computations in the option structure.
+
+@bold{Exercise:} This knapsack instance considers the items in the
+order that they are given. Change it so it tries the greedy solution
+first by sorting the items.
+
 If you'd like to use this code at home, you should put it in this
 order:
 
