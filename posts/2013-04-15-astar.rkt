@@ -223,13 +223,11 @@ path to nodes in the open set to cost @racket[+inf.0]:
 
 @chunk[<a-star-loop-per-neighbor>
        (define new-g-y (+ g-x (edge-cost x->y)))
-       (define add? (not (hash-has-key? node->best-path y)))
        (define old-g-y 
-         (if add? +inf.0 (hash-ref node->best-path-cost y)))
+         (hash-ref node->best-path-cost y +inf.0))
        (when (< new-g-y old-g-y)
          (hash-set! node->best-path-cost y new-g-y)
-         (hash-set! node->best-path y (cons x->y path-x)))
-       (when add?
+         (hash-set! node->best-path y (cons x->y path-x))
          (heap-add! open-set y))]
 
 This concludes the algorithm. When we run it on the example, the path
