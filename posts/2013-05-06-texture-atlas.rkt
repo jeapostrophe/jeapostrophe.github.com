@@ -88,8 +88,8 @@ some of the computations. This is a lot faster, in my example the
 program ran at about 30 to 40 FPS.
 
 Designing your renderer like this actually puts you on the path of
-being able to combine all your drawing into a single OpenGL that runs
-a GPU program that interprets the data and uses the texture atlas
+being able to combine all your drawing into a single OpenGL call that
+runs a GPU program that interprets the data and uses the texture atlas
 behind the scenes:
 
 @chunk[<gpu-render>
@@ -206,10 +206,10 @@ width and height.
               (listof any/c)
               (cons/c number? (listof placement?)))]))]
 
-The body of pack is fairly straight-forward: we decide what power of
-two to start with, then we order the elements to speed up the search,
-then we try atlas sizes until the first fits. (Since we try from the
-bottom, the first success is "optimal".)
+The body of @racket[pack] is fairly straight-forward: we decide what
+power of two to start with, then we order the elements to speed up the
+search, then we try atlas sizes until the first fits. (Since we try
+from the bottom, the first success is "optimal".)
 
 @chunk[<pack-body>
        <find-where-to-start>
