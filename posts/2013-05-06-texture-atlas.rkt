@@ -243,7 +243,8 @@ Next, we repeatedly try larger and larger sizes until one works. The
 core algorithm receives (a) the desired dimensions, (b) the object
 accessors, and (c) the objects and then returns the placements. We use
 a @racket[for/or] so that the first non-@racket[#f] result is returned
-and ensure that we always return @racket[#f] on failure.
+and ensure that we always return @racket[#f] on failure (which is
+impossible, by the way.)
 
 @chunk[<look-for-fit>
        (for/or ([try-pow2 (in-naturals starting-pow2)])
@@ -329,7 +330,7 @@ quadrants uniformly, but in fact each has a special
 meaning. Therefore, a better definition of @racket[quad] would be
 @racket[(struct quad layout (ul ur ll lr))], but that would require
 ugly code duplication in @racket[insert]. Similarly, we could be a
-little more efficient by ignoring the upper-right, because we know we
+little more efficient by ignoring the upper left, because we know we
 always put things in it when we create a split.
 
 This code produces beautiful atlases like:
