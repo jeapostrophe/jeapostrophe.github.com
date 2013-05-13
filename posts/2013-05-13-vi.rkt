@@ -12,7 +12,7 @@
 
 If you know me well, you know I hate mice and love
 keyboards. Naturally, this means I love things like
-link["http://en.wikipedia.org/wiki/Vi"]{vi},
+@link["http://en.wikipedia.org/wiki/Vi"]{vi},
 @link["http://en.wikipedia.org/wiki/Emacs"]{Emacs},
 @link["http://en.wikipedia.org/wiki/Conkeror"]{Conkeror}, and
 @link["http://en.wikipedia.org/wiki/Xmonad"]{xmonad}.
