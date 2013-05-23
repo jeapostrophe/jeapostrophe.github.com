@@ -186,7 +186,7 @@ This macro might look a little meaty, but it just left-associates
 until it reaches the end, whereupon it returns the stack, and contains
 an initialization case for the first call.
 
-This lets use write code like:
+This lets us write code like:
 
 @chunk[<dup-test>
        (check-equal?
@@ -194,7 +194,7 @@ This lets use write code like:
         (list 1 1))]
 
 However, using this directly in tests is a little awkward, because the
-stack is store oppositely from our intuitions:
+stack is stored oppositely from our intuitions:
 
 @chunk[<dup-test2>
        (check-equal?
