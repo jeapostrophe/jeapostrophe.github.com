@@ -339,7 +339,7 @@ the @racket[stack-spec] syntax class:
                     <stack-spec-attrs>)))]
 
 The next least complicated piece is the way we define the body of the
-stack transformer, in the non-lifted case:
+stack transformer, in the non-lifted cases:
 
 @chunk[<forthda:body>
        (cond
