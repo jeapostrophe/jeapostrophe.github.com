@@ -361,7 +361,9 @@ read a fixed number stack positions, call the Racket function, get
 back a fixed number of results, then put them back on the stack. We
 could use something like @racket[take] or @racket[split-at] for that,
 but it would be expensive, since we know exactly how many positions
-are needed at compile-time.
+are needed at compile-time. In addition, we'd have to use
+@racket[apply] and @racket[call-with-values] to invoke the Racket
+function, which is also expensive.
 
 Given that we know those two numbers, we can generate the appropriate
 number of temporary identifiers and then put them into two lists: one
