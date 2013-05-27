@@ -347,10 +347,10 @@ resets @racket[<>s] back to the empty list:
              #f)))]
 
 The most interesting piece is the @racket[<>] macro. If the macro is
-used by itself, then expand to a use of @racket[(<> 0)]. Otherwise,
-check if @racket[<>s] is as long as the static number. If it is, then
-expand to a use of that identifier. Otherwise error, with our special
-error structure:
+used by itself, then it expands to a use of @racket[(<>
+0)]. Otherwise, it checks if @racket[<>s] is as long as the static
+number. If it is, then it expands to a use of that
+identifier. Otherwise it errors, with our special error structure:
 
 @chunk[<best-tm-<>>
        (define-syntax (<> stx)
