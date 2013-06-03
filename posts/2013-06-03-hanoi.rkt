@@ -106,22 +106,22 @@ picture doesn't look nice.
          (rectangle (* d disc-width) disc-height 'solid "black"))
 
        (define (draw-stack s)
-         (for/fold ([img empty-image])
-             ([d (in-list s)])
-           (above img (draw-disc d))))
+         (apply above
+                empty-image empty-image 
+                (map draw-disc s)))
 
        (define (draw-stacks n ss)
-         (for/fold ([img empty-image])
-             ([s (in-list ss)]
-              [i (in-naturals)])
-           (define m (- n (length s)))
-           (beside/align
-            'top
-            img
-            (above (rectangle (* n disc-width)
-                              (* m disc-height)
-                              'solid "white")
-                   (draw-stack s)))))]
+         (apply
+          beside/align
+          'top
+          (map
+           (λ (s)
+             (define m (- n (length s)))
+             (above (rectangle (* n disc-width)
+                               (* m disc-height)
+                               'solid "white")
+                    (draw-stack s)))
+           ss)))]
 
 @section{Browsing}
 
