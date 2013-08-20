@@ -65,7 +65,7 @@ Here are some non-theses:
 
 The most important part of writing a thesis proposal is understanding
 what your thesis is. There are many people who just start working and
-figure what they've discovered later. This is bad science. It may
+figure out what they've discovered later. This is bad science. It may
 create knowledge, but it is bad science. A thesis is also called
 a "hypothesis". You should know what it is before you start.
 
