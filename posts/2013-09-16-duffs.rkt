@@ -89,7 +89,7 @@ The implementation of @racket[duff] is where the meat is.
 
 First, we need the @racket[switch] with the drop-through where the
 operations are duplicated. We've already implemented that in the
-@racket[cas-cad-e] macro from @postref["2013-06-24-cas-cad-e"].
+@racket[cas-cad-e] macro from @postref["2013-06-24-cas-cad-"].
 
 In the @racket[cas-cad-e], we have the cases in the order @racket[0]
 to @racket[K] down to @racket[1]. We can generate that as the template
