@@ -93,7 +93,7 @@ the way, this assumes we have this definition of doubly-linked-lists:
          (when head
            (set-node-last! head new))
          (unless (dll-tail l)
-           (set-dll-tail! l new))
+           (set-dll-tail! l head))
          (set-dll-head! l new))
        (define dll-cons! 
          (make-dll-cons!
