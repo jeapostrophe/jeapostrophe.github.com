@@ -203,7 +203,7 @@ Finally, this discussion merely explains what a thesis @emph{is} and
 @emph{how to propose} one for graduate study. Whether the thesis you
 have in mind is---(a) good science, (b) significant science, or (c)
 computer science research---are totally different questions with their
-own answers. Different committees are reviewers are likely to have
+own answers. Different committees and reviewers are likely to have
 very different standards on these questions and could approve or fail
 your proposal for failing to satisfy those points, despite your
 proposal being well-formed.
