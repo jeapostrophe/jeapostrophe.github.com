@@ -12,7 +12,7 @@
 The other week I was teaching my aging father-in-law about Sudoku and
 I needed to explain to him the rules and what techniques I use when I
 solve one. I like to avoid search as much as possible, because I think
-it is @postlink["2013-03-18-pap3"]{inhumane}. In this post, I encode
+it is @postlink["2013-03-19-pap3"]{inhumane}. In this post, I encode
 my technique as a Racket program that avoids search as much as
 possible.
 
