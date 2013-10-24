@@ -483,7 +483,7 @@ other kinds of reasoning for the solver was a lot of fun!
 
 But first let's remember what we learned today!
 
-Parsing ASCII is ugly.
+Parsing ASCII art is ugly.
 
 Backtracking and purely functional data-structures are a match made in
 heaven.
@@ -506,7 +506,7 @@ this order:
        <data-def>            
        <neighbor>
        <parser>
-       <propagate-one>
+       <propagate>
        <pivot>
 
        (define (propagate g)
