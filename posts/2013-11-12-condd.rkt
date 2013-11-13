@@ -124,7 +124,7 @@ something to the clause syntax:
          (condd2
           #:cond [(empty? l)
                   empty]
-          (match-define (cons fst rst) (first l))
+          (match-define (cons fst rst) l)
           #:cond [(zero? (modulo fst 3))
                   (cons 3 (f rst))]
           #:cond [(zero? (modulo fst 4))
@@ -161,7 +161,7 @@ there is no set of definitions for that layer:
          (condd3
           ([(empty? l)
             empty])
-          ((match-define (cons fst rst) (first l))
+          ((match-define (cons fst rst) l)
            [(zero? (modulo fst 3))
             (cons 3 (f rst))])
           ([(zero? (modulo fst 4))
@@ -187,6 +187,40 @@ parenthesis rather than keywords in the input syntax.
 
 I like the simplicity of this version, but I don't find it is easy to
 read and slightly prefer @racket[condd2], despite its flaws.
+
+@bold{Update:} Laurent Orseau had a great suggestion where you use a
+keyword for the definitions, because they are less common. I feel
+stupid for not thinking of this at first. Here's the program:
+
+@chunk[<ex2-condd4>
+       (define (f-condd4 l)
+         (condd4
+          [(empty? l)
+           empty]
+          #:do (match-define (cons fst rst) l)
+          [(zero? (modulo fst 3))
+           (cons 3 (f rst))]
+          [(zero? (modulo fst 4))
+           (cons (+ fst 4) rst)]
+          [else (list fst)]))]
+
+And the trivial definition:
+
+@chunk[<condd4>
+       (define-syntax (condd4 stx)
+         (syntax-parse stx
+           [(_)
+            #'(error 'condd4 "Fell through without else clause")]
+           [(_ [else . e])
+            #'(let () . e)]
+           [(_ #:do d . tail)
+            #'(let () d (condd4 . tail))]
+           [(_ [t:expr . e] . tail)
+            #'(if t
+                (let () . e)
+                (condd4 . tail))]))]
+
+I think this is clearly superior.
 
 @section{Yo! It's almost time to go!}
 
@@ -224,7 +258,10 @@ this order:
        <ex2-condd2>
 
        <condd3>
-       <ex2-condd3>]
+       <ex2-condd3>
+
+       <condd4>
+       <ex2-condd4>]
 
 Or just download the
 @link["https://github.com/jeapostrophe/exp/blob/master/condd.rkt"]{raw
