@@ -1,4 +1,8 @@
 
+/* This file is used by default by all Scribble documents.
+   See also "manual.css", which is added by default by the
+   `scribble/manual` language. */
+
 /* CSS seems backward: List all the classes for which we want a
    particular font, so that the font can be changed in one place.  (It
    would be nicer to reference a font definition from all the places
@@ -428,6 +432,8 @@ ol ol ol ol { list-style-type: upper-alpha; }
 
 /* A hack, inserted to break some Scheme ids: */
 .mywbr {
+  display: inline-block;
+  height: 0;
   width: 0;
   font-size: 1px;
 }
