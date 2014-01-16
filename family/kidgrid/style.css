@@ -1,0 +1,62 @@
+html, body {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+}
+
+#container {
+/*    min-height: 100%;
+    position: relative; */
+}
+
+#header {
+}
+
+#body {
+/*    padding-bottom: 1em; */
+}
+
+#footer {
+/*    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    height: 1em; */
+
+    padding-top: 1em;
+    text-align: center;
+}
+
+h3 {
+    text-align: center;
+    font-size: 75%;
+    font-style: italic;
+}
+
+table#activities {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table#days td {
+    padding: 0px;
+    border: 1px dashed black;
+}
+
+tr.activity td {
+    text-align: center;
+    font-size: 75%;
+}
+
+table#day td {
+    padding: 0px;
+    border: 1px solid black;
+}
+table#day td:nth-child(1) {
+    width: 10px;
+}
+table#day td:nth-child(2) {
+    width: 16px;
+}
+table#day td:nth-child(3) {
+    width: 24px;
+}
