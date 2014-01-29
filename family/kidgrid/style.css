@@ -1,5 +1,6 @@
 html, body {
     margin: 0px;
+    border: 0px;
     padding: 0px;
     height: 100%;
 }
@@ -40,6 +41,11 @@ table#activities {
 table#days td {
     padding: 0px;
     border: 1px dashed black;
+}
+
+table#days td.gapday {
+    border: 0px;
+    width: 66px;
 }
 
 tr.activity td {
