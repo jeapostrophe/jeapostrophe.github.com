@@ -5,6 +5,10 @@ html, body {
     height: 100%;
 }
 
+body {
+    font-size: 0.75em;
+}
+
 #container {
 /*    min-height: 100%;
     position: relative; */
@@ -29,13 +33,18 @@ html, body {
 
 h3 {
     text-align: center;
-    font-size: 75%;
+    /* font-size: 75%; */
     font-style: italic;
 }
 
 table#activities {
+    table-layout: fixed;
     margin-left: auto;
     margin-right: auto;
+}
+
+tr.boxes > td {
+    width: 50%;
 }
 
 table#days td {
@@ -48,9 +57,24 @@ table#days td.gapday {
     width: 66px;
 }
 
+td.died {
+    vertical-align: top;
+}
+
+td.died table tr {
+    vertical-align: top;
+    /* font-size: 75%; */
+}
+
+td.died table tr td span {
+    display: inline-block;
+    margin-right: 1em;
+    border: dotted 1px;
+}
+
 tr.activity td {
     text-align: center;
-    font-size: 75%;
+    /* font-size: 75%; */
 }
 
 table#day td {
