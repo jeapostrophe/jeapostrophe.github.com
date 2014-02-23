@@ -6,7 +6,7 @@ html, body {
 }
 
 body {
-    font-size: 0.75em;
+    font-size: 8pt;
 }
 
 #container {
@@ -64,6 +64,7 @@ td.died table tr {
 }
 
 td.died table tr td span {
+    font-size: 75%;
     display: inline-block;
     margin-right: 1em;
     border: dotted 1px;
