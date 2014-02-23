@@ -64,6 +64,7 @@ td.died table tr {
 }
 
 td.died table tr td span {
+    vertical-align: middle;
     font-size: 75%;
     display: inline-block;
     margin-right: 1em;
