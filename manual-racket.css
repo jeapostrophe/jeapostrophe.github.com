@@ -43,7 +43,7 @@ span.RktValDef, span.RktStxDef, span.RktSymDef
 .inherited td {
   font-size: 82%;
   padding-left: 0.5rem;
-  line-height: 1.3em;
+  line-height: 1.3;
   text-indent: 0;
   padding-right: 0;
 }
@@ -185,7 +185,7 @@ tbody > tr:first-child > td > .together {
 }
 
 .RktBlk {
-  white-space: normal;
+  white-space: pre;
   text-align: left;
 }
 
@@ -209,7 +209,8 @@ tbody > tr:first-child > td > .together {
 
 .defmodule td span.hspace:first-child {
   position: absolute;
-    width: 0;
+  width: 0;
+  display: inline-block;
 }
 
 .defmodule .RpackageSpec .Smaller,
@@ -304,4 +305,15 @@ tbody > tr:first-child > td > .together {
    left: 0px;
    top: 0px;
    z-index: 1;
+}
+
+/* ---------------------------------------- */
+/* For section source modules & tags */
+
+.RPartExplain {
+    background: #eee;
+    font-size: 0.9rem;
+    margin-top: 0.2rem;
+    padding: 0.2rem;
+    text-align: left;
 }
