@@ -31,7 +31,7 @@
 
 @centered{@emph{``Cowards die many times before their deaths, @(linebreak) The valiant never taste of death but once.''}}
 
-This is the blog of @link["http://faculty.cs.byu.edu/~jay/home/"]{Jay
+This is the blog of @link["http://jeapostrophe.github.io/home/"]{Jay
 McCarthy}, an assistant professor at @link["http://byu.edu/"]{Brigham
 Young University} in the @link["http://cs.byu.edu/"]{Computer Science
 Department}. I work on @link["http://racket-lang.org/"]{the Racket
@@ -40,10 +40,10 @@ programming language}.
 @itemize[
 
 @item{For course and other teaching information, visit my
-@link["http://faculty.cs.byu.edu/~jay/home/"]{home page}.}
+@link["http://jeapostrophe.github.io/home/"]{home page}.}
 
 @item{For publications and other professional activities, visit my
-@link["http://faculty.cs.byu.edu/~jay/home/"]{home page}.}
+@link["http://jeapostrophe.github.io/home/"]{home page}.}
 
 @item{For software projects, visit my
 @link["http://www.github.com/jeapostrophe"]{GitHub page}.}
