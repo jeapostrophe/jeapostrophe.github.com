@@ -1,0 +1,38 @@
+At the end of today's class you should
+
+KNOW:
+what is meant by mixed data (unions of data).
+
+BE ABLE TO:
+write a data definition for mixed data with a Java interface
+communicate to Java that a compound data structure belongs to a mixed data collection
+write functions over mixed data
+choose a set of good test cases for a function over mixed data.
+
+Exercises:
+
+0. Develop the function perimeter, which consumes either a circle or a square and computes the perimeter.
+
+1. Develop structure and data definitions for a collection of zoo animals. The collection includes
+
+* spiders, whose relevant attributes are the number of remaining legs (we assume that spiders can lose legs in accidents) and the space they need in case of transport;
+* elephants, whose only attributes are the space they need in case of transport;
+* monkeys, whose attributes are intelligence and space needed for transportation.
+
+Develop the function fitsHuh. The function consumes a zoo animal and the volume of a cage. It determines whether the cage is large enough for the animal. 
+
+2. The administrators of metropolitan transportation agencies manage fleets of vehicles. Develop structure and data definitions for a collection of such vehicles. The collection should include at least buses, limos, cars, and subways. Add at least two attributes per class of vehicle.
+
+3. Add rectangles to our 'area' program from class. For our purposes, the description of a rectangle includes its upper-left corner, its width, and its height.
+
+4. Extend the data definition of #1 so that animals endorse products, which are described by a product name and a product company. Write a function called 'endorse' that consums an animal and a product and produces an animal that endorses that product.
+
+5. Develop the function 'biggest', which consumes two animals from #1 and returns the one that takes up more space. (Hint: This requires a new function in the interface that ISN'T 'biggest'.)
+
+Optional Exercises:
+
+0. Develop the function 'center', which consumes either a circle or a square and computes the center point
+
+1. Add ellipses to our 'area' program from class. (Use Google/Wikipedia to discover what defines an ellipses.)
+
+2. Develop the function 'accident', which consumes an animal from #1 and returns a new animal that has been in an accident. Spiders lose legs in accidents, monkeys lose intelligence, and elephants shrink slightly.

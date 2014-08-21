@@ -1,0 +1,65 @@
+* Copying (2.4)
+** Moves all the live objects to one area
+** Not exactly GC (technically)
+** Work proportional to live objects
+
+* Stop-and-Copy w/ Semispaces (2.4.1)
+** Semispace collector w/ Cheney algorithm
+** Heap divided into two
+** Only one semispace used at a time
+** Allocation is free, Fragmentation is avoided
+** If more space is needed during an allocation, GC is triggered
+** Objects moved fromspace -> tospace
+** Cheney: Root set put in queue, children in queue, end-of-queue = no objs
+** Forwarding pointers
+*** What if there are multiple paths to an object?
+*** The obj is replaced with a pointer to where it is in the tospace
+
+* Efficiency (2.4.2)
+** Arbitrarily efficient given enough memory
+** Decreasing GC time means less frequent collection
+** Less frequent collection means larger semispaces
+** Alt: Less frequent means older average object age
+** Thus, probability an object becomes garbage is higher
+
+* Why use different techniques (2.6)
+** Asymptotic complexity nearly the same
+** Constants matter
+** If copying is 10 times the cost of sweeping, MS might be better
+** If space is smaller, none copying is obviously preferable
+** Large object spaces & hybrids
+** Conservative collection for non-moving GC
+*** Thinks anything that "looks like" a pointer is one
+
+* Problems w/ simple tracing (2.7)
+** Copying is free with large memories
+** Interferes with swapping
+** Copying might NOT improve locality
+*** Copying puts everything through the cache
+** Tracing is the reason there are pauses
+
+* Generational collection (4)
+** Assumption: Most objects live a very short time, while a small percentage of them live much longer
+** Therefore, a large fraction of objects survive many collections
+** Why does this improve GC: Faster GC time, but worse space*
+
+* Subheaps (4.1)
+** Different generations based on surviving different #s of collections
+*** Typically three
+** Must be able to collect young w/o looking at old
+*** But, old can point to new
+** "Write barrier" -- to detect integenerational pointers
+*** This introduces conservatism
+** Typing this is NOT done in reverse
+** Issues: Advancement policy, Heap organization, collection scheduling, intergenerational references
+
+* Generational Hypothesis revisited (4.5)
+** Radioactive decay: A fixed fraction of objects die a fixed period of time
+** GGC is good because it limits the scope of GC
+*** not because infant mortality is high 
+** Could also improve locality by pushing newly allocated pointers together
+** GGC essential tries to "predicate" object death
+*** there are theoretical reasons this is difficult
+** In fact, most GGC get the wrong generation: the youngest
+*** The youngest hasn't had time to die
+** Therefore, oldest-first is more efficient

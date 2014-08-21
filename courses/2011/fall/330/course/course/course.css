@@ -1,0 +1,22 @@
+table.lectures {
+    text-align: center;
+}
+table.lectures tr:nth-child(odd) {
+    background-color: #f0f0e0;
+}
+table.lectures td:nth-child(6) {
+    text-align: left;
+}
+table.lectures td:nth-child(8) {
+    text-align: right;
+}
+
+table.assignments {
+    text-align: center;
+}
+table.assignments tr:nth-child(odd) {
+    background-color: #f0f0e0;
+}
+table.assignments td:nth-child(2) {
+    text-align: left;
+}

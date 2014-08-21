@@ -1,0 +1,66 @@
+First
+-----
+
+Review homework (%, how to do it, using the labs/tas, etc...)
+
+Remind about google group and TA location
+
+TAs will sign names on GG
+
+HtDP - Chapter 2.2
+---------------
+
+area of a disk of radius r in math
+
+what is area when r = 5?
+
+we can name the value
+
+these math "rules" are functions
+
+write areaOfDisk
+
+once we create functions, they are indistinguishable from what comes with Java
+
+evaluate them with algebra (substitution)
+what about areaOfRing
+
+HtDP - Chapter 2.3
+-----------------
+
+We rarely turn math into programs
+
+"Company XYZ & Co. pays all its employees $12 per hour. A typical employee works between 20 and 65 hours per week. Develop a program that determines the wage of an employee from the number of hours of work."
+
+What is the actual problem?
+
+12 * h
+
+Discuss errors
+
+HtDP - Chapter 2.5
+-------------
+
+Design recipe...
+> understand the purpose
+-- contract
+-- header
+-- purpose statement
+
+> understand the problem
+-- examples
+
+> template
+
+> write the body
+-- fill in the ...
+
+> test
+-- run the examples
+
+Discuss some sample problems
+ - distance
+ - tithe
+ - areaOfSquare
+ - circumOfRect
+ - clampVolume

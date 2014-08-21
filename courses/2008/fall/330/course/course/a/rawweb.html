@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Raw Web Programming</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>You must complete this program with the same partner you had for
+&quot;Laziness&quot;.  This will be your team for the next few assignments.</em></p>
+
+<h2>Raw Web Programming</h2>
+
+<p>This assignment asks you to write a web program. At this point in the
+course, the purpose of this assignment seems unclear. Once the assignment has
+been handed in, however, we&#8217;ll introduce an entirely new way of
+programming the web which is intimately linked with one of the fundamental ideas
+of programming languages. By completing this assignment now, you&#8217;ll be
+better prepared to appreciate this idea when we introduce it in class. </p>
+
+<p>Though this assignment should not take you very long, we are giving you a
+lot of time because we know that not everyone is familiar with
+web programming; you may need to do some learning on your own.  Furthermore, to
+avoid last-minute problems, this project has an early &#8220;Hello,
+World!&#8221; hand-in in which you must demonstrate you have a web
+programming environment set up.</p>
+
+
+
+<h3>Choose Your Language</h3>
+
+<p>Unlike the other programming assignments in the course, in this one you will
+be able to use <strong>a programming language of your choice</strong>. If
+you&#8217;re already familiar with web programming, choose a language that
+you&#8217;re comfortable with. If you&#8217;re not, the web is a font of
+meta-information, so you should have little trouble in finding resources about
+programming for it.</p>
+
+<p>For example, your web program may run as:</p>
+
+<ul>
+
+<li><strong>A CGI script.</strong> CGI stands for &#8220;Common
+Gateway Interface&#8221; and is the simplest web-programming
+protocol. We recommend using CGI if you have never programmed a web
+application
+before. <a href="http://docs.cs.byu.edu/olddocproj/docs/web-setup/">See
+this page for help.</a></li>
+
+<li><strong>A Java servlet.</strong> If you have used Java servlets
+before, you may use them for this assignment.
+<strong>You will be responsible for starting and maintaining a Tomcat server
+instance</strong> for your servlet. Both traditional servlets and JSPs are
+acceptable.</li>
+
+<li><strong>A PHP script.</strong> Finally, you may use PHP.</li>
+
+</ul>
+
+<h3>&#8220;Hello, World!&#8221;</h3>
+
+<p>We&#8217;re want you to get your web programming setup sorted out early.
+You must demonstrate that you have by creating a &#8220;hello, world!&#8221;
+web application. The application should show a web page with the text
+&#8220;hello, world!&#8221; and the current time and date.</p>
+
+<p>We won&#8217;t require a formal handin for
+this. Instead, <strong>e-mail the me with the URL of your application
+and what language/environment you&#8217;re using</strong>. We must
+receive this e-mail by 2<small>AM</small> on the day after the due
+date.</p>
+
+
+<h3>Program Requirements</h3>
+
+<p>You will write the authoring half of a simple blogging tool.  (The
+publishing half that would complete the tool is outside the scope of this
+assignment.) Although this program is quite simple, it is representative of the
+core of much larger Web software (just as the interpreters we write in this
+course are themselves quite lean, but represent the core of large programming
+languages).</p>
+
+<p>Weblogs (&#8220;blogs&#8221;) are web pages that consist of a list of posts
+ordered so that newer content is at the top. For our purposes, a post
+is a title, somebody text, and a post date.  You must assume that the
+title and body are plain, ASCII-encoded text.  In particular, this means that
+your software will need to escape HTML entities.  For example, typing
+&#8220;&lt;b&gt;&#8221; into a text field should not make any part of the post
+bold.</p>
+
+<p>The main page of your web application should have:</p>
+<ul>
+<li>A list of posts, sorted correctly by date.</li>
+<li>A form for creating new posts, with a field for the title and a text area
+for the body.</li>
+</ul>
+
+<p>Upon submitting the form, the user should see a preview page that shows the
+post along with its date. <strong>The post is not shown on the main page until
+the user confirms it from the preview page</strong>, either through a link or a
+form button.</p>
+
+<p>We do not require that you save posts to disk, but you may need to, depending
+on your choice of web application environment. We require that your web
+application pass this persistence test: <strong>a post added from one computer
+should be visible from the main page on an entirely different computer</strong>,
+if the web server has not been restarted. You do not need to worry about
+concurrent accesses (i.e. you need not lock any data files).</p>
+
+</div>
+</body>
+</html>
+

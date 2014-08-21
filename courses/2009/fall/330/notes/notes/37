@@ -1,0 +1,45 @@
+* Macros and Language Design
+
+* R5RS
+** Programming languages should be designed not by piling feature on top of feature, but by removing the weaknesses and restrictions that make additional features appear necessary.
+
+* Scheme has a very powerful core, no restrictions, and macros
+
+* Macros do almost everything
+** But, the resulting code is not what the programmer wrote
+** Or what almost any programmer would write
+** Complicating error reporting and compilation
+
+* let macro
+** the compilation is inefficient: create and apply closure
+** no human would write the lambda
+** but macros do
+
+* switch macro
+** generates the same kind of code as let macro
+** compiler should optimize this
+
+* automata
+automaton init 
+ init : c -> more 
+ more : a -> more 
+         d -> more 
+         r -> end 
+ end : 
+
+* Interpreter for automata
+
+* Best implementation
+** Fast conditional dispatch
+*** case
+** Each state is quickly accessed
+*** pointers
+** Transition has low overhead
+*** gotos
+
+* Result of compilation
+
+* Automata compiler
+** Only uses tail-calls (not tail recursion)
+
+* Lightweight Compiler API!

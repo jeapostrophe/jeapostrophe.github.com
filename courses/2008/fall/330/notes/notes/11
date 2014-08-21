@@ -1,0 +1,23 @@
+* Three assignments out:
+** Written Lazy
+** Language design
+** Raw Web Programming
+
+* Replace environments with procedures
+* Change numbers? We could, but who cares?
+* Replace functions (closures) with functions (lambda)
+
+* Syntactic interpreter
+** Like our previous ones
+* Meta interpreter
+** Like this, uses features of language to implement similar features
+** Can be very hard if there is a mismatch in semantics of similar features
+** For example, laziness
+* Meta-circular interpreter
+** Meta interpreter for the language itself
+** Don't help understanding
+** Show linguistic power
+
+* Recursive environments w/ recursion
+
+

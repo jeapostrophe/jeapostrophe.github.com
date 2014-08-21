@@ -1,0 +1,29 @@
+6.1
+---
+
+Core of a game or animation
+
+Try to write translate
+
+Functions rarely take just one piece of data (number, boolean); instead they take many pieces
+
+Compound data combines a few atomic things---a description of a cd, a description of a point
+
+> define Posn
+-- data definition
+-- class + public
+-- public Posn
+
+> example points (3,4) (2*3, 2*4), (12,6-1)
+
+> pulling out pieces
+
+> distanceToPoint (from origin)
+
+design recipe "take stock" step has grown
+
+> translate (original, dx, dy)
+
+> time since midnight (hours, mins, secs)
+> boyfriend (name, hair, eyes, phone)
+> cheerleader (name, number)

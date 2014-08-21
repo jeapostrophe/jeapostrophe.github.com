@@ -1,0 +1,26 @@
+At the end of today's class you should
+
+KNOW:
+- what is meant by a nested structure
+
+BE ABLE TO:
+- create a nested structure
+- write a function to process a nested structure
+
+Exercises:
+
+0. A person consists of a name, age, address and telephone number. An address consists of a street, city, state, and zip code. Write the data definitions for person and address. Then write a function that satisfies the following contract and purpose:
+
+// dunstableSeniorHuh: person -> boolean
+// consumes a person, and produces true if the person is a senior
+// citizen (age >= 65) living in Dunstable, MA (zip code 1827), or false otherwise.
+
+1. Define a structure that keeps track of the cat's (x,y) coordinate and its happiness (expressed as a percentage number between 0 to 100.) Write a function called feed that consumes a cat and produces a cat with an increased happiness by 10%. Write a function called newspaper that decreases it by 15. Write a function called celestialize that returns a perfectly happy cat at the same position. Write a function called jump that increases a cat's y position by 10. These functions should all have the "cat -> cat" contract.
+
+2. Define a structure called zoo that contains two cats. Write versions of all the functions from #1, with names you choose, that return a zoo with the operation performed on one cat. For example, feedLeft could feed the first cat and feedRight could feed the second. These functions should all have the "zoo -> zoo" contract.
+
+3. Modify #2 to ensure that when cat's jump, they can't land on each other. Assume that cats are perfect circles with radius 5. If a jump would have a cat land another, leave them unmoved.
+
+Optional Exercises:
+
+0. Modify #1-3 such that cats have colors (a string) and can be dyed to a new color.

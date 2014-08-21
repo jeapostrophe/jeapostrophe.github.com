@@ -1,0 +1,253 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Extended Interpreter</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p>
+<em>You must do this assignment solo.  We know that some of you are
+not yet comfortable with Scheme; for that reason, we will weight this
+assignment very, very low in the overall score.  Doing poorly on it
+will not at all damage your course grade.  But, you should exploit
+this opportunity to become familiar with the style of programming you
+will do in the rest of the semester.</em></p>
+
+
+<h2>Extended Interpreter</h2>
+
+<!--<p>Like the first assignment, this is to be completed solo.</p>
+-->
+
+<ol>
+
+<li>Write a parser and interpreter for the CFWAE language we&#8217;ve
+discussed in class, extended with the language features described
+below.  Your interpreter should have eager application semantics and
+use deferred substitution.  Call the new language CFWAE (conditionals,
+functions, with, and arithmetic expressions).  </li> <br>
+
+<li>After completing the first part of the assignment, copy the resulting
+interpreter and modify it so that it has lazy application semantics. (We
+strongly recommend that you not attempt this part of the assignment until
+you&#8217;ve gotten the first interpreter done, thoroughly tested, and
+debugged!)  <i>Ensure you don&apos;t miss the change you must make to the <a href="#lazyvalue">type definitions</a> for this part.</i></li>
+
+</ol>
+
+<p>In each part of the assignment, implement the function <code>parse</code>,
+which consumes an expression in the language&#8217;s concrete syntax and returns
+the abstract syntax representation of that expression. <code>parse</code> must
+accept only expressions in the <a href="#grammar">grammar</a> of the language.</p>
+
+<p>In addition to <code>parse</code>, you must implement the function
+<code>interp</code>, which consumes an abstract syntax expression (as
+returned by the <code>parse</code> function) and returns a
+<code>CFWAE-value</code>. Please include a contract for every function that you
+write and include test cases that amply exercise all of the code you&#8217;ve
+written. </p>
+
+
+<h4>Features to Implement</h4>
+
+
+<dl>
+
+<dt>Conditionals</dt>
+
+<dd>
+<p>To save the trouble of having to add boolean values and operators over them,
+create the construct <code>if0</code> using the syntax described by the EBNF below.
+Note that <code>if0</code> has three branches:</p>
+
+<ul>
+<li>A test expression</li>
+
+<li>A &#8220;then&#8221; expression, which evaluates if the test expression
+evaluates to zero</li>
+
+<li>An &#8220;else&#8221; expression, which evaluates for any other number.</li>
+</ul>
+
+<p>Evaluation should signal an error for non-numeric test values.</p></dd>
+
+
+<!--
+<dt>Multi-armed <code>rec</code></dt>
+
+<dd>
+Using the datatype definition of environments, implement a multi-armed
+<code>rec</code> construct that cyclically binds zero or more identifiers. If
+there are multiple bindings of the same identifier in a single <code>rec</code>
+expression&#8217;s list of bindings, your interpreter should halt with an error
+message. Each named expression can access all the identifiers bound by the
+<code>rec</code>. All the named expressions must syntactically be functions.
+</dd>
+-->
+
+<dt>Multi-argument <code>fun</code></dt>
+
+<dd><p>Extend the <code>fun</code> language feature described in lecture so
+that functions can accept a list of zero or more arguments instead of
+just one.  All arguments to the function must evaluate with the 
+<i>same deferred substitutions</i>.  An example of a multi-argument fun:</p>
+
+<pre>
+{{fun {x y} {* x y}} 2 3}
+</pre>
+
+<p>This evaluates to 6.</p>
+
+<p>As you did for multi-armed <code>with</code>, you must ensure that the
+arguments to a function have distinct names.</p>
+
+
+
+</dd>
+
+</dl>
+
+<a name="grammar" />
+<h4>Syntax of CFWAE</h4>
+
+<p>
+The syntax of the CFWAE language with these additional
+features can be captured with the following EBNF:
+</p>
+
+<pre>
+&lt;CFWAE&gt; ::= &lt;num&gt;
+    | {+ &lt;CFWAE&gt; &lt;CFWAE&gt;}
+    | {- &lt;CFWAE&gt; &lt;CFWAE&gt;}
+    | {* &lt;CFWAE&gt; &lt;CFWAE&gt;}
+    | {/ &lt;CFWAE&gt; &lt;CFWAE&gt;}
+    | &lt;id&gt;
+    | {if0 &lt;CFWAE&gt; &lt;CFWAE&gt; &lt;CFWAE&gt;}
+    | {with {{&lt;id&gt; &lt;CFWAE&gt;} ...} &lt;CFWAE&gt;}
+    | {fun {&lt;id&gt; ...} &lt;CFWAE&gt;}
+    | {&lt;CFWAE&gt; &lt;CFWAE&gt; ...}
+where an id is not +, -, *, /, with, if0 or fun.
+</pre>
+
+
+<p>In this grammar, the ellipsis (<code>...</code>) means that the previous
+non-terminal is present zero or more times.</p>
+
+<p>If a <code>fun</code> or a <code>with</code> expression has duplicate
+identifiers, we consider it a syntax error. Therefore, such errors must be
+detected in <code>parse</code>. For example, parsing the following
+expressions must signal errors:
+
+<pre>
+{with {{x 10} {x 20}} 50}
+
+{fun {x x} 10}
+</pre>
+
+<h4>Testing Your Code</h4>
+
+<p><strong>You must include a contract for every function that you write and
+include test cases that amply exercise all of the code you&#8217;ve
+written.</strong> We will not give full credit to untested functionality, even
+if it is correct!</p>
+
+<p>Your parser and interpreter must detect errors and explicitly signal them by
+calling <code>(error ...)</code>.  We will consider an error raised internally
+by Scheme to be a bug in your code.</p>
+
+<p>For example, Scheme signals a &quot;divide by zero&quot; error if you
+attempt to evaluate <code>(/ 1 0)</code>.  Since we use Scheme&apos;s division
+function to implement division in CFWAE, you may be tempted to leave it to
+Scheme to signal division by zero errors for you.  However, you must signal the
+error yourself by explicitly testing for division by zero before calling
+Scheme&apos;s division procedure.</p>
+
+If you are not sure if an error raised by your program constitutes a bug,
+search the Help Desk for <code>test/exn</code>.  <code>test/exn</code> tests
+for errors, but only succeeds on errors that you explicitly signal.
+
+<h4>Support Code</h4>
+<p>
+Please once again use the "PLAI Scheme" language.  Your code 
+<strong>must</strong> adhere to the following template, without any changes:
+</p>
+
+<pre>
+(define-type Binding
+  [binding (name symbol?) (named-expr CFWAE?)])
+
+(define-type CFWAE
+  [num (n number?)]
+  [binop (op procedure?) (lhs CFWAE?) (rhs CFWAE?)]
+  [with (lob (listof Binding?)) (body CFWAE?)]
+  [id (name symbol?)]
+  [if0 (c CFWAE?) (t CFWAE?) (e CFWAE?)]
+  [fun (args (listof symbol?)) (body CFWAE?)]
+  [app (f CFWAE?) (args (listof CFWAE?))])
+
+(define-type Env
+  [mtEnv]
+  [anEnv (name symbol?) (value CFWAE-Value?) (env Env?)])
+
+(define-type CFWAE-Value
+  [numV (n number?)]
+  [closureV (params (listof symbol?))
+            (body CFWAE?)
+            (env Env?)])
+
+;; parse : expression -> CFWAE
+;; This procedure parses an expression into a CFWAE
+(define (parse sexp)
+  ...)
+
+;; interp : CFWAE Env -> CFWAE-Value
+;; This procedure interprets the given CFWAE in the environment 
+;; and produces a result in the form of a CFWAE-Value
+;; (either a closureV or a numV)
+(define (interp expr env)
+  ...)
+</pre>
+
+<p><a name="lazyvalue">However</a>, for the second part of the assignment (lazy
+application), you will need to add an <code>exprV</code> variant to
+<code>CFWAE-Value</code>.  That is, <code>CFWAE-Value</code> for
+<code>xinterp-lazy.ss</code> should read:</p>
+
+<pre>
+(define-type CFWAE-Value
+  [numV (n number?)]
+  [closureV (params (listof symbol?))
+            (body CFWAE?)
+            (env Env?)]
+  [exprV (expr CFWAE?) (env Env?)]))
+</pre>
+
+<h4>Handin</h4>
+<p>
+You should turn in two Scheme programs where each contains all of the 
+code needed to run your parser and interpreter.  One should be for the 
+eager evaluation, called "xinterp.ss", and the other for the lazy evaluation, 
+called "xinterp-lazy.ss".  You can also include a README or other relevant 
+files.</p>
+
+</div>
+</body>
+</html>
+

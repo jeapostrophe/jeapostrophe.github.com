@@ -1,0 +1,35 @@
+At the end of today's class you should
+
+KNOW:
+how to create functions with "static"
+how to name constants
+a function should be commented with a contract and a purpose
+programs are built by combining smaller computations into larger computations
+
+BE ABLE TO:
+create a function that performs an arithmetic calculation on its inputs
+write a contract and a purpose for a function
+
+Exercises:
+
+0. Define a function called tip that will add a 15% tip to a given number. Write a contract and a purpose for your function. Then define a function called shareWithTip that computes the share of the cost of a pizza, including the cost of the tip (refer to your answer to yesterday's sample exam question). Write a contract and purpose for shareWithTip.
+
+1. Define the function fahrenheitToCelsius, which consumes a Fahrenheit temperature and produces the Celsius equivalent. Use Google or Wikipedia to find the conversion formula.
+
+2. Define the function dollarToYen, which consumes a number of dollars and produces a number of yen. Use the Google search "1 dollar = yen" to find the current conversion.
+
+3. Define the function areaOfTriangle, which consumes the length of a triangle's side and the perpendicular height and produces the area. Use Google or Wikipedia to find the formula.
+
+4. Define the function convert3, which consumes three digits, starting with the least significant (meaning right-most when written positionally) digit, and produces the corresponding number. So, convert3(1,2,3) should produces 321 and convert3(3,2,1) should produces 123.
+
+5. Formulate the following expressions as functions:
+ a) n^2 + 10
+ b) (1/2)*n^2 + 20
+ c) 2 - (1/n)
+Determine their results for n = 2 and n = 9 by hand and with Java.
+
+6. Utopia's tax accountants always use programs that compute income taxes even though the tax rate is a solid, never-changing 15%. Define the program tax, which determines the tax on the gross pay.
+
+7. The local supermarket needs a program that can compute the value of a bag of coins. Define the program sum_coins. It consumes four numbers: the number of pennies, nickels, dimes, and quarters in the bag; it produces the amount of money in the bag. 
+
+8. An old-style movie theater has a simple profit function. Each customer pays $5 per ticket. Every performance costs the theater $20, plus $.50 per attendee. Develop the function total_profit. It consumes the number of attendees (of a show) and produces how much income the attendees produce.

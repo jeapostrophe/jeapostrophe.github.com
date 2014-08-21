@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Garbage Collection</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>You must complete this program with the same partner you had for
+&quot;Continuations (Written)&quot;.  This will be your team for the next few assignments.</em></p>
+
+<h3>Garbage Collection</h3>
+
+<p>In this assignment, you will implement two garbage collectors:
+<strong>mark &amp; sweep</strong>, and <strong>stop &amp;
+copy</strong>. As we have seen, garbage collection involves starting
+from a <em>root set</em> of references, which reside in local
+variables and stack frames, and searching for reachable values on the
+heap.</p>
+
+<h3>Writing your Garbage Collectors</h3>
+
+<p>Your garbage collectors must be written in the <i>GC Collector Scheme</i>
+language level.  This language defines an interface to a program&apos;s stack
+and heap that you will use to implement garbage collection.</p>
+
+<p>Your garbage collectors must implement the following functions:</p>
+
+<ul>
+
+<li><code>init-allocator :: -> void</code> The mutator implicitly calls this
+function after initializing the heap and before calling any allocation
+routines.  It is essentially a callback into the allocator indicating that the
+heap is ready.</li>
+
+<li><code>gc:cons :: first-addr rest-addr -> cons-addr</code> returns the
+address of a new cons cell with the given field addresses; the field addresses
+are presumed to be already allocated</li>
+
+<li><code>gc:cons? :: addr -> boolean</code> returns a boolean that indicates
+whether the given address refers to a cons cell</li>
+
+<li><code>gc:first :: cons-addr -> first-addr</code> and <code> gc:rest ::
+cons-addr -> rest-addr</code> return the fields of a given cons</li>
+
+<li><code>gc:set-first! :: cons-addr first-addr  -> void</code> and
+<code>gc:set-rest! :: cons-addr rest-addr  -> void</code> set the addresses of the first and last pointers of a cons cell</li>
+
+<li><code>gc:alloc-flat :: atomic -> number</code> allocates space for a flat value and returns the base address of the allocated block</li>
+
+<li><code>gc:flat? :: addr -> boolean</code>
+returns a boolean that indicates whether the given address refers to
+an atomic value</li>
+
+<li><code>gc:deref :: addr -> atomic</code> returns the atomic value stored at
+the given address</li>
+
+</ul>
+
+<p>To help you write these functions, the <i>GC Collector Scheme</i> language defines an interface for the heap and the roots:</p>
+
+<ul>
+
+<li><code>heap-size :: -> number</code> the size of the heap</li>
+
+<li><code>heap-set! :: addr atomic -> void</code> stores a value at the specified address</li>
+
+<li><code>heap-ref :: addr -> atomic</code> returns the value at the specified address</li>
+
+<li><code>get-root-set :: -> listof root</code> returns the roots of the collection</li>
+
+<li><code>read-root :: root -> addr</code> returns the address the root
+references</li>
+
+<li><code>set-root! :: root addr -> void</code> updates the root to reference the specified address</li>
+
+</ul>
+
+<p>Note that <code>get-root-set</code> accepts an arbitrary number of
+identifiers that it treats as roots and returns as part of the root set.  That
+is, <code>read-root</code> returns the cell address stored in the location
+referenced by the identifiers and <code>set-root!</code> mutates the identifier
+to reference a new cell address.  You may find this useful when you implement
+<code>gc:cons</code>; you may wish to add the <code>first</code> and
+<code>last</code> arguments to your root set in lieu of manually updating them if they move during garbage collection.</p>
+ 
+<h3>Testing your Garbage Collectors</h3>
+
+<p>You may write programs that exercise your garbage collectors using the <i>GC
+Mutator Scheme</i> language.  This language is a subset of Scheme that uses a
+garbage collector that you specify.  The first line of a test program must
+be:</p>
+
+<pre>(allocator-setup "collector.ss" heap-size)</pre>
+
+<p><code>"collector.ss"</code> must be the name of your collector&apos;s file.  <code>heap-size</code> is the size of the heap your collector will use.</p>
+
+<p>The remainder of the program is in a subset of Scheme with numbers, symbols,
+lists, etc.  The primitives of the language map directly to the procedures you
+define in your garbage collector.</p>
+
+<h3>Sample Code</h3>
+
+<p>To get you started, we&apos;ve provided a <a
+href="../templates/mutator.ss">sample mutator</a> and a <a
+href="../templates/collector.ss">trivial collector</a> that signals an error
+when the heap fills up.  (In fact, our collector does signal an error with the
+mutator we&apos;ve provided, if you don&apos;t increase the size of the
+heap.)</p>
+
+<h3>Notes</h3>
+
+<p>You must store bookkeeping data on the heap provided by <i>GC Collector
+Scheme</i>.  You may store 2-3 atomic values, such as addresses into the heap
+as variables in your garbage collector.  We will assume they represent machine
+registers.  However, all compound data structures must be on the heap.</p>
+
+
+<p>In particular, in the mark &amp; sweep collector, you should maintain a free
+list <strong>in the heap</strong>.  That is, you should not use any auxiliary
+data structure; instead, use the available space in the heap to keep track of
+the free list. You may use one extra box (&#8220;register&#8221;) to point to
+the start of the free list.  You may need to adjust your allocation accordingly
+to have enough space to maintain free list pointers! </p>
+
+<p>Some final words of advice:</p>
+
+<ul>
+
+<li> You will want to test your program with small heap sizes, so that
+the garbage collector runs frequently.  </li>
+
+<li>You do not need to compact memory in mark-and-sweep.</li>
+
+<li> You may find it convenient to use the Scheme construct
+<tt>set!</tt>, which allows you to mutate a variable without using
+boxes.  We recommend you use this feature only in one instance: when
+swapping the semispaces in the stop &amp; copy collector.  This will
+save you the trouble of unboxing the heap every time you use it.  </li>
+
+</ul>
+
+</div>
+</body>
+</html>
+

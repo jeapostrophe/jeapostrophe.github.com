@@ -1,0 +1,30 @@
+At the end of today's class you should
+
+KNOW:
+* That the data definition for an ancestor family tree (a fixed-width tree) requires a self-referential compound data structure inside a compound data structure.
+
+BE ABLE TO:
+* Write the data definition for an ancestor family tree.
+* Write functions over ancestor family trees.
+
+Exercises:
+
+0. Add a blood type attribute to family trees and write a function countType that consumes a bloodtype and a family tree and produces the number of people in the family tree who have the given bloodtype.
+
+1. Add a age attribute to family trees and write a function, averageAge, that takes a family tree and returns the average age of everyone in the tree.
+
+2. Write the function properBlueEyedAncestor that consumes a family tree and returns true only if an actual ancestor of the person given has blue eyes. (For example, I have blue eyes, but none of my ancestors do, so this function would return false on my family tree.)
+
+3. Develop a data definition for a "binary search tree". A binary search tree is either empty or a node that is a number (the "key"), a string (the "value"), and two binary search trees---"left" and "right". In the left tree, every node's key is less than its parent. In the right tree, every node's key is greater than its parent. This means the same key cannot appear in the tree multiple times. You do not need to enforce this property, just assume it is so.
+
+Develop a function, searchBst, that takes a binary search tree, a key, and a missing string. It should produce the value associated with the key if the key is in the tree or the missing string.
+
+4. Develop the function, inorder, that takes a binary search tree and produces a list of strings in the key order.
+
+5. Develop the function, oldestMatriarch, that takes a family tree and produces the info about the oldest woman on the matriarchal line.
+
+Optional Exercises:
+
+0. Develop the function, mothers, that takes a family tree and produces a list of the names of all the mothers in the tree.
+
+1. Develop the function, allInfo, that takes a family tree and produces a list of the infos of all the people in the tree.

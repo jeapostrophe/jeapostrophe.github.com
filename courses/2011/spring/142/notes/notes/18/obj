@@ -1,0 +1,40 @@
+- 18 -
+At the end of today's class you should
+
+KNOW:
+- What mutation is
+- The difference between internal and external mutation
+- How to analyze mutation-based programs with store tracking
+
+BE ABLE TO:
+- Write basic mutation-based programs
+- Use the Java 'while' construct
+- Use the Java 'FileReader' class
+
+Exercises:
+
+0. Perform store tracking on this program:
+
+int i = 0;
+int j = 1;
+i = i + j;
+j = j * 4;
+i = j - i;
+j = i * i;
+i = i + j;
+
+1. Write the remove, which takes a name and modifies the address book such that looking up the name in the future will always return false. (Hint: Write in accumulator style first!)
+
+2. Write isPrime, from last exercise, with a while loop.
+
+3. Create a program called letterCount that reads a file and prints out how many characters are in it. Write in accumulator style. (Remember the example we did in class!)
+
+4. Create a program called lineCount that reads a file and prints out how many lines are in it. Write in accumulator style. (Hint: The character for newlines is '\n'.)
+
+5. Create a program called wordCount that reads a file and prints out how many words are in it. Write in accumulator style. Remember, words are separated by one or more spaces. (Hint: The character for a space is ' '.)
+
+6. Convert #3 through #5 to use mutation.
+
+Optional Exercises:
+
+0. Write to10, from last exercise, with a while loop.

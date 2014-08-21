@@ -1,0 +1,32 @@
+* Review
+** CPS of add-two-numbers
+* Transforming library code
+* tally
+** Consumes a list of items and asks user for cost of each
+** Not web-safe, because of web-read
+** It is not a complete program, how to we translate it?
+** [Need a continuation argument]
+** [Pass the wrong k to inner call]
+** [Use the right k]
+** [Use k in the empty case]
+* total+s&h
+** Also a library call
+** But it calls tally/k, so what k to give it?
+** {The transformation gives names to intermediate results}
+* Essence of transformation
+** (f v1 ... vm) -> (f/k v1 ... vm k)
+* Higher-order
+** Convert get-one-temp & call
+** How do we change higher-order? Must look at map
+** [Make trivial map that calls f/k with id as cont]
+** TEST
+** [Must make map/k]
+** [Don't pass the cons to k]
+** TEST
+** [Fix the cons, but not the empty at the top]
+** TEST
+** [Fix]
+* Web transformation
+** Order of evaluation is decided
+** Global: affects all procedures in the program
+** Every function takes values... simplifies the language, used in compilers

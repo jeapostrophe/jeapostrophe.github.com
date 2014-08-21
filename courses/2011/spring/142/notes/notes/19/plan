@@ -1,0 +1,55 @@
+19
+== Structure Mutation ==
+
+We should always prefer internal mutation, like factorial, over external mutation, but external mtutation is used to build internal, so we must understand it well.
+
+Can we re-use factorial? What if we wanted to find two factorials? [Yes, do it]
+
+Can we re-use 'next'? What if we wanted to manage two lights? [No, there's only one 'color'.]
+-- Okay, well duplicate it
+-- Copy the code so that you have colorAtUniversity and colorAtState, nextAtUniversity and nextAtState
+-- This will be tedious, hideous and ugly.
+
+Where have we seen re-use before? [With objects]
+-- Move the original code into a new TrafficLight class (but keep the static variable!!!!)
+-- Now, we have lightAtUniversity and lighAtState
+-- But we can't look at the color in our main function
+-- Write a method that gives you the color
+-- Now we can finally test
+-- But, when we call .next() on one it affects the other!!
+
+Translate the static variable into a class variable
+-- [I don't know if this is true] say that we have to just name the new piece, but put its definition inside the constructor, just like we did with the other pieces
+-- We can't juse write "color = ..." anymore, we MUST write "this.color = ..." [I know that's wrong, but it is pedagogic to make it clear that it is a PIECE of the implicit argument.]
+-- This is a hint of how constructors can really do arbitrary computations and how objects can have more pieces
+-- Now the tests pass
+
+Elaborate on the mutation of structure contents
+-- Now that we made 'color' an attribute, we can write lightAtUniversity.color rather than lightAtUniversity.whatIsTheColor()
+-- Well, if we can write "this.color = "green"", can we write "lightAtUniversity.color = "green""?
+-- Is that good or bad?
+
+It is HORRIFIC:
+   lightAtUniversity.color = "purple"
+
+Our code will NEVER recover.
+
+Mutation allows OTHERS to break our invariants---that the color is always green, red, or yellow.
+
+Introduce 'private'
+-- So far everything has been public
+-- But because of mutation it is clear that this is unsafe
+-- Instead, everything should be private and we should provide methods to give access to the pieces we want
+
+Show that this protects...
+     String theColor = lightAtUniversity.whatIsTheColor();
+     theColor = "purple"
+     System.out.format("The light is %s, but should be %s%n", lightAtUniversity.whatIsTheColor(), "green");
+     // NOT purple!
+
+This is _encapsulation_
+
+Make a new PhoneBook class (separate from ListOfPhoneEntry) that implements add and lookup
+Create a two phone books
+
+**** Show a small cyclic list and that it causes simple functions to not return. Say that dealing with cyclic data is complicated and we won't cover it.

@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Type Inference</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>You must complete this assignment with Team 3.</em></p>
+ 
+<h3>Type Inference</h3>
+
+<p>For this assignment, we will use the <i>PLAI</i> language.</p>
+
+<h4>Part I: Parsing the Language</h4>
+
+<p>Write a parser for this language:</p>
+
+<pre>
+ &lt;expr&gt; ::= &lt;num&gt;
+          | true
+          | false
+          | {+ &lt;expr&gt; &lt;expr&gt;}
+          | {- &lt;expr&gt; &lt;expr&gt;}
+          | {* &lt;expr&gt; &lt;expr&gt;}
+          | {iszero &lt;expr&gt;}
+          | {bif &lt;expr&gt; &lt;expr&gt; &lt;expr&gt;}
+
+          | &lt;id&gt;
+          | {with {&lt;id&gt; &lt;expr&gt;} &lt;expr&gt;}
+          | {rec {&lt;id&gt; &lt;expr&gt;} &lt;expr&gt;}
+          | {fun {&lt;id&gt;} &lt;expr&gt;}
+          | {&lt;expr&gt; &lt;expr&gt;}
+
+          | tempty
+          | {tcons &lt;expr&gt; &lt;expr&gt;}
+          | {tempty? &lt;expr&gt;}
+          | {tfirst &lt;expr&gt;}
+          | {trest &lt;expr&gt;}
+</pre>
+
+<p>The <a href="../templates/type-inference-support.ss">support code</a> specifies the
+abstract syntax that your parser should return. Your parse function must have
+the name and contract <pre>parse :: S-exp -> Expr</pre> <i>You may assume
+that the s-expressions supplied to <code>parse</code> are valid</i>.
+
+<h4>Part II: Constraint Generation</h4>
+
+<p>Write a function called <code>generate-constraints</code> that accepts
+an expression and returns a list of constraints. You have the freedom to
+determine the precise contract of this function, including the representation of
+your constraints. However, we strongly recommend that you use the
+<code>Type</code> data structures as defined in the support code as part of your
+representation of constraints.  A few things to note:</p>
+
+<ul>
+
+<li><p>List operations are polymorphic; that is, you can create lists of numbers
+or booleans.</p></li>
+
+<li><p>The bound body of a rec binding does not have to be a syntactic function.
+However, you may assume that the rec-bound identifier only appears under a
+<code>{fun&nbsp;...}</code> in the bound body. In other words, the following
+expressions are legal:
+
+<pre>
+ {rec {f {fun {x} {f x}}}
+   ...}
+
+ {rec {f {with {y 4}
+           {fun {x} {f y}}}}
+   ...}
+</pre>
+
+while the following are not legal:
+
+<pre>
+ {rec {f f}
+   ...}
+
+ {rec {f {+ 1 f}}
+   ...}
+</pre>
+</p></li>
+
+<li><p>During constraint generation, you will need to generate fresh
+identifiers. The function <code>gensym</code> returns a unique symbol each time
+it is applied. (<code>gensym</code> accepts an optional symbol as an argument;
+the result of <code>(gensym 'x)</code> is then a unique symbol that &quot;looks
+like &quot; <code>'x</code>.)</p></li>
+
+</ul>
+
+<h4>Part III: Unification</h4>
+
+<p>Implement the unification algorithm from the lecture notes. Call the function
+<code>unify</code>. The <code>unify</code> function should accept a list of
+constraints and return a substitution.  However, <code>unify</code> should
+signal an error if two types cannot be unified or if the <i>occurs check</i>
+fails. Again, the precise contract of <code>unify</code> is up to you to
+define.</p>
+
+<h4>Part IV: Inferring Types</h4>
+
+<p>To infer the type of a program, parse it, generate constraints, and unify the
+constraints to get a substitution. From the substitution, you can determine the
+type of the program.</p>
+
+<p>In particular, define the function <pre>infer-type :: Expr -> Type</pre></p>
+
+<h4>Part V: Testing</h4>
+
+<p><code>infer-type</code> returns a <code>Type</code>, so you will need to test
+types for equality. This can be tricky due to type variables, particularly if
+<code>generate-constraints</code> calls <code>(gensym)</code> to generate unique
+type variables. The support code defines a function <code>((type=? t1)
+t2)</code> that returns <code>true</code> if <code>t1</code> and <code>t2</code>
+are equal, modulo renaming of variables. We&apos;ve included a few examples that
+show you how to use <code>type=?</code> with <code>test/pred</code> and
+<code>test/exn</code>. You are free to modify this function as you see fit or
+to not use it at all.</p>
+
+<p>You should write unit tests for all functions that you write.</p>
+
+
+<h4>Extra Credit</h4>
+
+<p> For a very small amount of extra credit, write a program in this language
+for which your algorithm infers the type <pre>(t-fun (t-var 'a) (t-var 'b))</pre> You shouldn&#8217;t attempt this problem until you&#8217;ve fully
+completed the assignment.</p>
+
+<h4>What Not To Do</h4>
+
+<p>You do <em>not</em> need to implement an interpreter for this language. </p>
+
+<p>You do <em>not</em> need to implement let-based polymorphism. </p>
+
+</div>
+</body>
+</html>
+

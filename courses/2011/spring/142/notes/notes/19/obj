@@ -1,0 +1,33 @@
+- 19 -
+At the end of today's class you should
+
+KNOW:
+- What "encapsulation" is
+
+BE ABLE TO:
+- Use object variables
+- Use the 'private' designation in Java
+
+Exercises:
+
+0. Create a program called fileCount that reads a file and prints how many characters, words, and lines it contains. Write in accumulator style.
+
+1. Redo #0 with object variable mutation.
+
+2. Develop a data definition for Hangman bodies, which are lists of parts. Write a function called "ripper" which returns a body with one less part.
+
+3. Develop a data definition for Hangman words, which are lists of characters. Make a list of Hangman words and a function called "randomWord" which takes a list and returns a random word in it. (Hint: new java.util.Random().nextInt(50) returns a random integer between 0 and 49.)
+
+4. Develop a function called 'reveal' which consumes two Hangman words (the target and the current) and a character (the guess) and returns a boolean that is true if the guess is in the target. In every position the target contained the guess, the current should be modified to contain the guess.
+
+5. Develop a program called 'hangman' which plays a game of Hangman with the user at the console. You should print out the current word and the body parts every round and allow the user to input a guess character. If the user guesses incorrectly, a body part should be removed. The game ends in success if the user guesses the word. The game ends in failure if the user loses all their body parts. The current should start off as '_'. You should make the target randomly selected.
+
+import java.io.InputStreamReader; // At the top
+...
+InputStreamReader user = new InputStreamReader(System.in); // In 'main'
+
+sets up 'user', such that user.read() is like reading a file but communicates with a user. However, everytime the user presses a letter, they must press Return for the program to receive it. The Return will also be sent to the program, so the program should ignore every other read().
+
+Optional Exercises:
+
+0. Develop a data definition for intersections with four traffic lights. Develop a function called 'switch' that advances the entire intersection's state to the next appropriate configuration. Make sure perpendicular directions aren't green at the same time! You will get an additional extra credit if you do it in accumulator style first. You will get another if you do store tracking on example of at least 6 switchings.

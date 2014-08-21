@@ -1,0 +1,19 @@
+At the end of today's class you should
+
+KNOW:
+where to find information about this course
+that a program performs computations on data
+the "shape" of a program in Java
+
+BE ABLE TO:
+convert an arithmetic computation into a Java program
+
+RESOURCES:
+http://download.oracle.com/javase/tutorial/getStarted/cupojava/unix.html#unix-2
+https://cs.byu.edu/students
+http://download.oracle.com/javase/tutorial/java/data/numberformat.html
+http://download.oracle.com/javase/tutorial/java/data/beyondmath.html
+
+Exercises:
+
+0. You and your friends decide to order a pizza and share the cost according to how many slices you eat. The pizza is cut into 8 slices. You eat 3 of them. If the pizza costs $12, how much should you contribute? Write a program to perform the computation.

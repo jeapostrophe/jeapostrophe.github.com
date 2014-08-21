@@ -1,0 +1,301 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Implementing Prolog</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>Complete this assignment with Team 3.</em></p>
+
+<h3>Implementing Prolog</h3>
+
+<p>In this assignment, you will implement Prolog-style logic variables
+and backtracking search using Scheme's macros and continuations.  In
+particular, you must implement the following:
+
+<ul>
+<li> <code> =succeed </code>: succeeds exactly once </li>
+
+<li> <code> =fail </code>: does not succeed </li>
+
+<li> <code> (== e1 e2) </code>: attempts to unify <code>e1</code>
+with <code>e2</code> (succeeds at most once)
+
+<li> <code> (=var (v ...) e) </code>: binds all of the <code>(v
+...)</code> to fresh logic variables and evaluates <code>e</code> in the
+extended environment </li>
+
+<li> <code> (_) </code>: returns a fresh anonymous variable (its binding
+always succeeds and affects nothing else)
+
+<li> <code> (=or e ...) </code>: searches for variable assignments that
+satisfy <b>any</b> of the <code>e ...</code> expressions
+
+<li> <code> (=and e ...) </code>: searches for variable assignments that
+satisfy <b>all</b> of the <code>e ...</code> expressions
+</ul>
+
+
+Some of these abstractions may be implementable as Scheme procedures,
+while others will require the use of macros.  In either case, recall
+the pattern we developed in class for performing backtracking: the
+unification and search primitives (i.e. <code>=succeed</code>, 
+<code>=fail</code>, <code>==</code>, <code>=or</code>, and
+<code>=and</code>) consume a <b>failure continuation</b> (to be
+invoked on failure) and, if successful, return a <b>success
+continuation</b> (to allow resumption of the search).  This pattern
+prevents the Prolog embedding from communicating ordinary program
+answers through procedure return values.  Instead it uses logic
+variables, which you will need to update imperatively, taking care to
+restore when backtracking.
+
+In addition to these linguistic extensions, you must also implement the
+following testing interface:
+
+<ul>
+<li> <code> (=find-all (v ...) e) </code> : returns a list of all the
+solutions to <code>e</code>; each solution is a list of variable
+bindings (one binding for each of the <code>v ...</code>), and each
+variable binding is a two-element list consisting of the quoted
+variable name (a symbol) and its value.  Note that if the value is a 
+list, it should be returned as a Scheme list.  The solutions should be
+returned in their order of discovery (by a left-to-right depth-first
+search), and each solution should list the variables in the order
+provided.</li>
+
+<li> <code> (=find-some n (v ...) e) </code> : returns a list of solutions
+to <code>e</code>, as in <code>(findall ...)</code> from above, except
+that search is bounded to at most <code>n</code> solutions (this allows us
+to test on queries with infinite solutions)
+
+</ul>
+
+<p> Note that there is nothing special about the variables bound by 
+<code>=find-all</code> and <code>=find-some</code>.  They are simply the 
+logic variables whose values the user is interested in (v ...).
+
+<h4>Data Types</h4>
+
+There are two data types that you have to deal with in your 
+unification process: flat types and cons types.  Flat types 
+(e.g. numbers, symbols, strings) can be bound directly to logic variables.  
+Cons types are compound objects that may have other data types or 
+even logic variables within them.
+
+You must implement <code>(=cons f r)</code> which produces a cons
+of f and r.  Essentially, this behaves exactly like cons except that 
+it stores the data in a representation you define to facilitate 
+unification.  Here is a definition for <code>=list</code>:
+
+<pre>
+(define =list
+  (lambda args
+    (if (empty? args) '()
+        (=cons (first args) (apply =list (rest args))))))
+</pre>
+
+Your definition of <code>=cons</code> should behave nicely with this. 
+Thus,
+
+<pre>
+(show (x y) (== (=cons 1 (=cons (=cons 2 '()) '())) (=list x y)))
+</pre>
+
+should successfully find <code>x=1, y=(2)</code>.  Note here that 
+<code>y</code>'s value is not implementation specific; it is a standard 
+Scheme list.
+
+<h4>Interactive Testing</h4>
+
+These are not required by the assignment, but to aid in interactive 
+testing (as shown in the examples below), you may find the following 
+two definitions helpful:
+
+<pre>
+(define resumer-box (box 'resumer))
+
+(define (next) ((unbox resumer-box) 'dummy))
+(define-syntax show
+  (syntax-rules ()
+    [(show (vars ...) e)
+     (=var (vars ...)
+           (let/cc esc
+             (let/cc fk
+               (esc (let ([next (e fk)])
+                      (set-box! resumer-box next)
+                      (printf "~a: ~a~n" (quote vars) (lv-value vars))
+                      ...
+                      (void))))
+             'fail))]))
+</pre>
+
+where <code>lv-value</code> accesses the value stored in the given 
+logic variable.
+
+<p>Please note that these definitions are <em>very</em> implementation 
+specific.  If you would like to use them for testing, we not only encourage you, but we expect you to modify them to make them work with your implementation.
+
+<h4>Testing</h4>
+
+Please use the following definitions to help you with your testing:
+
+<pre>
+;; symbol -> boolean : returns true if and only if the given
+;; symbol is an uninterned symbol
+(define (gensym? s)
+  (not (equal? (string->symbol (symbol->string s)) s)))
+
+;; list X list -> boolean : takes two bindings (for example, returned
+;; from =find-all) and returns true if and only if the two variables
+;; they bind are equal to the same thing.
+(define (binding-equal? b1 b2)
+  (equal? (second b1) (second b2)))
+
+;; Prolog-Expr X symbol X bool-Exprs ... -> Test result : Takes a 
+;; (=find-all ...) or (=find-some ...), an identifier, and a set of 
+;; expressions that evaluate to booleans when the identifier is bound 
+;; to the result of the given Prolog-expr.  The test passes if and 
+;; only if all of the boolean expressions are true.
+(define-syntax test-prolog
+  (syntax-rules (test-prolog)
+    [(test-prolog find-expr result-id bool ...)
+     (test (let ([result-id find-expr])
+             (and bool ...)) true)]))
+</pre>
+
+<h4>Notes</h4>
+<ul>
+<li>Please do not use global variables for this assignment.  We expect your implementation 
+to have the ability to do a query, capture the continuation returned, do a different 
+query, and then invoke the first continuation with no trouble.
+
+<li>Unbound variables should have a unique "value" in their output.  That is, if 
+<code>y</code> is unbound, it should have a unique symbol as its value.  If 
+<code>x</code> and <code>y</code> are dependently unbound, they should have 
+the same unique symbol as their values.
+
+<li>Remember that order counts.  Please carefully read the definitions for =find-all 
+and =find-some.  Even if your results are correct, if they are in the wrong order 
+or format, they will be marked as incorrect.
+
+<li>Remember that <code>=cons</code> is a construct that you use to make lists 
+with logic variables in them; it's not necessarily a list itself.  That's why 
+if you are making 
+a test which should bind the logic variable <code>X</code> to, say,
+<code>(=cons 1 '())</code>, the test case should check that the result 
+equals <code>(cons 1 '())</code> or <code>'(1)</code> rather than 
+<code>(=cons 1 '())</code> to build 
+the result.
+
+<li>Remember to implement the occurs check during unification.
+</ul>
+
+<h4> Example 1: Simple Search </h4>
+
+<p>
+You might want to start by just testing <code>=and</code> and
+<code>=or</code> with success and failure (no logic variables).  In
+this restricted setting, there are a couple of useful properties:
+namely, if <code>e1</code> succeeds in <i>n1</i> ways, <code>e2</code>
+succeeds in <i>n2</i> ways, etc., then <code>(=or e1 e2 ...)</code>
+succeeds in <i>n1 + n2 + ...</i> ways, and <code>(=and e1 e2
+...)</code> succeeds in <i>n1 * n2 * ...</i> ways.  For instance,
+
+<pre>
+(=and (=or =succeed =succeed =fail =succeed)
+      (=or =fail =succeed =succeed))
+</pre>
+succeeds in six ways.  The first <code>=or</code> succeeds in three
+ways, the second <code>=or</code> succeeds in two ways, and the
+<code>=and</code> combines them in all possible ways.
+
+Likewise,
+
+<pre>
+(=or (=and =succeed =succeed)
+     (=and =fail =succeed =succeed)
+     (=and =succeed))
+</pre>
+succeeds in two ways.  The first and third <code>=and</code>s each
+succeed in one way, and the <code>=or</code> explores both of
+them.
+
+<p>
+You can use <code>show</code> (with an empty variable list) and
+<code>next</code> to count how many times a query succeeds. You can 
+also use the following test-prolog expression:
+
+<pre>
+(test-prolog (=find-all () (=or (=and =succeed =succeed)
+                                (=and =fail =succeed =succeed)
+                                (=and =succeed)))
+             result
+             (= (length result) 2))
+</pre>
+<br>
+
+<h4> Example 2: Family Trees </h4>
+
+<p>
+As a more complicated example, suppose we have the following
+definitions:
+
+<pre>
+(define (=parent c p)
+  (=or (=and (== c 'vito) (== p 'dom))
+       (=and (== c 'sonny) (== p 'vito))
+       (=and (== c 'michael) (== p 'vito))
+       (=and (== c 'fredo) (== p 'vito))
+       (=and (== c 'sophia) (== p 'michael))
+       (=and (== c 'tony) (== p 'michael))))
+
+(define (=ancestor X Y)
+  (=or (=parent X Y)
+       (=var (Z)
+             (=and (=parent X Z)
+                   (=ancestor Z Y)))))
+</pre>
+Then we get the following query results:
+<pre>
+> (show (x) (=ancestor x 'vito))
+x: sonny
+> (next)
+x: michael
+> (next)
+x: fredo
+> (next)
+x: sophia
+> (next)
+x: tony
+> (next)
+'fail
+> (find-all (x) (=parent x 'michael))
+(list (list (list 'x 'sophia))
+      (list (list 'x 'tony)))
+> (find-some 3 (x y) (=ancestor x y))
+(list (list (list 'x 'vito) (list 'y 'dom))
+      (list (list 'x 'sonny) (list 'y 'vito))
+      (list (list 'x 'michael) (list 'y 'vito)))
+</pre>
+
+</div>
+</body>
+</html>
+

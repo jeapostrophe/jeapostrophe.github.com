@@ -1,0 +1,17 @@
+* Store passing style
+
+* New 'box' value
+* Implement newbox, setbox, openbox
+
+* Env-passing is linear, but store is threaded
+** Scope vs Extent
+** Difference between names and values
+** Some languages (C/C++) confuse them and destroy values when names go away
+
+***
+
+* We have mutable data structure, but not 'variables'
+* How do we add 'set'?
+** Just use env-lookup, but not store-lookup (l-value)
+** Compare to C
+* Interaction with function application?

@@ -1,0 +1,36 @@
+20
+== Arrays ==
+
+[This day is deliberately short, because yesterday might have run long and this is really complicated.]
+
+Some structures are inherently mutable and cannot be constructed any other way.
+
+An array is a homogenous vector of values.
+
+Introduce 'for'
+
+Write sumArray (int[])
+
+Show that it is a length-polymorphic
+-- This is why arrays exist, the same thing cannot be done with structures because they always have the same number of pieces
+
+Write sums
+-- Replaces each element with itself added to all subsequent elements
+-- Write in accumulator style with a helper
+-- Translate to a for form
+-- Why: We can count down, we can develop with accumulator style and translate, even though there is other mutation going on
+
+Write andArray (boolean[])
+-- We can have arrays of everything
+
+Write inPlaceSort (int[])
+-- Refer to http://www.htdp.org/2003-09-26/Book/curriculum-Z-H-53.html (figures 126 and 127, for a referesher)
+
+== Congrats ==
+
+You are a programmer! Go forth and conquer.
+
+Everything else is just learning the domains of existing libraries people have put together.
+
+Make sure you review the details on when the last assignment is due:
+     https://mail.google.com/mail/?shva=1#sent/13037927b51e9225

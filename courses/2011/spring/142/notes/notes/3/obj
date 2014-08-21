@@ -1,0 +1,70 @@
+At the end of today's class you should
+
+KNOW:
+that the Java function 'System.out.format' can be used to automate testing
+that tests should be written before the function is defined
+that 'if' and 'else' is the way to ask a true/false question in a Java program
+that Java has a 'boolean' data type to represent true/false values
+that words can be represented as strings in a Java program
+
+>> Formulate auxiliary function definitions for every dependency between quantities mentioned in the problem statement or discovered with example calculations.
+>> Give names to frequently used constants and use the names instead of the constants in programs.
+
+BE ABLE TO:
+write test cases for a function using 'System.out.format'
+write a Java program that makes a decision using 'if' and 'else'
+write a Java program that consumes and/or produces strings
+
+REFERENCES
+http://download.oracle.com/javase/tutorial/java/data/numberformat.html
+http://download.oracle.com/javase/tutorial/java/nutsandbolts/if.html
+http://download.oracle.com/javase/tutorial/java/nutsandbolts/op2.html
+http://download.oracle.com/javase/tutorial/java/data/strings.html
+
+Exercises:
+
+0. Write a Java function called sign that consumes a number, and returns one of the words positive, negative, or zero depending on the sign of the number. For example,
+
+sign(-2)
+
+would return "negative"
+
+Comment your function with a contract and purpose, and write a set of test cases for your function.
+
+1. The United States uses the English system of (length) measurements. The rest of the world uses the metric system. So, people who travel abroad and companies that trade with foreign partners often need to convert English measurements to metric ones and vice versa.
+
+Here is a table that shows the six major units of length measurements of the English system:
+
+English                	metric
+1 inch				=	2.54	cm
+1 foot	=	12	in.
+1 yard	=	3	ft.
+1 rod	=	5(1/2)	yd.
+1 furlong =	40	rd.
+1 mile =  	8	fl.
+
+Develop the functions inchesToCenti, feetToInches, yardsToFeet, rodsToYards, furlongsToRods, milesToFurlongs.
+
+Then, develop the functions feetToCenti, yardsToCenti, rodsToInches, and milesToFeet.
+
+Hint: Reuse functions as much as possible. Use variables to specify constants.
+
+2. Develop areaOfCylinder. The program consumes the radius of the cylinder's base disk and its height. Its result is the surface area of the cylinder. [Use Google if you don't know the equation.]
+
+3. Develop the function areaOfTube. It computes the surface area of a tube, which is an open cylinder. The program consumes three values: the tube's inner radius, its length, and the thickness of its wall. [Use Google if you don't know the equation.]
+
+Develop two versions: a program that consists of a single definition and a program that consists of several function definitions. Which one evokes more confidence? 
+
+4. Develop the program height, which computes the height that a rocket reaches in a given amount of time. If the rocket accelerates at a constant rate g (= 1m/s^2), it reaches a speed of g · t in t time units and a height of 1/2 * v * t where v is the speed at t.
+
+5. Recall fahrenheitToCelsius, write celsiusToFahrenheit.
+
+Now consider the function:
+
+// I : double -> double
+// to convert a Fahrenheit temperature to Celsius and back
+static double I ( double f ) {
+       return celsiusToFahrenheit( fahrenheitToCelsius( f ) );
+}
+
+Evaluate I ( 32. ) by hand. What does this suggest about the composition of the two functions?

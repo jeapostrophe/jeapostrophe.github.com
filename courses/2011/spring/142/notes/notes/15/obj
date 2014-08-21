@@ -1,0 +1,24 @@
+At the end of today's class you should
+
+KNOW:
+* That the data definition for a descendant family tree requires two data definitions that refer to each other (mutually recursive data definitions).
+
+BE ABLE TO:
+* Write the data definition for a descendant family tree.
+* Write functions over descendant family trees.
+
+Exercises:
+
+0. Write a function countGenerations which counts the number of generations in a descendant family tree.
+
+1. Develop the function howFarRemoved. It determines how far a blue-eyed descendant, if one exists, is removed from the given parent. If the given parent has blue eyes, the distance is 0; if eyes is not blue but at least one its children's eyes are, the distance is 1; and so on. If no descendant of the given parent has blue eyes, the function returns -1 when it is applied to the corresponding family tree.
+
+2. Develop the function countProperDescendents which consumes a parent and produces the number of descendents, not including the parent.
+
+3. Develop the function generationDescendents which consumes a parent and a generation number and produces a list of all information about descendents in that generation.
+
+4. Develop the function truncate which consumes a parent and a generation number and produces a parent that does not have any descendents in that generation (and thus, obviously, subsequent generations.)
+
+Optional Exercises:
+
+0. Generalize howFarRemove so it takes an eye color argument and does not always check for blue-eye descendents.

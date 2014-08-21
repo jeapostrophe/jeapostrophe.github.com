@@ -1,0 +1,37 @@
+body {background-color: #99FF99 ;
+      font-family: 'Trebuchet MS' ;
+}
+
+h1 {font-size: 1.75em ;}
+h2 {font-size: 1.25em ;}
+
+#mainmenu ul {list-style-type : none ; } 
+#mainmenu li { font-size : 1.2em ; } 
+#mainmenu { position: relative ; 
+            background-color: #white ;
+            float: left ;
+	    padding-right: 1em ;
+            margin: 0 ;
+	    width: 12em ;
+            border: solid ;
+}
+
+#header { 
+  position: relative ; 
+  margin: 0px ;
+  margin-left: 14em ;
+}
+
+#info-frame { clear : both ;
+	      margin : 0px ;
+}
+
+#listing { clear : both ; padding-top: .5em ; }
+
+#footer {
+  clear: both ;
+  text-align : right ;
+  font-size : .75em ;
+}
+
+

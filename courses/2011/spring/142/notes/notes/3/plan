@@ -1,0 +1,44 @@
+HtDP - Chapter 3
+-----------------
+
+Guess: Divide by 0
+
+Programs are many definitions
+Functions compose with functions
+- the one we really want... the main one
+- the auxiliary or helpers
+
+Compare un-composed areaOfRing
+- no divide and conquer or abstractions
+
+Let's experiment with a problem:
+
+"Imagine the owner of a movie theater who has complete freedom in setting ticket prices. The more he charges, the fewer the people who can afford tickets. In a recent experiment the owner determined a precise relationship between the price of a ticket and average attendance. At a price of $5.00 per ticket, 120 people attend a performance. Decreasing the price by a dime ($.10) increases attendance by 15. Unfortunately, the increased attendance also comes at an increased cost. Every performance costs the owner $180. Each attendee costs another four cents ($0.04). The owner would like to know the exact relationship between profit and ticket price so that he can determine the price at which he can make the highest profit."
+
+What information?
+- profits, revenue, costs, attendees
+
+What data?
+
+What depends on what?
+
+Write function headers, contracts, and purposes
+
+Find numbers of attendees for $3, $4, and $5 tickets. What is an equation for this?
+
+How much does it cost to run the show at $3, 4, and 5?
+
+What should we charge?
+
+What if there were no fixed costs, but each attendee cost $1.5?
+
+Give names to all the constants
+
+drop static when naming values inside functions
+
+HtDP - Chapter 4
+----------------
+
+make a new function to find the best price of three options
+- using if and strings
+

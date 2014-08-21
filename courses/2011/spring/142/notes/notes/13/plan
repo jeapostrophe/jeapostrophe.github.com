@@ -1,0 +1,19 @@
+append
+-- start with students (3)
+-- do it myself?
+
+REMEMBER: give a break!
+
+reverse
+
+---
+
+noRobots : inv -> inv (no "robot")
+
+[Maybe look at String.contains()]
+
+containsThingHuh : inv name -> boolean
+
+totalItemPrice : inv name -> price [sum all the items]
+
+discount : inv name -> inv

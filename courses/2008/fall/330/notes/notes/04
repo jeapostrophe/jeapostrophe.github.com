@@ -1,0 +1,21 @@
+* Remind about colloquium on Thursday
+* Review
+** Write WAE BNF / define-type
+* Functions
+** With is like function definition then application
+** First model of functions is like DrScheme
+*** Separate Definitions and Interactions windows
+*** Passed in a set of definitions
+** F1WAE --- {<id> <F1WAE>} for fun-app
+*** Write new BNF / define-type
+*** Write define-type for FunDef
+**** Write double
+*** Write interp (new arg: list of fundefs)
+** Why are arguments F1WAEs?
+** Why are function bodies F1WAEs?
+** Namespaces
+*** F1WAE functions are separate from named identifiers
+*** Like Common Lisp, but not like Scheme
+** Where are function definitions available?
+*** This means funs can call each other
+*** And themselves! No if means no bottom out of recursion

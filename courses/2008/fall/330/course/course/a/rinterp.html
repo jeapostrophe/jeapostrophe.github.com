@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Rudimentary Interpreter</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p>
+<em>You must do this assignment solo.  We know that some of you are
+not yet comfortable with Scheme; for that reason, we will weight this
+assignment very, very low in the overall score.  Doing poorly on it
+will not at all damage your course grade.  But, you should exploit
+this opportunity to become familiar with the style of programming you
+will do in the rest of the semester.</em></p>
+
+
+<h2>Rudimentary Interpreter</h2>
+
+<p> Write a parser and interpreter for the WAE language 
+([<a href="#one">1</a>])
+we discussed
+in class. <strong>The textbook can be of great assistance in this
+part of the assignment;</strong> they provide the beginnings of a
+parser, an abstract syntax datatype and an interpreter.</p>
+
+<p>Once you&#8217;ve <strong>written and tested</strong> the parser and
+interpreter for WAE, extend the language with these features:</p>
+
+<dl>
+<dt>Binary arithmetic operators</dt>
+
+<dd><p>In place of having separate rules for <code>+</code> and
+<code>-</code>, define a single syntactic rule for all binary arithmetic
+operators.  Parse these into a <code>binop</code> datatype variant.
+Define a table that maps operator names (symbols) to actual functions
+(Scheme procedures) that perform the corresponding operation.  Having a
+single rule like this, accompanied by a table, makes your language
+easier to extend: once you have modified your parser and interpreter
+once to support binary operators, you won't need to touch either one to
+add any number of new ones.  To demonstrate this, define multiplication
+and division (using <code>*</code> and <code>/</code> to represent them
+in the language's concrete syntax).  </p></dd>
+
+<dt>Multi-armed <code>with</code> </dt>
+
+<dd><p>Each identifier bound by
+the <code>with</code> expression is bound only in its body.  There will
+be zero or more identifiers bound by each <code>with</code> expression.
+If there are multiple bindings of the same identifier in a single
+<code>with</code> expression&#8217;s bindings list, your interpreter should 
+halt with an error message.  An example:</p>
+
+<pre>
+{with {{x 2}
+       {y 3}}
+  {with {{z {+ x y}}}
+    {+ x z}}}
+</pre>
+
+<p>will evaluate to <code>7</code>, while</p>
+
+<pre>
+{with {{x 2}
+       {x 3}}
+	{+ x 2}}
+</pre>
+
+<p>will halt with an error message.</p>
+</dd>
+</dl>
+
+<p>The syntax of the WAE language with these additional features can
+be captured using EBNF notation ([<a href="#two">2</a>]):</p>
+
+<pre>
+&lt;WAE&gt; ::= &lt;num&gt;
+    | {+ &lt;WAE&gt; &lt;WAE&gt;}
+    | {- &lt;WAE&gt; &lt;WAE&gt;}
+    | {* &lt;WAE&gt; &lt;WAE&gt;}
+    | {/ &lt;WAE&gt; &lt;WAE&gt;}
+    | {with {{&lt;id&gt; &lt;WAE&gt;}*} &lt;WAE&gt;}
+    | &lt;id&gt;
+where an &lt;id&gt; is not +, -, *, /, or with.
+</pre>
+
+
+<p> You should turn in a single Scheme program containing all of the code needed
+to run your parser and interpreter. <strong>Implement the function
+<code>parse</code></strong>, which consumes an expression in the language's
+concrete syntax and returns the abstract syntax representation of that
+expression. Also <strong>implement the function <code>calc</code></strong>,
+which consumes an abstract syntax expression (as returned by the
+<code>parse</code> function) and returns a Scheme number. </p>
+
+<p><strong>You must include a contract for every function that you write and
+include test cases that amply exercise all of the code you&#8217;ve
+written.</strong> We will not give full credit to untested functionality, even
+if it is correct!</p>
+
+<a name="one" />
+
+<p> [1] Remember, the WAE language has numbers, two arithmetic operators
+(<code>+</code>, <code>-</code>), identifiers and <code>with</code> expressions.
+Of course, to handle identifiers and <code>with</code> expressions you'll have
+to implement substitution. (You do not have to implement caching substitution,
+but you are free to do so.) Finally, both the concrete syntax and abstract
+syntax are specified by the WAE language&#8217;s BNF (which can be found in the
+textbook). </p>
+
+<a name="two" />
+
+<p> [2] The textbook introduced you to BNF.  An
+extension of this notation, called EBNF (Extended Backus-Naur Form),
+provides three additional operators:</p>
+
+<ul>
+<li> <code>?</code> means that one or more symbols to its left can
+appear zero or one times. </li>
+
+<li> <code>*</code> means that one or more symbols to its left can be
+repeated zero or more times. </li>
+
+<li> <code>+</code> means that one or more symbols to its left can
+appear one or more times. </li>
+</ul>
+
+<h4>Support Code</h4>
+
+<p>
+Your code <strong>must</strong> adhere to the following templates,
+without any changes:
+</p>
+
+<pre>
+(define-type Binding
+  [binding (name symbol?) (named-expr WAE?)])
+
+(define-type WAE
+  [num (n number?)]
+  [binop (op procedure?) (lhs WAE?) (rhs WAE?)]
+  [with (lob (listof Binding?)) (body WAE?)]
+  [id (name symbol?)])
+
+;; parse : s-exp -> WAE
+;; Consumes an s-expression and generates the corresponding WAE
+(define (parse sexp)
+  (...))
+
+;; calc : WAE -> number
+;; Consumes a WAE representation of an expression and computes
+;;   the corresponding numerical result
+(define (calc expr)
+  (...))
+</pre>
+
+</div>
+</body>
+</html>
+

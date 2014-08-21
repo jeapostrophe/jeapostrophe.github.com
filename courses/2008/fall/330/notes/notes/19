@@ -1,0 +1,32 @@
+* HW
+** Garbage Collection (Presented)
+* Implementing Continuations
+** Will use a meta-interpreter for closures
+* How do we get the continuations in the interpreter?
+** CPS it! _Any_ program can be CPS'd
+** Add an extra argument
+** Convert
+** [Note that num-zero? and num+ are _primitive_]
+** How does app work?
+** [Closures must receive a new continuation argument]
+* Adding continuations to the language
+** How are the continuations/receivers of the interpreter diff/same as cont of user program?
+** {Meta: SML vs Scheme continuation interface}
+** Add {bindcc <id> <KCFAE>}
+** Add a contV value
+** Write bindcc in interp
+** Add a case in app in interp
+* Subtlety
+** Continuation application ignores the current continuation
+** Continuations close over the environment
+* Stacks
+** Stacks are not necessary for invoking functions
+** Stacks only evaluate the argument to the function
+* Reflection and Reification
+** Reflection: Exposing something normally hidden
+** Reification: Allowing something to be manipulated directly
+* Tail Call Optimization
+** Loops are unnecessary
+** They can be implemented by the programmer, not just by designer
+** TCO could be done in any language
+** CPS: Every fun in tail-position

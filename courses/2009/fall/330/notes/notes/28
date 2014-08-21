@@ -1,0 +1,65 @@
+* Type Inference
+
+* Writing down the annotations is annoying
+** Why not have the computer do it?
+** We've seen that the computer can do GC and closures better...
+
+* Inference for Monomorphic programs first
+
+* Ex: factorial
+** Name sub-expressions
+** Write and solve constraints
+
+* Ex: nlength
+
+* Formalizing constraint generation
+** They are not "equations" that are true, but those that are hoped for
+** [Faith joke]
+** Build a table where left is expression, right are constraints
+
+* Errors
+** nlsum with (nrest l) rather than (nfirst l)
+** Errors = false equations
+
+* First-class functions: nmap
+
+* Solving Type Constraints
+** Unification
+*** Identifies inconsistency or generates a substitution
+** Algorithm
+*** Start with empty subst
+*** Push all constraints on stack
+*** If stack is empty, return subst
+*** Otherwise, pop constraint X = Y
+**** If X and Y identical, do nothing
+**** If X is id, replace X with Y on stack and subst and add X -> Y to subst
+**** If Y is id, "
+**** If X is C(X1 ... Xn) and so is Y, push all the sub-constraints on stack
+**** Otherwise error
+*** Iterate
+** Termination: Always pops off stack, pushes on smaller constraints
+
+* Example: ((lambda (x) x) 7)
+
+* Parameterized Types
+** Only -> was a type constructor with positive arity
+** Lists are other examples
+
+* "Occurs" check
+** list([X]) = list(list([X]))
+** Step 4: Push [X] = list([X])
+** But, subst doesn't remove occurrences of X
+** So, in 2 and 3, we see if the substituted id occurs on the right
+
+* Underconstrained Systems
+** Ex: map
+** There are unconstrainted types in the output
+** Unification found polymorphism!
+
+* Principal Types
+** For a term t, consider type T. T is a principal type of t if, for any type T' that types t, these is a substitution that, when applied to T, yields T'.
+** I.e. a MOST general type
+** I.e. the one with the fewest constraints
+** I.e. as polymorphic as possible 
+
+

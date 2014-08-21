@@ -1,0 +1,17 @@
+* We have mutable data structure, but not 'variables'
+** Like o.f = e
+* How do we add 'set'?
+** Just use env-lookup, but not store-lookup (l-value)
+** Compare to C:
+ x = 2
+ y = x
+
+* Interaction with function application?
+** Write swap or use set on fun argument
+* We have call-by-value, what about call-by-reference?
+** Add refun... must have new value and new app code
+
+* Are they good?
+** In C, you can hide call-by-ref from caller
+** In modern languages, this is too confusing, so you should pass a box
+** Why do they exist? They are "cheaper"

@@ -1,0 +1,11 @@
+Use wage ($12/h)
+
+Make hoursToWages
+
+Write eliminateOverworkers (more than 100 hours)
+
+Write cap (doesn't remove over 100, but makes them 100)
+
+Generalize cap to take an argument specifying how much overworking is.
+
+Write update (replace at atleast a position)

@@ -1,0 +1,17 @@
+* Typing Data
+
+* Recursive types
+** Fundamental in computer science: trees and lists
+** Ex: Types on length
+** Can't have dif types, like empty and cons, one to combine them
+** Package deal: names for new types, variants, and recursive defs
+** Ex: family tree type
+** Ex: cases judgment
+** If datatypes are local, what is the type of something returned from one?
+*** Could restrict if body expr couldn't be declared type
+*** Actually, can't appear free
+*** Actually, what if we returned two functions, creator and consumer
+*** This is an object system
+
+* Space for Datatype Variant Tags
+** We NEED to store the variant

@@ -1,0 +1,24 @@
+* Assignment recap
+** wlazy will have 2.5 as the max
+** Got grades on everything... also have presentation grades
+** Happy with presentation reports
+* Web programming
+** Orbitz bug
+** What is the principle?
+** Shopping cart example
+* HTTP is stateless ... what does it mean?
+* Structure of Web programs
+** Add two numbers on console
+** Programmer must write 3 programs
+** How to pass along the first number?
+*** Hidden form or database
+** The program we wrote can't be run
+** The pending computation is lost
+* What is the pending computation?
+** A better server primitive: web-read/k
+** Should save the pending comp it is given
+** Rewrite the program and demo
+* How to run on traditional server?
+** The boxes get deleted
+** So, change from lambda to named procedure
+* These are the three programs we said you need to write!

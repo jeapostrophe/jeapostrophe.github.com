@@ -1,0 +1,26 @@
+* with is like writing a function and applying it
+** In math...
+** But, not exactly, because the function has no name
+** These are anonymous functions, F1WAE doesn't support them
+* Two features: anonymous functions and ability to write them anywhere
+** First-order: Functions are not values, they have names
+** Higher-order: Functions can return other functions
+** First-class: On par with all other values... passed as arguments, returned, and stored in data structures
+* Write some examples (inline and using with)
+* BNF for FWAE
+* define-type for FWAE
+* What is the contract for the interpreter?
+** Functions are programs, ergo not numbers, ergo return FWAEs
+* Write interp w/ substitution
+** Rule for functions is the same as numbers, both values
+** Must interp the function position
+*** What happens otherwise?
+** add & with changes because interp doesn't return numbers
+** Substitution happens in function bodies
+* with is redundant
+* We can do deferred substitution
+** Re-introduce dynamic scope
+* Must introduce closures
+** Test cases
+* How do we make it lazy?
+* Deferred substitutions = environment

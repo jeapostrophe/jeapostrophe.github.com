@@ -1,0 +1,28 @@
+At the end of today's class you should
+
+KNOW:
+* That the data definition for a descendant family tree requires two data definitions that refer to each other (mutually recursive data definitions).
+
+BE ABLE TO:
+* Write the data definition for a descendant family tree.
+* Write functions over descendant family trees.
+
+Exercises:
+
+0. Write a function called dyeGeneration that takes a parent, a generation number, and an eye color and produces a parent where everyone in the given generation's eyes are the given color.
+
+1. Add a boolean to the information about people that encodes if the person is living. Write a function called living that takes a parent and returns a list of info about all living descendants.
+
+2. Using #1, write a function averageLifespan that takes a parent and returns the average age of dead descendants. (Their age is, of course, their last living age.)
+
+3. Write a function called birth that takes a parent, a name, and information about a new person. The function should return an updated family tree where the named descendant (assume there is only one) has a new descendant (with no children) specified by the given information.
+
+4. Using #1, write a function called death that takes a parent and a name and returns a family tree where the named person is marked as non-living.
+
+Optional Exercises:
+
+0. Modify #1 so that rather than a boolean there is a status string that may be "living", "dead", or "undead". Update the function from #1.
+
+1. Using optional #0, write a new function calling vampires that returns all undead descdenents.
+
+2. Using optional #0, generalize the function so the status string is specified in an argument. (For example, optional #1 would have "undead" as the status string.)

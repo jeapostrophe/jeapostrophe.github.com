@@ -1,0 +1,35 @@
+* Domain Specific Languages
+
+* Design
+** Notation -- very different, boring unless targeting an existing notation
+** Control -- early langs didn't do recursion, modern don't do konts
+** Data -- Scheme blurs control and data w/ first-class funs and konts
+** Organzing progs --- functions, modules, classes
+** Automation -- memory management, run-time safety, type checking
+
+* Abstract
+** Align the code and the world
+** A loop in C abstract a number of operations you COULD write by hand
+** Scheme's `map' is an abstraction
+** In Scheme you can define your own abstractions
+
+* DSLs
+** Building abstractions appropriate for a domain
+** Define a domain
+** Justify language against existing GPLs
+*** Notational convenience
+*** Performance based on domain knowledge
+*** Special semantics
+** Enveloping languages
+*** Control other programs, Shell and Perl
+*** Imagine writing "ls -l | sort | uniq"
+*** These have a tendency to grow unexpectedly
+** Embedded
+*** Make embeds shell
+*** Syntax can be annoying
+*** How are values shared between the languages?
+*** Analysis --- the embedded language may be a backdoor that breaks
+** Have a growth path and don't be condescending
+*** Closures vs non
+** Negative space
+*** What ISN'T there is most important

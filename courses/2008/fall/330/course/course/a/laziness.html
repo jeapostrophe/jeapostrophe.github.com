@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Laziness</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>Complete this assignment with the same team you worked with for Substitution (Written).  You and your partner should each understand the 
+answers to all the problems, so don't just split up the work.</em></p>
+
+<h2>Laziness</h2>
+
+<p>For this assignment, we will use the <a
+href="http://www.haskell.org/">Haskell</a> programming language.  The
+<a href="http://www.haskell.org/ghc/">Glasgow Haskell Compiler</a>
+(GHC) is freely available for most platforms and is installed on the
+CS department network.  To start the interactive evaluator, simply run
+<b>ghci</b>.</p>
+
+<p>Haskell has wonderful standard libraries which probably contain the function
+you're looking for.  To see tree-style browsable docs, check out the
+<a href="http://www.haskell.org/ghc/docs/latest/html/libraries/"> Haskell
+Hierarchical Libraries </a>.  You should particularly take advantage of
+the 
+<a href="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Prelude.html">
+<code>Prelude</code></a>, which is the set of functions that are "built in"
+to Haskell.  You're welcome to use other functions; if you want to do so, you
+must put an <code>import</code> statement at the top of your code (there's
+an example in the template).</p>
+
+<p>The following are library functions that you may find particularly helpful,
+and which are all in the Haskell <code>Prelude</code>:</p>
+
+<table>
+<tr align="center"><th>Haskell Function</th><th>Scheme
+Analog</th></tr> <tr align="center"><td>==</td><td>eq?</td></tr> <tr
+align="center"><td>&lt;, &gt;, &lt;=, &gt;=</td><td>&lt;, &gt;, &lt;=,
+&gt;=</td></tr> <tr align="center"><td>mod</td><td>modulo</td></tr>
+<tr align="center"><td>div</td><td>quotient</td></tr>
+<tr align="center"><td>not</td><td>not</td></tr>
+<tr align="center"><td>!!</td><td>list-ref</td></tr>
+<tr align="center"><td>filter</td><td>filter</td></tr>
+<tr align="center"><td>all</td><td>andmap</td></tr>
+<tr align="center"><td>any</td><td>ormap</td></tr>
+<tr align="center"><td>take</td><td>(returns a prefix of a list)</td></tr>
+<tr align="center"><td>takeWhile</td><td>(returns the prefix of a list
+satisfying a predicate)</td></tr>
+</table>
+<br>
+
+Any function whose name begins with a symbolic character is an infix
+operator.  Other binary functions can be used as infix operators by
+enclosing in backquotes (e.g., <code>x `mod` y</code>).  Also, infix
+operators can be used as ordinary functions by enclosing them in
+parentheses (e.g., <code>(!!) [1, 2, 3] 2</code>).
+<br><br>
+Please submit a README file explaining how you tested your code. Actual test 
+cases are preferable, but a clear summary of what you did will be sufficient as
+long as your code actually works as you claim it does.
+
+<hr>
+
+<h3> Problem 1: Prime Numbers </h3>
+
+<ol>
+
+<!-- Read over the given definition of <code>factors :: Integer ->
+[Integer]</code>, which computes the prime factorization of any given
+natural number.
+
+<br><br>-->
+
+<li> Write <code>isPrime :: Integer -> Bool</code>, which
+determines whether a given integer is prime. </li>
+
+<li> Define <code>primes :: [Integer]</code>, the list of all
+primes. </li>
+
+<li> Revise <code>isPrime</code> so that it only tests divisibility by
+<i>prime</i> factors.  Just turn in the revised version.</li>
+
+<!--<li> How many primes are computed to determine the primality of
+1000000000039? </li> -->
+
+</ol>
+
+<hr>
+
+<h3> Problem 2: Longest Common Subsequence </h3>
+
+<ol>
+
+<li> Write <code> buildList :: Int -> (Int -> a) ->
+   [a]</code>, where <code>((buildList n f) !! i) == (f i)</code>
+(for all i in [0 .. n-1]). </li>
+
+<li> Write <code> buildTable :: Int -> Int -> (Int -> Int -> a) ->
+   [[a]]</code>, where <code>(((buildTable n m f) !! i) !! j) == (f i
+   j)</code> (for all i in [0 .. n-1], j in [0 .. m-1]). </li>
+
+<li> Write <code> lcsLength :: String -> String -> Int</code>, 
+which quickly
+computes the length of the longest common subsequence of two strings s1 and s2.
+Hint: you can easily compute <code>lcsLength (take i s1) (take j s2)</code>
+from
+
+<pre>
+lcsLength (take (i-1) s1) (take   j   s2),
+lcsLength (take   i   s1) (take (j-1) s2), and 
+lcsLength (take (i-1) s1) (take (j-1) s2).
+</pre></li>
+
+and the knowledge of whether <code>(s1 !! i) == (s2 !! j)</code>.  Note that you will lose credit if you use a slow, "brute force" method; make use of your table!
+
+</ol>
+
+<hr>
+
+<h3> Problem 3: Minimax Search </h3>
+
+In this exercise, you will implement a strategy to play a simple game.
+The game is called Mancala, but you won't need to worry about the
+specific rules, since we have implemented that part for you.  Your job
+is to build a tree of possible move sequences and choose the move that
+appears best.
+
+<br>
+
+The support code below provides the following set of data types and functions:
+
+<ul>
+
+<li> <code>Player</code>: values of this type represent the players
+of the game (<code>PlayerA</code> or <code>PlayerB</code>).</li>
+
+<li> <code>State</code>: values of this type represent game
+configurations.</li>
+
+<li> <code>initialState :: Player -> State</code> represents the
+initial configuration of the game board (the given player goes
+first).</li>
+
+<li> <code>getPlayer: State -> Player</code>: given a configuration,
+returns the player who makes the next move.</li>
+
+<li> <code>gameValue :: State -> Int</code> returns Player A's score
+minus Player B's score.  (Player A wants a big value and Player B 
+wants a small value.)</li>
+
+<li> <code>nextStates :: State -> [State]</code> gives the possible
+configurations after the next move.  If the returned list is empty, then
+the game is over.</li>
+
+<li> <code>simulateGame :: IO</code> uses an IO loop to allow you to play 
+Mancala.  The valid moves are the numbers 1 through 6 and they indicate 
+the player playing the nth cup on her side.  Player A goes first; her cups 
+are on the top row and are numbered from right to left.  Player B is the 
+bottom row numbered from left to right.</li>
+
+<li> <code> simulateAIGame :: (State -> Int) -> IO</code> consumes a 
+scoring function and plays 
+the game where Player A is the AI using that function.  We give you 
+the helper function, <code>level :: Int -> IO</code> in the stub file, 
+which consumes a difficulty and runs simulateAIGame using your 
+functions.  This may be helpful for testing.</li>
+
+</ul>
+
+<ol>
+
+<li> Define a datatype <code>GameTree</code> to represent the game
+state after any sequence of moves.  Each node should have its current
+configuration and a list of trees, where each tree corresponds to
+the game states obtainable after making any one legal 
+move.</li>
+
+<li> Define <code>mkTree :: State -> GameTree</code>, which consumes 
+a state and returns the tree of all legal board configurations (those
+obtainable by repeated application of <code>nextStates</code> to the
+given state).  Use this to define <code>mancala :: GameTree</code>, the 
+entire game of Mancala as a GameTree (remember that Player A goes 
+first).</li>
+
+<li> Define <code>prune :: Int -&gt; GameTree -&gt; GameTree</code>, which
+prunes a tree to a given depth. </li>
+
+<li> Define <code>minimax :: GameTree -&gt; Int</code>,
+which consumes a (pruned) tree and evaluates the configuration by
+looking ahead and applying the minimax algorithm.  If a node has no
+children, its value is the <code>gameValue</code> of its <code>State</code>. 
+Remember, Player A, 
+Maxi, is always trying to get the maximum value, and Player B, Mini, 
+is always trying to get the minimum value.</li>
+
+</ol>
+
+<h4>Support Code</h4>
+<p> Note that you must download both files (even for problems 1 and 2), and
+you must put them both in the same directory.  To test your code interactively,
+first <code>cd</code> into the directory with your code, and then do
+<code>ghci Laziness.hs</code> at which point you should either see a parse
+error, type error, or this:
+
+<pre>
+   ___         ___ _
+  / _ \ /\  /\/ __(_)
+ / /_\// /_/ / /  | |      GHC Interactive, version 6.6, for Haskell 98.
+/ /_\\/ __  / /___| |      http://www.haskell.org/ghc/
+\____/\/ /_/\____/|_|      Type :? for help.
+
+Loading package base ... linking ... done.
+[1 of 2] Compiling Game             ( Game.hs, interpreted )
+[2 of 2] Compiling Laziness         ( Laziness.hs, interpreted )
+Ok, modules loaded: Game, Laziness.
+*Laziness>
+
+</pre>
+<code>ghci</code> supports tab completion, which is a very handy feature.
+</p>
+<p>
+A Haskell stub file for the problem set:
+<a href="../templates/Laziness.hs">Laziness.hs</a>.
+</p>
+<p>
+The support code for Problem 3: <a href="../templates/Game.hs">Game.hs</a>.  
+Remember, you need neither read nor understand this code.
+</p>
+
+</div>
+</body>
+</html>
+

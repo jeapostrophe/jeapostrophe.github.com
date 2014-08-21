@@ -1,0 +1,58 @@
+* Types
+
+* Why?
+** {fun {x}} rejected by parser
+** {+ 3 {fun {x} x}} runtime error
+** How to avoid running this program?
+** Could do syntactically, but what about fun returns?
+** What about branches of if0?
+** What about Halting Problem?
+*** Type Systems must under or over approximate
+
+* What Are Types?
+** Any property of a program that can be established w/o execution
+** Approximation of "what happens"
+** Or, set of values, i.e. kind of value, not actual values
+** Types on establish "validity" not "correctness"
+
+* Constraints
+** More information => more conclusions => less approx
+** Acquire info is difficult:
+*** Restrictions on programs
+*** Computational expense
+*** Many annotation
+*** Computability
+
+* Why Types?
+** Detect legitimate errors = less debugging
+** Catch errors in unexecuted code
+*** Side effect: bad test suites
+** Documentation
+** Compilers and other optimizations
+** Removes certain terrible coding styles
+
+* Type Judgments
+** Type system is
+*** language of types,
+*** expression to type judgments,
+*** and algorithm 
+** number
+** function
+** identifier
+*** => type environment
+** addition
+** application
+*** Can't do it
+
+** Add annotations to functions and expand type lang with ->
+** Now do app
+** Now go back and do fun
+
+** app : def :: assume : guarantee
+
+* How Judgments Work
+** Trees (real trees grow up)
+** {+ 2 {+ 5 7}}
+** {{fun {x : number} : number {+ x 3}} 5}
+** {+ 3 {fun {x : number} : number x}}
+*** Error = unable to construct tree

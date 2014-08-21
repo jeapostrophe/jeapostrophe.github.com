@@ -1,0 +1,31 @@
+At the end of today's class you should
+
+KNOW:
+what is meant by "compound data"
+what is meant by "data definition"
+
+BE ABLE TO:
+define compound data using "class"
+create compound data using "new"
+extract data from an object using a selector
+write a function over compound data
+
+Exercises:
+
+0. Write a data definition for a baseball player. Your definition should record the player's name, batting average, number of homeruns, number of runs batted in, and the player's position in the field. Give two examples of baseball players. Finally, write a function worthAMillion that returns true if a given player has more than 20 homeruns, more than 100 RBI's, and an average above .280. Make sure you write a contract and purpose for your function.
+
+1. Write a data definition for movies. Create example objects for two of your favourite movies. Print out their contents with System.out.format
+
+2. Write a data definition that represents an airforce's jet fighters. Assume that a fighter has four essential properties: designation ("f22", "tornado", or "mig22"), acceleration, top speed, and range. Then develop the function withinRange. The function consumes a fighter and the distance of a target from the (fighter's) base. It determines whether the fighter can reach the intended target. Also develop the function reduceRange. The function consumes a fighter and produces a fighter in which the range field is reduced to 80% of the original value.
+
+3. Write a data definition that represents time since midnight as hours, minutes, and seconds. Write a function timeToSeconds that produces the number of seconds since midnight.
+
+4. Write a data definition for three digit numbers, where there are three integers. Write a function called reveal that takes three arguments: a 'chosen' three digit number, a 'current' three digit number, and 'guess' integer. The function produces a new 'current' number where the digits are the same as before, unless the 'guess' is the same as one of the digits, in which case it is "revealed". For example,
+
+reveal( new TDN(1, 2, 3), new TDN(0, 0, 0), 1) = new TDN( 1, 0, 0)
+reveal( new TDN(1, 2, 3), new TDN(1, 0, 0), 3) = new TDN( 1, 0, 3)
+reveal( new TDN(1, 2, 3), new TDN(1, 0, 3), 6) = new TDN( 1, 0, 3)
+reveal( new TDN(1, 2, 3), new TDN(1, 0, 3), 2) = new TDN( 1, 2, 3)
+reveal( new TDN(1, 2, 2), new TDN(1, 0, 3), 2) = new TDN( 1, 2, 2)
+
+This is basically Hangman!

@@ -1,0 +1,85 @@
+At the end of today's class you should
+
+KNOW:
+how to use numeric comparsion operators
+how to use the Boolean combinators &&, ||, and !
+when to use a helper function
+
+BE ABLE TO:
+"clean up" a function by creating helper functions for common computations
+
+REFERENCES
+http://download.oracle.com/javase/tutorial/java/nutsandbolts/op2.html
+http://en.wikipedia.org/wiki/Interval_(mathematics)#Notations_for_intervals
+
+Exercises:
+
+0. What are the truth values of...
+ a. 4 > 3 && 10 <= 100
+
+1. What are the truth values of
+ a. x > 3
+ b. 4 > x && x > 3
+ c. x * x == x
+when x is 4
+
+2. Encode the following intervals as functions:
+ a. (3,7]
+ b. everything outside [1,3]
+
+3. Which intervals do these Java expressions represent?
+ a. -3 < x && x < 0
+
+4. Write programs that identify solutions to these equations:
+ a. 4n + 2 = 62
+
+5. Develop the function 'interest'. Like interestRate, it consumes a deposit amount. Instead of the rate, it produces the actual amount of interest that the money earns in a year. The bank pays a flat 6% for deposits of up to $1,600, a flat 7.5% per year for deposits of up to $9,000, and a flat 8% for deposits of more than $9,000.
+
+6. Some credit card companies pay back a small portion of the charges a customer makes over a year. One company returns
+
+.25% for the first $500 of charges,
+.50% for the next $1000 (that is, the portion between $500 and $1500),
+.75% for the next $1000 (that is, the portion between $1500 and $2500),
+and 1.0% for everything above $2500.
+
+Thus, a customer who charges $400 a year receives $1.00, which is 0.25 · 1/100 · 400, and one who charges $1,400 a year receives $5.75, which is 1.25 = 0.25 · 1/100 · 500 for the first $500 and 0.50 · 1/100 · 900 = 4.50 for the next $900.
+
+Determine by hand the pay-backs for a customer who charged $2000 and one who charged $2600.
+
+Define the function 'payback', which consumes a charge amount and computes the corresponding pay-back amount.
+
+Optional Exercises:
+
+0. What are the truth values of...
+ a. 4 > 3 || 10 == 100
+ b. ! (2 == 3)
+
+1. What are the truth values of
+ a. x > 3
+ b. 4 > x && x > 3
+ c. x * x == x
+when x is 2 and 7/2
+
+2. Encode the following intervals as functions:
+ a. [3,7]
+ b. [3,9)
+ c. (1,3) and (9,11)
+
+3. Which intervals do these Java expressions represent?
+ a. x < 1 || x > 2
+ b. ! (1 <= x && x <= 5)
+
+4. Write programs that identify solutions to these equations:
+ a. 2n^2 = 102
+ b. 4n^2 + 6n + 2 = 462
+
+5. What is the value of
+ if (n <= 1000) { return .040; }
+ else if (n <= 5000) { return .045; }
+ else if (n <= 10000) { return .055; }
+ else if (n > 10000) { return .060; }
+when n is 500, 2800, and 15000?
+
+6. Develop the function 'tax', which consumes the gross pay and produces the amount of tax owed. For a gross pay of $240 or less, the tax is 0%; for over $240 and $480 or less, the tax rate is 15%; and for any pay over $480, the tax rate is 28%.
+
+Also develop netpay. The function determines the net pay of an employee from the number of hours worked. The net pay is the gross pay minus the tax. Assume the hourly pay rate is $12.

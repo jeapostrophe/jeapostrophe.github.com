@@ -1,0 +1,43 @@
+* Implementing Prolog
+
+* Program = Facts + Rules
+* Query = Goal to Satisfy, i.e., find assignments
+
+* Rules in disjunctive normal form (OR and AND)
+** These naturally form a tree where each node is connective
+** And each leaf is a fact query
+
+* For each query, Prolog builds an or-tree of the different options
+** Examines each node in sequence -- a sub-goal
+** If sub-goal is fact, nothing to be done
+** Prolog examines a classical "search tree"
+
+* How does it search?
+** breadth-first :: never get "stuck", but expensive
+** depth-first :: more efficient, but "stickable"
+** Most do depth-first
+
+* What is satisfaction?
+** Assignments to logic variables s.t. facts and expr are true
+
+* What are logic variables?
+** Placeholders... they can only go from unbound to bound
+** Expressions don't work on variables
+** Never 'varies'
+*** However, the search may back-track to a point when it was unbound
+*** Return to an earlier computation... continuation
+
+* Prolog programs...
+** consume a 'failure' continuation
+** and provides a 'next' continuation
+
+* Why does computation terminate?
+** When no more terms satisfy
+
+* Unification built in
+** When two values need to be compared, we do unification
+** Except it interacts well with the rest of the system
+** So that unification of X to "robby" can be 'undone'
+
+* Prolog must perform the 'occurs' check
+* Prologs often provide the ! operator, to eliminate the ability to back-track

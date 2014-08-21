@@ -1,0 +1,29 @@
+At the end of today's class you should
+
+KNOW:
+what is meant a list
+
+BE ABLE TO:
+write a data definition for a list
+write a function over lists
+
+Exercises:
+
+0. Write a data definition for a list of numbers. Then write a function that consumes a list of numbers and produces the product of the numbers. Go through all the steps in the design recipe in the development of your function.
+
+1. Use the data definition for lists of strings from class and create a list of colors that contains at least 5 colors.
+
+2. Use your data definition from #0 and write a function called "containsFiveHuh" that returns true if the number list contains 5.
+
+3. Make a data definition of lists of booleans. Write a function called "allTrueHuh" that is true when all the booleans in a list are true.
+
+4. Use your data definition from #1 and write a function called "longestColourLength" that returns the length of longest color in the the list. (Math.max and someString.length() may be useful.)
+
+Optional Exercises:
+
+0. Using #0, write a function that finds the length of a list of numbers.
+
+1. Using #1, write a function that returns true if "red" is in the list of strings. (Remember about .equals())
+
+2. Using #3, write a function that returns true if a list of booleans contains any false booleans.
+

@@ -1,0 +1,23 @@
+family trees were ancestor based
+
+hard to learn about children
+
+let's switch the arrows
+
+but now, people can have multiple children...
+
+parent is info, list of children
+
+count-blue-eyed : parent -> number
+
+has-old-and-blue? : parent number -> boolean [has a blue eyed descedent born before a given data]
+
+count-descendents : parent -> number
+
+descendents : parent -> ListOfInfo
+
+averageAge : parent -> number
+
+truncateTree : parent number -> parent [removes everyone after a generation]
+
+advanced-ages : parent -> parent [update ages by 1]

@@ -1,0 +1,63 @@
+18
+== Mutation ==
+
+Sometimes we can turn accumulator style into mutator style
+
+write factorial with a while loop
+-- CLEARLY dervie the mutation version from the functional version
+-- n = n - 1 [do not use --!]
+-- Make sure you have a nice comment that explains the syntax of while
+-- include this link in the comment: http://download.oracle.com/javase/tutorial/java/nutsandbolts/while.html
+
+change the address book functions to leave the phone-book argument implicit and have add return void. Instead, they will mutator a static variable.
+
+Contrast the two programs: we can do substitution of factorial, but we cannot on the address book functions
+
+factorial uses internal mutation, add uses external
+
+This means factorial is an abstraction, but add is not
+
+Mutation makes it so we can no longer analyze our programs in pieces, we have to take in everything at once.
+-- I would use an example where there is a whole bunch of code between two lookups on the same thing, but one returns a number and the other returns "Not found", we have to inspect everything in between to find out what happened
+-- Instead of substitution, we must use "store tracking", where we have to keep track of the store AND the program at the same time, whereas before we could keep track of just the program. Show this with factorial.
+
+Internal mutation is okay, but external mutation is DANGEROUS, how do we tame it?
+
+Write a traffic light simulator with a color and a function 'next' that goes green -> yellow -> red -> green -> ...
+-- Write in accumulator style, then port
+-- Use this as the way of discussing the design of external mutation-based functions
+-- Tests cases aren't simple, because they have to mention the state variable (if color is "green", then after next(), color is "yellow" --- not the same as next("green") == "yellow")
+-- Instead, our test cases must look like:
+---------- // Pre condition
+---------- color = "green";
+---------- // Test 
+---------- next();
+---------- // Post condition
+---------- System.out.format("The answer is %s, but should be %s%n", color, "yellow"); 
+
+Some built-in Java functions use mutation. For example:
+-- http://download.oracle.com/javase/7/docs/api/java/io/FileReader.html
+
+import java.io.FileReader; // <-- At the very top
+import java.io.IOException;
+class scratch {
+      public static void main(String[] args) throws IOException {
+      	      FileReader f = new FileReader("scratch.java");
+	      System.out.format("The answer is %c, but should be %c%n", f.read(), 'i');
+      }
+}
+
+
+// You must explain that %c means "character", which is an integer (like 64) interpreted as a letter (like 'a'). Java syntactic minutae: Notice that single characters use single quotes, not double quotes, like strings.
+
+This succeeds, "The answer is i, but should be i"
+If we try this test case again, 
+
+System.out.format("The answer is %c, but should be %c%n", f.read(), 'i');
+
+It fails, "The answer is m, but should be i"
+
+// More minutate, if read() ever returns -1, that means the file is over. It will return -1 from that time on.
+
+That means read uses mutation.
+

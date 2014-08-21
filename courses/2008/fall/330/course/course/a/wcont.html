@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Continuations (Written)</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>Form new groups of two for this assignment. We will not accept
+this assignment from people working individually or with a partner
+from the previous assignments. Email me the names of the members of
+your group by 5 pm five days after the "out" date for this assignment
+(only one member needs to send this email). If you cannot find a
+partner, send us an email by the same deadline and you will be
+assigned a partner. In order to avoid being assigned a random partner,
+we suggest staying after class that day to find a partner in
+person. Missing the email deadline will lower your grade for this
+assignment by 10% per day late.</em></p>
+ 
+<p><em> Each problem is clearly marked with a filename below.  For
+each file that you submit that has the wrong name, you will lose 5% on
+the final grade.
+</em></p>
+
+<h3>Continuations (Written)</h3>
+
+
+
+<h4> Problem 1 </h4>
+
+<p> <b> Submit your solution as whynostack.pdf</b> </p>
+
+<p>Any program that consumes some amount of stack, when converted to CPS and
+run, suddenly consumes no stack space at all.  Why?</p>
+
+
+<hr />
+
+
+<h4> Problem 2 </h4>
+
+<p> <b> Submit your solution as filterk.ss </b> </p>
+
+<p> CPS the following Scheme function.  You don&#8217;t need to CPS
+primitives such as <code>empty?</code>, <code>first</code>,
+<code>rest</code>, <code>cons</code>, <code>cons?</code> and
+<code>&lt;</code>.  You may also assume that the function argument to both
+of the functions is in CPS.  Name the result <code>filter/k</code> as shown
+below.</p>
+
+<pre>
+;; filter: (x -> bool) (listof x) -> (listof x)
+(define (filter f l)
+  (cond
+    [(empty? l) empty]
+    [else (cond
+            [(f (first l)) (cons (first l)
+                                 (filter f (rest l)))]
+            [else (filter f (rest l))])]))
+
+;; filter/k: (x receiver -> doesn't return) (listof x) receiver -> doesn't return
+(define (filter/k f l k)
+  'fill-me-in)
+</pre>
+
+<p> Now change the following expressions to use <code>filter/k</code>. </p>
+
+<pre>
+(define (less-than-three x)
+   (< x 3))
+(filter less-than-three
+        (cons 1 (cons 4 empty))) ;; this evaluates to (list 1)
+
+</pre> <br>
+
+
+<hr />
+
+<h4> Problem 3 </h4>
+
+<p> <b> Submit your solution as stackinspect.ss </b> </p>
+
+<p>The Java security model uses a primitive called <em>stack
+inspection</em>.  Let us implement a simple version of this.  Assume
+the language had two new primitives:
+</p>
+
+<pre>
+&lt;E&gt; ::= ...
+    | {bless &lt;E&gt;}
+    | {check}
+</pre>
+
+<p>The <code>bless</code> primitive creates a blessed stack frame for
+the duration of evaluating its sub-expression.  The <code>check</code>
+primitive traverses the run-time stack; if it finds a blessed frame it
+evaluates to <code>0</code> (so you can, for instance, use it inside
+sums without affecting the outcome), otherwise it terminates the
+program's execution.
+</p>
+
+<p>
+Extend the CPSed interpreter presented in the text in Figure 20.2
+with these two new language constructs.  For your convenience, here is a file
+to start with: <a href="../templates/stackinspect.ss">stackinspect.ss</a>
+</p>
+
+<p>
+<strong>Note</strong>: Java lacks tail-call optimization ostensibly
+because this hurts the ability to implement stack inspection.  In
+fact, <a href="http://www.ccs.neu.edu/scheme/pubs/cf-toplas04.pdf">this 
+claim is entirely false</a>.  But we're stuck with the result of this
+decision, making the JVM a poor target for other language compilers.
+Unfortunately, .NET has also adopted this mistake, as the paper explains.
+</p>
+
+</div>
+</body>
+</html>
+

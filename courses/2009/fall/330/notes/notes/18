@@ -1,0 +1,44 @@
+* CPS
+** Gives use web-read and a non-inverted interface
+** But it is global
+** It replaces the stack, so it inhibits optimizations in compilers and CPUs
+** Assumes tail-call optimization
+* call/cc
+** Generate the continuation automatically on the fly, when needed
+* Capturing
+** call/cc and let/cc
+* Examples
+** What does (let/cc k (k 3)) do?
+** What does (+ 1 (let/cc k (k 3)))
+*** Halting behavior of continuation lambdas
+** Exceptions
+*** Catching when we are about to divide by zero
+* web-read
+** Can be written directly
+* Producers & Consumers
+** Want to give one answer at a time
+** What to pass as 'send'? Can't be a lambda
+*** Only the last is returned
+** What if we give it its continuation?
+*** Only the first is returned
+** What is the continuation after invoking send for the first time?
+** We could store that in a box, for next time!
+** What do we do with it if its there?
+*** Call it with a dummy
+** We need to actually store it though...
+** Test it...
+* Continuations are not like gotos
+** They don't go to a line... they go to arbitrary prior computations
+* A Better Producer
+** Why can't we put three 'gets' in a list?
+** Infinite loop on 2nd
+** The wrong 'real-send' is used
+** Store the correct one in a box?
+** What is the correct one?
+** The one at the time of the call, i.e., where 'dummy' is
+** Now it works!
+* Abstract out to a general function...
+* Show infinite generator of odd
+* Why continuations?
+** We can implement _any_ new control operator
+** And its implementation is encapsulated

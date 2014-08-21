@@ -1,0 +1,19 @@
+HtDP 7
+
+start with Posn
+
+Square (nw, length)
+Circle (center, radius)
+
+Find perimeter of each
+
+Define the perimeter function... that takes both
+       - data definition
+       - communicate to Java (interface)
+       - try
+       - add to classes
+       - glory
+
+Sometimes we know we want to write 'perimeter' first, so we discover our needs top-down
+
+Write translate (dx, dy)

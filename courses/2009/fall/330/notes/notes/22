@@ -1,0 +1,66 @@
+* Pitfalls of Generational Collection (4.6)
+** Large objects or collections thereof move through gens slowly
+** Many pointers from old to young
+** Large root sets
+*** If the young gen is small, but many roots to old
+*** Lots of wasted work
+*** Could treat many stack/root variables like old objs (with write barriers)
+
+* Low-level Implementation Issues (6)
+
+* Pointer Tags and Object Headers (6.1)
+** The GC needs to know "what kind of obj" each obj is
+** Tags are typically added to pointers to notate what kind they point to
+*** Could be as simple as "has pointers / doesn't have pointers" in it
+** Very common in systems without type systems
+** Tagless GC in typed systems
+*** The compile "knows" the types of everything
+** BiBOP
+*** Individual objs don't have tags
+*** They are put in segments of similar types
+*** Typically by page
+
+* Conservative Pointer Finding (6.2)
+** Some compilers don't provide ANY support for finding pointers
+** So, the collector must treat ANYTHING that COULD be pointer as one
+*** Properly align bit pattern for a valid address
+*** This includes integers!
+** Actually works for C (Boehm-Wieser)
+** Generational collection can work with virtual memory hacks
+*** Like dirty bits and access protection traps
+** Can't do movement, because assumed pointers might not be
+** Unsound: int x = rand(); p = p + x; ...; p = p - x;
+** Pointer mangling optimizations may actually do stuff like this
+** What is the trade-off between two kinds of "incorrectness"?
+*** Conservative finding vs the programmer
+
+* GC-related language relations (7)
+
+* Weak Pointers (7.1)
+** Pointers that don't prevent objs from being reclaimed
+** E.g., a cache
+
+* Finalization (7.2)
+** Actions performed when an obj is reclaimed
+** E.g., close a file
+** Can create VERY subtle bugs
+
+* Static & Safe Memory Management
+** How can we know that it is 'safe' to call free in a C program?
+*** If the pointer is UNIQUELY referenced
+*** This can be enforced with a type system (linear)
+** We can generalize this idea to batches of pointers called regions
+*** A region may be opened, closed, and allocated
+*** But you can't free within a region opening
+*** or refer to region ptrs outside its opening
+*** Thus, close corresponds to freeing everything
+*** This imposes a STACK discipline on mem usage
+** We can then have dynamic regions with unique references to them
+*** Thus you can 'safely' free them
+** There are many region-based type systems
+*** Most require region annotation, but others do inference to detect places
+** Examples: ML-Kit, Cyclone, Clean
+
+
+
+

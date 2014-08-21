@@ -1,0 +1,28 @@
+- 17 -
+At the end of today's class you should
+
+KNOW:
+- what accumulator style is
+
+BE ABLE TO:
+- write functions in accumulator style
+
+Exercises:
+
+N.B. When you write you functions in accumulator style, you must decide on an accumulator argument. I have not given that to you below, therefore when you add it, it is /not/ considered violating the contract, unless your main function (the one you use for test cases) takes the argument as well.
+
+0. Write the function treeHeight, which takes an ancestor family tree and returns the number of levels, in accumulator style.
+
+1. Write the function product, which takes a list of numbers and returns their product, in accumulator style. Show the complete substitutions for an application of this function to a list of 4 numbers.
+
+2. Write the function palindrome, which takes a list of numbers and returns a palindrome of that list. For example, on the list 1:2:3:! it should return 1:2:3:2:1:!.
+
+3. Write the function to10, which takes a list of digits and returns the corresponding number, where the first number is the MOST significant digit. Thus, 1:2:3:! should return 123. (This is UNLIKE the convert functions we've seen before.)
+
+4. Write the function isPrime, which takes an integer and returns true if the number is prime. Recall that a number is prime if it is not divisible by any number except itself and 1. Recall that 'a % b' is the remainder after dividing a by b. (Hint: This uses the natural number data definition.)
+
+Optional Exercises:
+
+0. Generalize #3 to toB which takes an additional "base" argument that controls the numeric base of the digit sequence.
+
+1. Write the function howMany, which takes a list of strings and returns how many letters are in all the strings combined, in accumulator style.

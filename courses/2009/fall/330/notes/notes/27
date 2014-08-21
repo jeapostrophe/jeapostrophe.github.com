@@ -1,0 +1,28 @@
+* Explicit Polymorphism
+
+* lengthNum and lengthSym
+** The only difference is the type annotation
+** It is more difficult to write some programs
+** Because type systems reject programs
+
+* Type Abstraction
+** Replace Num/Sym with T
+** But T isn't bound!
+** So we should bind T in a lambda
+** Introduce LAMBDA at the type level
+
+* parameteric polymorphic with explicit type paramters
+
+* Type language
+** Value arrows and type procedures
+
+* This is a notation... but what is the semantics?
+** Does type fun app happen at runtime?
+** If so, it is slow and types must exist at run time
+
+* Static type application = type elaborator
+** Rule for type application
+** Rule for type fun def...
+*** alpha is unconstrained, so that it MUST be allowed to be anything
+
+* Implementation issues

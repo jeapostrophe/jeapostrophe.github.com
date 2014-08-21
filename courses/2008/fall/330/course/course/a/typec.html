@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Type Checker</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>You must complete this assignment with Team 3.</em></p>
+
+<h3>Type Checker</h3>
+
+ <p>
+  In this assignment, you will work with a typed language that includes
+  numbers, booleans, conditionals, functions, and numeric lists.  The
+  concrete syntax for the language is given by the following BNF
+  grammars:
+
+  <pre>
+   &lt;expr&gt; ::= &lt;num&gt;
+            | true
+            | false
+            | {+ &lt;expr&gt; &lt;expr&gt;}
+            | {- &lt;expr&gt; &lt;expr&gt;}
+            | {* &lt;expr&gt; &lt;expr&gt;}
+            | {iszero &lt;expr&gt;}
+            | {bif &lt;expr&gt; &lt;expr&gt; &lt;expr&gt;}
+
+            | &lt;id&gt;
+            | {with {&lt;id&gt; &lt;expr&gt;} &lt;expr&gt;}
+            | {fun {&lt;id&gt; : &lt;type&gt;} : &lt;type&gt; &lt;expr&gt;}
+            | {&lt;expr&gt; &lt;expr&gt;}
+
+            | nempty
+            | {ncons &lt;expr&gt; &lt;expr&gt;}
+            | {nempty? &lt;expr&gt;}
+            | {nfirst &lt;expr&gt;}
+            | {nrest &lt;expr&gt;}
+
+   &lt;type&gt; ::= number
+            | boolean
+            | nlist
+            | (&lt;type&gt; -&gt; &lt;type&gt;)
+  </pre>
+
+   In the surface syntax for types, base types are represented by
+   symbols, and the arrow type by a Scheme list of three elements: the
+   type of the argument, the symbol <code>-&gt;</code>, and the type of the
+   result.
+  </p>
+
+  <p>
+   You have not implemented some of these constructs yet, but they should
+   be familiar:
+
+  <ul>
+   <li>
+    <code>iszero</code> consumes a number, and returns <code>true</code> if
+    it is <code>0</code>, <code>false</code> otherwise
+   </li>
+   <li>
+    the test expression of <code>bif</code> ("boolean if") must
+    evaluate to <code>true</code> or <code>false</code>
+   </li>
+   <li>
+    <code>ncons</code> consumes a number and a numeric list, and produces a
+    numeric list
+   </li>
+  </ul>
+  
+  </p>
+
+<h3>Design and Implement the Type Checker</h3>
+
+<p>Your type checker must be written in the <i>PLAI</i> language. We
+provide a <a href="../templates/type-checker-template.ss">template</a>
+to help you get started. The template has <code>define-type</code>
+definitions for the abstract syntax of the language and its types. You
+should not change these definitions.</p>
+
+<ol>
+
+<li><p> Define the function <code>parse</code>, which consumes the concrete
+representation of a program, and returns its abstract syntax tree.  To be
+precise, <pre>parse :: S-exp -> Expr</pre>  <i>You may assume that
+s-expression provided to parse conforms to the grammar.</i></p>  </li>
+
+<li><p> Write down type judgments for the five numeric list constructs:
+<code>nempty</code>, <code>ncons</code>, <code>nempty?</code>,
+<code>nfirst</code>, and <code>nrest</code>. Include them as <code>judgments.pdf</code> in your folder.</p> </li>
+
+<li> <p> Implement the function <code>type-of</code>, which consumes the
+abstract representation of a program (i.e. the result of <code>parse</code>) If
+the program has no type errors, <code>type-of</code> returns the type of the
+program, using the names of the types given in the grammar above. To be
+precise, <pre>type-of :: Expr -> Type</pre>  However, if the program does
+have a type error, <code>type-of</code> invokes <code>error</code> with an
+appropriate error message. For example:
+
+<pre>(type-of (parse '{+ 1 2}))</pre>
+    
+should produce <code>(t-num)</code>, while:
+
+<pre>(type-of (parse '{3 4}))</pre>
+
+should call <code>error</code> with some string, e.g. "Number is not a function".
+
+</p> </li> </ol>
+
+</div>
+</body>
+</html>
+

@@ -1,0 +1,46 @@
+* Prolog
+
+* Varieties of languages
+** Laziness tames infinite computation
+** Continuations capture control and interaction
+** GC provides memory management
+** Type inference drops type annotations from our world
+
+* But still, why must computation be expressed as functions?
+
+* Prolog says a program is data and relations over those data
+** Computation is searching for the answer
+** Colloquial: Writing in Prolog means you don't write algorithms
+** This is subtly incorrect
+
+* Ex: PhD trees
+** Define facts
+** No need to define a relation before using it
+** Constants are lower-case
+** Variables are upper-case
+
+* Ex: Define ancestor (in two steps)
+
+* Ex: Define descendent
+
+* More = ;
+
+* Ex: sibling 
+
+* Prolog harnesses backtracking and non-determinism
+
+* Encoding type judgments
+** numConst and boolConst
+** if
+
+* What expr has type 'num'?
+
+** var with [bind(V,T)|_] as list for type env
+
+** fun rule
+
+** app rule
+
+* Ask for type of (lambda (x) x)
+
+* Ask for type of little omega

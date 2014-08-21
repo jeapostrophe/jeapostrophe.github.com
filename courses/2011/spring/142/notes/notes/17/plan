@@ -1,0 +1,31 @@
+17
+== Accumulators ==
+
+write factorial functionally (show the natural number data definition using 0 and n+1)
+
+write factorial in accumulator style (saves space on stack---don't say the stack, instead talk about how when we do substitution the program gets really big)
+- point out that the order of addition is different
+- we need to know what the initial argument is (it moves from the empty code to the caller---this breaks the abstraction)
+
+write reverse (from #13) in accumulator style (save space and time, because we can write "putAtEnd" better i.e. we just cons onto the front going down in the acc)
+
+writing a purpose for an accum function is difficult, because the answer depends on the accumulator argument
+
+make a data definition for a phone book (list of phone entry (name and number))
+write the following FUNCTIONS:
+write lookup : name phone-book -> number [must be backed up by method]
+write add : name number phone-book -> phone-book
+
+End with a weird thing:
+
+int i = 0;
+System.out.format("The answer is %d, but should be %d%n", i, 0);
+System.out.format("The answer is %d, but should be %d%n", i, 0);
+System.out.format("The answer is %d, but should be %d%n", i, 0);
+System.out.format("The answer is %d, but should be %d%n", i, 0);
+System.out.format("The answer is %d, but should be %d%n", i, 0);
+i = 1;
+System.out.format("The answer is %d, but should be %d%n", i, 0);
+
+WHAT????
+

@@ -1,0 +1,29 @@
+At the end of today's class you should
+
+KNOW:
+function definitions mirror data definitions
+
+BE ABLE TO:
+write a function over lists of objects
+
+Exercises:
+
+0. Develop data definitions for ListOfCourse and Course (level, department, etc), write a function upperLevelCourses that consumes a list of courses and a department and produces a list of all courses at the 300- or 400-level offered by that department.
+
+1. A phone directory combines names with phone numbers. Develop a data definition for phone records and directories. Using this data definition develop the functions
+
+whoseNumber, which determines the name that goes with some given phone number and phone directory, and
+
+phoneNumber, which determines the phone number that goes with some given name and phone directory.
+
+2. Using the notes from class, develop the function extractMoreThan1, which consumes an inventory and creates an inventory from those records whose prices are above one dollar.
+
+3. Using the notes from class, develop the function recall, which consumes the name of a toy ty and an inventory and produces an inventory that contains all items of the input with the exception of those labeled ty.
+
+4. Write a function, append, which takes two lists of numbers and returns a list of numbers where every element of the first list is before every element of the second list.
+  
+For example, append(new OneMoreNumber( 1, new OneMoreNumber( 2, new EmptyListOfNumbers () ) ), new OneMoreNumber( 3, new OneMoreNumber( 4, new EmptyListOfNumbers () ) ) ) = new OneMoreNumber( 1, new OneMoreNumber( 2, new OneMoreNumber( 3, new OneMoreNumber( 4, new EmptyListOfNumbers () ) ) ) )
+
+Optional Exercises:
+
+0. Using the notes from class, develop the function nameRobot, which consumes an inventory and produces an inventory with more accurate names. Specifically, it replaces all occurrences of "robot" with "r2d3".

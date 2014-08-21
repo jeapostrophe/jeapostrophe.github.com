@@ -1,0 +1,54 @@
+* Macros as Compilers
+** Reusing existing languages is valuable: editors, debuggers, etc
+** Scheme's macros unlike CPP macros or templates
+
+* Measuring time
+** my-time as a function
+** receives e as a value, so always zero
+** try a thunk
+** now a macro, because making the thunk is annoying
+
+* Local definitions
+** my-let-1
+** my-let
+
+* Nested Local Definitions
+** my-let*
+
+* Simple Conditional
+** my-cond2 (don't include else as literal)
+
+* Disjunction
+** or as function
+** or as a simple macro
+** or with result let
+
+* Hygeine
+** or doesn't capture result
+** we shouldn't care the name of identifiers in funs or macros
+
+* Non-solutions to hygeine
+** CPP hideous names
+** typos are common
+** can be circumvented and code generating programs might
+** only good "for one level", nesting or recursion are out
+
+* Loops
+** for0 
+** for1 --- we should bind names for expressions that only eval once
+** for2 --- add 'it'
+*** try one, gets hygeine wrong
+*** next do syntax-case and with-syntax
+
+* Macros are wonderful
+** But bad rep from C's horrible ones
+** Macros aren't inlining and they're not laziness
+** They are SYNTACTIC ABSTRACTION
+
+* Why
+** Cosmetics
+** Binding
+** Altering order of eval
+** Defining data lang
+
+

@@ -1,0 +1,38 @@
+* HW
+** Continuation (Written)
+** New teams
+* Review
+** CPS of get-one-temp
+* Higher-order
+** Convert get-one-temp & call
+** How do we change higher-order? Must look at map
+** [Make trivial map that calls f/k with id as cont]
+** TEST
+** [Must make map/k]
+** [Don't pass the cons to k]
+** TEST
+** [Fix the cons, but not the empty at the top]
+** TEST
+** [Fix]
+* Web transformation
+** Order of evaluation is decided
+** Global: affects all procedures in the program
+** Every function takes values... simplifies the language, used in compilers
+* CPS
+** A style of program, implemented with a compiler
+** Every function call is in tail-position OR functions do not return
+** Every program is represented by a function of one argument: k
+* Variables and numbers and lambdas?
+** Var/num = simple
+** lambda = must add arg and convert body
+* compiler is a source to source function
+** Scheme gives us macros
+** Basic structure
+** Rule for +
+** Rule for app
+** Rule for lambda
+** Rule for web-read
+** Rule for v
+* look at expansion of add-two-numbers
+* This is the Fischer transformation... introduces a lot of overhead
+* Add define-cps and run

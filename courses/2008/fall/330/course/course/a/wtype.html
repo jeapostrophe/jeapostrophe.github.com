@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Typed (Written)</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>You must complete this assignment with Team 3.</em></p>
+
+<h3>Typed (Written)</h3>
+
+<h4> Problem 1 </h4>
+
+<p>This problem is extremely open-ended. It reflects the kind of question
+you may need to answer if you ever design a language.</p> 
+
+<p>Consider our typing rules for datatypes. A datatype declaration defines
+a new type (such as <code>nlist</code>), and each constructor (eg, <code>cons</code>) creates a
+value of that type. As a result, however, selectors (such as <code>first</code>)
+cannot statically determine whether or not they have been given the
+correct variant (there are two variants of lists, for instance) of the
+datatype, and must rely on a check from the run-time system.</p>
+
+<p>Your boss, who thinks he has a better idea of how to design a type
+system (your colleagues always do, and so do your students) thinks
+you&#8217;ve made a poor decision. He says that if you instead create a new
+type for each variant, you can give a very precise type for the selector
+thus turning the dynamic check into a static one, thereby increasing the
+effectiveness of the type system.  (You ask him what to do about the new
+type declared in the datatype declaration: should the programmer no
+longer declare it? Should they declare two or three new types when
+defining lists? He hasn't of course thought this issue out in that much
+depth&#151;that's your problem&#151;so he just murmurs and asks you to do at
+least a little work in return for the brainwave he's just handed you.)</p>
+
+<p>Write at most a page (of reasonably-sized text) exploring this question.
+Can we build an effective type system out of this idea? If so, how, and
+if not, why not? If so, why hasn&#8217;t someone already done this? If not,
+can we turn this germ of an idea into something that actually works?
+Have you seen any languages that do something like this?  Solutions to this problem which are 
+much shorter than one page are certainly acceptable so long as they get the point across.</p>
+
+<hr>
+
+<h4> Problem 2 </h4>
+
+<p>Consider the program:<br>
+<code>(+ 1 (first (cons true empty)))</code><br>
+This program has a type error.<p>
+
+<p>Generate constraints for this program. Isolate the smallest set of these
+constraints that, solved together, identify the type error.</p>
+
+<p>Feel free to label the sub-expressions above with superscripts for use
+when writing and solving constraints.</p>
+
+<hr>
+
+<h4> Problem 3 </h4>
+
+<p>Consider the following typed expression:<br>
+<pre>
+{fun {f : B1 } : B2
+  {fun {x : B3 } : B4
+    {fun {y : B5 } : B6
+      {cons x {f {f y}}}}}}</pre></p>
+
+<p>We have left the types unspecified (<code>Bn</code>) to be filled in by the type inference
+process.  Derive type constraints from the above program. Then solve these
+constraints. From these solutions, fill in the values of the boxes. Be sure to
+show all the steps specified by the algorithms (i.e., writing the answer based
+on intuition or knowledge is insufficient). You should use type variables where
+necessary.  To save writing, you can annotate each expression with an
+appropriate type variable, and present the rest of the algorithm in terms of
+these type variables alone (to avoid having to copy the corresponding
+expressions). If you do this, be sure to annotate every sub-expression with a
+type variable. Be sure the annotations are clearly readable!</p>
+
+<hr>
+
+<h4> Problem 4 </h4>
+
+<p>Consider the type judgments discussed in the textbook.  
+These rules are for an eager language.  Consider the lazy
+version of the language instead. Pay special attention to the typing rules for
+
+<ul>
+<li>function definition</li>
+<li>function application</li>
+</ul></p>
+
+<p>For each one, provide a new rule or, if you believe the existing
+rule does not change, explain why not. (If you believe neither rule
+changes, you can answer both parts together.) If you believe any other
+type judgments should change, mention those as well.</p>
+
+</div>
+</body>
+</html>
+

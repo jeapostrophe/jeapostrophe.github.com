@@ -1,0 +1,17 @@
+Nested structure
+
+Posn =>
+Ball with vert/horiz velocity
+Ball with both velocity
+
+tick : ball -> ball
+
+Phone (area,digits) =>
+Telephone book entry (cell,home,office)
+
+all-in-area? : bentry area => boolean
+
+The template step grows to include calling other functions to do the job
+
+box (ul and lr posn)
+-- translate

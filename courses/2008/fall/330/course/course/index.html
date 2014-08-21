@@ -1,0 +1,387 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330</title>   
+    <link href="course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+    <h2><a href="http://groups.google.com/group/byu-cs-330-fall-2008">Google Group</a> (Post non-revealing questions, look for answers)</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p>The fundamental tool of a computer scientist and software engineer
+is the programming language. Programming languages of all shapes and
+sizes are found under every rock in computing. There are large,
+mainstream languages that everyone uses regularly. But, there are also
+small, domain-specific languages that are like feudal lords:
+well-known to their subjects, but anonymous in the wider world.</p>
+
+<p>Few of us will design a large mainstream language during our
+careers, but almost all of us will (need to) design and implement at
+least one small language. Sometimes, this design might even be
+implicit if we're not educated about what constitutes a language.</p>
+
+<p>This course will prepare you to understand the design of all
+languages and to design and implement small ones. In contrast to
+other courses of this nature, we will not treat programming languages
+like fish and try to make little boxes for them to fit in. Programming
+languages are not fish. Instead, we will explore the "periodic table"
+of languages features and concepts. In particular, this course
+will <em>not</em> teach you to program in many languages. There is too
+much noise in that approach that distracts from the <em>real</em>
+differences.</p>
+
+<h2>Textbook &amp; Readings</h2>
+
+<p>Unless stated otherwise, readings are from the course text
+(freely available
+online), <a href="http://www.cs.brown.edu/~sk/Publications/Books/ProgLangs/">Programming
+Languages: Application and Interpretation</a> (PLAI), by Shriram
+Krishnamurthi.  We will
+use <a href="http://www.drscheme.org/">DrScheme v4.1</a> for many
+programming assignments. (Make sure you read the "Get the Software"
+section on the text book site.) Other language implementations will be
+provided when necessary. We will look
+at <a href="ftp://ftp.cs.utexas.edu/pub/garbage/bigsurv.ps">Paul
+Wilson's survey<a> of Garbage Collection methods later in the
+course.</p>
+
+<p>DrScheme v4.1 is available on the department machines in
+the <code>/users/groups/cs330/plt</code>. Run
+the <code>drscheme</code> binary in the <code>bin</code>
+directory.</p>
+
+<p><em>Note: We will not be using the textbook in the traditional
+way. Think of the textbook as your lecture notes. Don't read it before
+a class, but refer to it afterwards. The book is superb, so you won't
+need to distract yourself from the discussion by taking copious
+notes. (You may want to take note of your ideas and insights, but the
+content of the lecture will be in the textbook.)</em></p>
+
+<h2>Assignments</h2>
+
+<p>All assignments are due by 2<small>AM</small> the day after the day
+listed. Assignments that are a second late will not be
+graded.</p>
+
+<table border="1" cellpadding="3" cellspacing="1" width="75%">
+  <tr><th>Assignment</th><th>Team</th><th>Out</th><th>Due</th><th>Code</th></tr>
+  <tr><td><a href="a/music.html">Musical Notation (Written)</a></td><td>Solo</td><td>9/3</td><td>9/8</td><td>music</td></tr>
+  <tr><td><a href="http://spreadsheets.google.com/viewform?key=pCk1LNaW0kd7jmzF4knbwMQ&email=true">Survey</a></td><td>Solo</td><td>9/3</td><td>9/10</td><td>N/A</td></tr>
+  <tr><td><a href="a/rinterp.html">Rudimentary Interpreter</a></td><td>Solo</td><td>9/5</td><td>9/12</td><td>rinterp</td></tr>
+  <tr><td><a href="a/xinterp.html">Extended Interpreter</a></td><td>Solo</td><td>9/12</td><td>9/19</td><td>xinterp</td></tr>
+  <tr><td><a href="a/wsubst.html">Substitution (Written)</a></td><td>Team 1</td><td>9/19</td><td>9/26</td><td>wsubst</td></tr>
+  <!--SKIP: <tr><td><a href="a/laziness.html">Laziness</a></td><td>Team 1</td><td>9/19</td><td>9/26</td><td>lazy</td></tr>-->
+  <tr><td><a href="a/wlazy.html">Laziness (Written)</a></td><td>Team 1</td><td>9/26</td><td>10/3</td><td>wlazy</td></tr>
+  <tr><td><a href="a/rawweb.html">Raw Web Programming</a></td><td>Team 1</td><td>9/26</td><td>10/3</td><td>N/A</td></tr>
+  <tr><td><a href="a/wlang.html">Language (Written)</a></td><td>Solo</td><td>9/26</td><td>10/6</td><td>wlang</td></tr>
+  <tr><td><a href="a/wcont.html">Continuations (Written)</a></td><td>Team 2</td><td>10/15</td><td>10/22</td><td>wcont</td></tr>
+  <tr><td><a href="a/pltweb.html">Web Programming in Scheme</a></td><td>Team 2</td><td>10/17</td><td>10/24</td><td>pltweb</td></tr>
+  <tr><td><a href="a/pgc.html">Garbage Collection (Presented)</a></td><td>Solo</td><td>10/20</td><td>10/27</td><td>pgc</td></tr>
+  <tr><td><a href="a/gc.html">Garbage Collection</a></td><td>Team 2</td><td>10/24</td><td>11/7</td><td>gc</td></tr>
+  <tr><td><a href="a/wgc.html">Garbage Collection (Written)</a></td><td>Team 2</td><td>10/24</td><td>11/7</td><td>wgc</td></tr>
+  <tr><td><a href="a/typec.html">Type Checker</a></td><td>Team 3</td><td>11/7</td><td>11/14</td><td>typec</td></tr>
+  <tr><td><a href="a/wtype.html">Typed (Written)</a></td><td>Team 3</td><td>11/7</td><td>11/21</td><td>wtype</td></tr>
+  <tr><td><a href="a/typei.html">Type Inference</a></td><td>Team 3</td><td>11/14</td><td>12/1</td><td>typei</td></tr>
+  <tr><td><a href="a/prolog.html">Implementing Prolog</a></td><td>Team 3</td><td>11/24</td><td>12/12</td><td>prolog</td></tr>
+</table>
+
+<p>All assignments (with a few exceptions) are to be emailed
+to <a href="mailto:jay@cs.byu.edu">jay@cs.byu.edu</a>. The subject
+must be: "BYU - Fall 2008 - CS 330 - Section x - y", where 'x' is your
+section (1 or 2) and 'y' is the name of the assignment above. Only one
+email should be sent per team. If two are sent, I will grade
+the <em>oldest</em> one. The message body should be the names of the
+team members <em>one per line</em>. You should attach (or provide a
+link to) an archive (<code>zip</code> or <code>tgz</code> is fine) of
+your work. The archive should create a folder with the coded name of
+the assignment. Even assignments with one file should create a
+folder. Each assignment specifies the names of code files, if not,
+use the coded name.</p>
+
+<p>Written essays must be submitted as PDFs. Use this as an
+opportunity to learn LaTeX. (Some written assignments carry files,
+these should be in the folder.)</p>
+
+<p>Assignments that do not have the correct format on either the
+code, writing, or submission email will not be graded.</p>
+
+<h2>Lectures</h2>
+
+<p><table border="1" CELLPADDING="3" cellspacing="1" width="75%">
+   <tr><th>Date</th><th>Lecture Topic</th><th>Lecture Notes</th></tr>
+
+   <tr><td>9/3</td><td>Overview / Modeling languages</td><td>PLAI 1</td></tr>
+   <tr><td>9/5</td><td>Basic interpreters</td><td>PLAI 2</td></tr>
+   <tr><td>9/8</td><td>Substitution</td><td>PLAI 3</td></tr>
+   <tr><td>9/10</td><td>Functions</td><td>PLAI 4</td></tr>
+   <tr><td>9/12</td><td>Deferring substitution</td><td>PLAI 5</td></tr>
+   <tr><td>9/15</td><td colspan="2">Assignment 1 Review</td></tr>
+   <tr><td>9/17</td><td>First-class functions</td><td>PLAI 6</td></tr>
+   <!--<tr><td>9/17</td><td>Laziness / Haskell</td><td>PLAI 7</td></tr>-->
+   <tr><td>9/19</td><td>Implementing laziness</td><td>PLAI 8</td></tr>
+   <tr><td>9/22</td><td>Recursion</td><td>PLAI 9</td></tr>
+   <tr><td>9/24</td><td>Implementing recursion</td><td>PLAI 10</td></tr>
+   <tr><td>9/26</td><td>Interpretation without Representation <small>(<a href="notes/11.ss">Before</a>)</small></td><td>PLAI 11</td></tr>
+   <tr><td>9/29</td><td>Mutation <small>(<a href="notes/12.ss">Before</a>) (<a href="notes/post-12.ss">After</a>)</small></td><td>PLAI 12-13</td></tr>
+   <tr><td>10/1</td><td>Mutation, cont <small>(<a href="notes/post-12.ss">Before</a>) (<a href="notes/post-13.ss">After</a>)</small></td><td>PLAI 13</td></tr>
+   <tr><td>10/3</td><td>Variables <small>(<a href="notes/14.ss">Before</a>) (<a href="notes/post-14.ss">After</a>)</small></td><td>PLAI 14</td></tr>
+   <tr><td>10/6</td><td colspan="2">Presentations</td></tr>
+   <tr><td>10/8</td><td colspan="2">Presentations, cont.</td></tr>
+   <tr><td>10/10</td><td>Web programming <small>(<a href="notes/15.ss">Before</a>) (<a href="notes/post-15.ss">After</a>)</small></td><td>PLAI 15-16</td></tr>
+   <tr><td>10/13</td><td>Web programming, cont. <small>(<a href="notes/16.ss">Before</a>) (<a href="notes/post-16.ss">After</a>)</small></td><td>PLAI 17</td></tr>
+   <tr><td>10/15</td><td>Web programming, cont. and CPS <small>(<a href="notes/17.ss">Before I</a>) (<a href="notes/17k.ss">Before II</a>) (<a href="notes/post-17.ss">After I</a>) (<a href="notes/post-17k.ss">After II</a>)</small></td><td>PLAI 17-18</td></tr>
+   <tr><td>10/17</td><td>Continuations <small>(<a href="notes/18.ss">Before</a>) (<a href="notes/post-18.ss">After</a>)</small></td><td>PLAI 19</td></tr>
+   <tr><td>10/20</td><td>Implementing continuations <small>(<a href="notes/19.ss">Before</a>) (<a href="notes/post-19.ss">After</a>)</small></td><td>PLAI 20</td></tr>
+   <tr><td>10/22</td><td>Automatic memory management</td><td>PLAI 21, Wilson 1</td></tr>
+   <tr><td>10/24</td><td>Garbage collection</td><td>Wilson 2.1-2.3</td></tr>
+   <tr><td>10/27</td><td colspan="2">GC Conversation</td></tr>
+   <tr><td>10/29</td><td>Garbage collection</td><td>Wilson 2.4, 2.6-2.7, 4, 4.1, 4.5</td></tr>
+   <tr><td>10/31</td><td>Garbage collection</td><td>Wilson 4.6, 6.1-6.2, 7.1-7.2, 9; <a href="http://www.google.com/search?hl=en&client=safari&rls=en-us&q=region+based+memory+management&btnG=Search">Regions</a></td></tr>   
+<!--
+SKIP:   <tr><td>10/31</td><td>Lambda calculus</td><td>PLAI 22</td></tr>
+SKIP:   <tr><td>10/31</td><td>Semantics</td><td>PLAI 23</td></tr>
+-->
+   <tr><td>11/3</td><td>Types</td><td>PLAI 24-25</td></tr>
+   <tr><td>11/5</td><td>Typing control</td><td>PLAI 26</td></tr>
+   <tr><td>11/7</td><td>Typing data</td><td>PLAI 27</td></tr>
+   <tr><td>11/10</td><td>Type soundness</td><td>PLAI 28</td></tr>
+   <tr><td>11/12</td><td>Explicit polymorphism</td><td>PLAI 29</td></tr>
+   <tr><td>11/14</td><td>Type inference</td><td>PLAI 30</td></tr>
+   <tr><td>11/17</td><td>Implicit polymorphism</td><td>PLAI 31</td></tr>
+   <tr><td>11/19</td><td>Prolog</td><td>PLAI 32-33</td></tr>
+   <tr><td>11/21</td><td>Implementing Prolog</td><td>PLAI 34</td></tr>
+   <tr><td><strong>11/24</strong></td><td>Domain-specific languages</td><td>PLAI 35</td></tr>
+   <tr><td>12/1</td><td>Macros: Compiler extension (<a href="notes/36.ss">code</a>)</td><td>PLAI 36</td></tr>
+   <tr><td>12/3</td><td>Macros and language design (<a href="notes/37.ss">code</a>)</td><td>PLAI 37</td></tr>
+   <tr><td>12/5</td><td colspan="2">Review: Type Inference</td></tr>
+   <tr><td>12/8</td><td colspan="2">Cool PLT Stuff</td></tr>
+   <tr><td>12/10</td><td colspan="2">Review</td></tr>
+   <tr><td colspan="3">&nbsp;</td></tr>
+   <tr><td>12/15</td><td colspan="2">2:30pm to 5:30pm: S1 Final Exam</td></tr>
+   <tr><td>12/18</td><td colspan="2"> 11am to 2:00pm: S2 Final Exam</td></tr>
+   </table>
+
+<h2>Exams</h2>
+
+<p>There is no midterm. There will be a final in class during the
+scheduled time. It is one question. Beware.</p>
+
+<h2>Related Reading</h2>
+<ul>
+
+<li><a href="http://www.paulgraham.com/avg.html"><cite>Beating the
+Averages</cite></a>: The LISP behind the Yahoo! Store
+(<a href="http://www.paulgraham.com/articles.html">Other essays by
+Graham</a>)</li>
+
+<li><a href="http://www.franz.com/success/customer_apps/scheduling/nasa.lhtml">LISP
+used in NASA planning</a></li>
+
+<li><a href="http://nmp-techval-reports.jpl.nasa.gov/DS1/Remote_Integrated_Report.pdf">NASA's
+Deep Space 1 uses LISP or LISP in space!</a></li>
+
+<li><a href="http://homepages.inf.ed.ac.uk/wadler/realworld/">Functional
+Programming in the Real World</a></li>
+
+</ul>
+
+<h2>Scheme Material</h2>
+<p>If you need a Scheme reference, see Chapters 1-6
+of <a href="http://www.ccs.neu.edu/home/dorai/t-y-scheme/t-y-scheme.html">Teach
+yourself Scheme in Fixnum Days</a>
+or <a href="http://www.htdp.org">How to Design Programs</a> (the intro
+text that goes with DrScheme).  We will use the following
+constructs/concepts this term: functions, conditionals, symbols,
+user-defined datatypes (using define-type, covered in class notes
+only), lists (including map, filter, etc), functions as arguments,
+let/local.</p>
+
+<p>DrScheme comes with an extensive manual and guide. This is
+available via the "Help > Help Desk" menu item. It is
+also <a href="http://docs.plt-scheme.org/">online</a>. Use the search
+box. Refer to
+the <a href="http://docs.plt-scheme.org/quick/index.html">Tutorial</a>, <a href="http://docs.plt-scheme.org/guide/index.html">Guide</a>,
+and <a href="http://docs.plt-scheme.org/reference/index.html">Reference</a>.</p>
+
+<p>PLAI comes with a manual
+also: <a href="http://www.cs.brown.edu/courses/csci1730/2008/Manual/manual/index.html">It
+is available here</a>.</p>
+
+<p>Please ask for help.</p>
+
+<h2>Team Work</h2>
+ <p>
+Most assignments for this class will be done in teams (pairs, with a
+single triple if enrollment is an odd number). Our assignments tend to
+be short on code but long on thinking, so this will give you the
+opportunity to fully discuss a solution with another person. You will
+work with four different people over the course of the semester.
+ </p>
+
+ <p>
+Programming in teams does not mean each person writes part of the code
+and the team simply pastes together these contributions. <strong>Each
+person is responsible</strong> for every line of code, documentation,
+etc. turned in.  <strong>This responsibility extends over written
+assignments as well.</strong> It includes getting or losing points for
+quality, being able to explain the work, and <strong>also incurring
+penalties in case of plagiarism or other violations</strong>.  That
+said, we <strong>will</strong> sometimes ask you questions
+individually and, if you are unable to answer them, we may give you
+less credit than your teammates.  In short, working is teams is meant
+to help you learn material better, not to enable you to do less work
+than you would have if the assignment had to be done individually.
+ </p>
+
+ <p>
+For team projects, <strong>you may not discuss the assignment with a
+<em>student</em> not on your team</strong>.
+ </p>
+       
+ <p>
+We recommend that teams develop the software together using <a
+href="http://en.wikipedia.org/wiki/Pair_programming">pair-programming
+techniques</a> (of the form preached by <a
+href="http://www.extremeprogramming.org/">Extreme Programming</a>),
+though this is a suggestion, not a requirement.  Pair-programming in a
+nutshell:
+       
+ <ul>
+<li>Both programmers share a single computer, monitor, and keyboard.</li>
+
+<li>One person is the typist, the other watches what is being typed
+and critiques it.</li>
+
+<li>Programmers switch roles at regular intervals. (Note that this is
+also good for preventing RSI!)</li>
+
+<li>Both programmers jointly own every single line of code, regardless
+of who typed it.</li>
+ </ul>
+
+While this does require that you schedule times to work with your
+team, we think that pair-programming will increase your productivity
+and aid you in taking responsibility for all of your code.
+ </p>
+
+ <p>
+Assignments are broken into groups---approximately three assignments
+per group. <strong>You will work with the same team for every
+assignment in a single group, and you may not work with anyone you
+worked with in a previous group.</strong> Once you have selected a
+partner please inform the course staff. If you are having difficulty
+finding someone to be your partner, please contact us and we will
+attempt to match you with another student.
+ </p>
+
+<h2>Coding Style</h2>
+
+ <p><strong>20% of your grade for programming assignments will depend
+on your design, style, and comments.</strong> Since we expect that you
+document and test your code anyway, we think of this as giving you a
+free 20% for each assignment.</p>
+
+ <p>Not already knowing Scheme or having learned Scheme with a
+different style are not excuses for not following these
+requirements. We are using
+the <a href="http://www.htdp.org/2001-01-18/Book/node14.htm">coding
+style from How To Design Programs</a> for this course.</p>
+
+ <ul>
+   <li>All functions must have a <strong>purpose statement</strong>
+that fully explains, in a sentence or two, what the function
+does.</li>
+
+   <li>All functions must have contracts.</li>
+
+   <li>If you need to use a new type, define a new datatype to
+represent it. Do not overload lists. <strong>Understand the difference
+between lists and datatypes.</strong> Lists are homogeneous collections
+of unlimited extent. In contrast, datatypes are heterogeneous
+collections with a fixed number of members.</li>
+
+   <li>As a general rule, all functions should be <strong>no longer
+than what fits on a screen</strong>. We will of course relax this for
+functions with a lot of pattern matching (<code>parse</code> comes to
+mind) and in that case recommend that each match case fits on a
+screen.</li>
+
+   <li>Assume that your reader understands Scheme, so, in any inline
+comments, explain <em>why</em> you wrote the code, don&#8217;t explain
+<em>what</em> you wrote. We consider <code>define-type</code> to be
+self-documenting.</li>
+
+   <li>Only use Scheme primitives that we have taught in this
+course. For example, use <code>first</code> and <code>rest</code>
+instead of
+<code>car</code> and <code>cdr</code>. Likewise, consider using
+<code><a
+href="http://www.htdp.org/2001-01-18/Book/node99.htm">local</a></code>
+instead of <code>let</code> (<code>local</code> is much better,
+anyway).</li>
+ </ul>
+
+<h2>Testing: General Principles</h2>
+
+ <p>All functions must have tests that exercise non-trivial cases. We
+require this to encourage good software development skills, but, more
+importantly, to force you to show us that you know what your code is
+supposed to do and that you&#8217;re not getting a correct answer by
+guessing. <strong>We will not give full credit to untested
+functionality, even if it is correct!</strong></p>
+
+<p>Good testing:</p>
+
+ <ul>
+   <li>Strikes a good balance between testing individual features and
+testing the program as a whole.</li>
+
+   <li>Actually <em>tests</em> the program.  That means not only
+executing the program but also checking the output to ensure it is
+what you expected.</li>
+
+   <li>Includes comments to explain the purpose of each test.</li>
+ </ul>
+
+ <h2>Codewalks</h2>
+
+  <p>We will use <em>codewalks</em>, a common practice at software
+companies, to evaluate some of your programs. A codewalk is a
+presentation where you, the programmer, convince us, a jury, of
+specific properties of your program. You accomplish this by
+<strong>presenting your program and answering questions about
+it</strong>. We are most interested in</p>
+
+  <ul>
+    <li>correctness: does it do the right thing?,</li>
+    <li>extensibility: how adaptable is it to related tasks?,</li>
+    <li>robustness: is it built like a house of cards?, and</li>
+    <li>performance: does it avoid poor implementation decisions?.</li>
+  </ul>
+
+  <p>Each program will receive about 30 minutes of scrutiny. The code
+you present <strong>must the be the same</strong> code you turned in
+electronically. We will not tell you if we will conduct a codewalk for
+an assignment until <em>after</em> you have turned in a solutions for
+it. No excuses or exceptions; you read it here.</p>
+
+</div>
+
+</body>
+</html>
+

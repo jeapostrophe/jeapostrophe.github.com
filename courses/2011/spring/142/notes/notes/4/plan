@@ -1,0 +1,49 @@
+Divide by zero
+Area of tube
+TAs!
+
+
+HtDP 4
+-----
+
+Computers deal with different situations... is the click on the demon or the shopkeeper? Was that a positive or negative number?
+
+Consider:
+
+Company XYZ & Co. pays all its employees $12 per hour. A typical employee works between 20 and 65 hours per week. Develop a program that determines the wage of an employee from the number of hours of work, if the number is within the proper range.
+
+Math deals with true and false claims... these are the different booleans
+
+We can create claims... ==, <, >, etc
+
+We can combine claims... with and, or, or not
+
+Functions can return booleans...
+	 - isFiveHuh
+	 - isBetween5and6Huh
+	 - isBetween5and6OrOver10Huh
+
+We can think of these as intervals on the number line
+
+We can go back and forth
+
+We can write programs that identify solutions to equations like
+ - 6n + 3 = 12
+ - 2n^2 = 74
+ - 3n^2 + 2n + 11 = 19
+
+These programs all /produce/ booleans. What about programs that /consume/ booleans?
+
+When do we need this in the real world?
+
+"Suppose the bank pays 4% for deposits of up to $1,000 (inclusive), 4.5% for deposits of up to $5,000 (inclusive), and 5% for deposits of more than $5,000."
+
+if and else
+
+information => data => examples
+
+intervals mean there must be an if that decides which part of the interval the input comes from
+
+our "take stock" part of the design recipe has a new step
+
+sometimes we can simplify programs because we know earlier conditions are false

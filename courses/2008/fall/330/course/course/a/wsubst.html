@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Substitution (Written)</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>You must complete this assignment with a partner.  You and your partner
+should each understand the answers to both problems, so don't just do one
+each.</em></p>
+
+<h2>Substitution (Written)</h2>
+
+<h3> Problem 1 </h3>
+
+<p>We have discussed how the definition of substitution results in an
+inefficient operator: in the worst case, it can take time at least quadratic in
+the size of the program (where we can define the program size as the number of
+nodes in the abstract syntax tree). We talked about deferring substitution
+using a cache.  However, as we discussed in class, implementing the cache using
+a simple stack of bindings doesn&apos;t seem very much more efficient.</p>
+
+<p>Answer the following two questions.</p>
+
+<ol>
+
+<li> Provide a schema for a program (similar in style to the one we saw in
+class for the non-linearity of substitution) that illustrates the non-linearity
+of the stack-based cache implementation. Explain briefly why its execution time
+is non-linear in its size.</li>
+
+<li> Describe a data structure for a substitution cache that a FWAE interpreter
+can use to improve its complexity, and show how the interpreter should use it
+(if the interpreter must change to accommodate your data structure, describe
+these changes by providing a pseudocode version of the new interpreter). State
+the new complexity of the interpreter, and (informally but rigorously) prove
+it. You don&apos;t need to restrict yourself to the subset of Scheme we are
+using in this course; you may employ all your knowledge of, say, Java. However,
+the responsibility for providing a clear enough description lies on you.
+Remember that simple code is often the clearest description.</li>
+
+</ol>
+
+<h3> Problem 2 </h3>
+
+<p>The program</p>
+
+<pre>
+{with {x 4}
+  {with {f {fun {y} {+ x y}}}
+    {with {x 5}
+      {f 10}}}}
+</pre>
+
+<p> should evaluate to 14 by static scoping. Evaluating <code>x</code> in the
+environment at the point of invoking <code>f</code>, however, yields a value of
+15 for the program. Ben Bitdiddle, a sharp if eccentric student, points out
+that we can still use the dynamic environment, so long as we take the oldest
+value of <code>x</code> in the environment rather than the newest and for this
+example, he&#8217;s right! </p>
+
+<p> Is Ben right in general? If so, justify. If not, provide a counterexample
+program and explain why Ben&#8217;s evaluation strategy would produce the wrong
+answer. (A bonus point for explaining why Ben&#8217;s way of thinking about
+environments is conceptually wrong, irrespective of whether or not it produces
+the right answer.) </p>
+
+</div>
+</body>
+</html>
+

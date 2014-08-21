@@ -1,0 +1,35 @@
+* Typing Control
+
+* Conditionals
+** What is the judgment?
+** Extend type lang w/ bool
+** Give each branch whatever prog wants
+** What should the entire expression be?
+*** Union?
+*** Same!
+
+* Recursion
+** Can we write a recursive function?
+** No, because with doesn't get recursion
+** Let's try OMEGA
+** Convert into TFAE
+** What types do we assign the funs?
+** ta = ta -> t2
+** Doesn't exist, therefore our type system rejects this prog
+
+* Termination
+** TFAE is Simply-typed lambda calculus
+** It is strongly normalizing: always terminates
+** Every time we apply a fun, we remove an error, thus we run out of arrows
+** Not Turing complete, but good for many things:
+*** inner-loops
+*** program linkers
+*** packet filters and routers
+*** client-side Web scripts
+*** initialization
+*** config files
+
+* Typed Recursive Programming
+** So lets add rec and figure out its judgment
+** v should not be same as whole expr, but as annotation
+** extend type env twice

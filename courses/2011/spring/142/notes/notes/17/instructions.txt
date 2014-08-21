@@ -1,0 +1,30 @@
+0. Start with a prayer.
+
+1. Always record the screen and yourself speaking.
+
+2. I spent about 15 to 20 minutes going over the homework. Sometimes I ask people to present their exercises; normally I pick the person based on reading their assignment. Since you won't have access to them, you should just do it yourself or ask for a volunteer. I will normally briefly describe the exercises that were tough and do just one. You should decide. I always do this in a separate file that is NOT distributed to the whole list, but that I will email to anyone who asks.
+
+3. My Java program is always named "scratch.java". My Emacs setup can be replicated with:
+
+https://github.com/jeapostrophe/exp/blob/master/.emacs.el
+https://github.com/jeapostrophe/exp/blob/master/bin/javai 
+
+Ctrl-t (like DrRacket) will compile, run, and cleanup the program
+
+4. I take a 5 minute break at 11am
+
+5. I try to the end the class by opening the exercises and talking about them.
+
+6. Make sure you end on-time at 11:40am. I find it tough.
+
+7. Immediately email out the scratch.java file. I will look for this email and update the site.
+
+8. I then compress the recording (it is normally 2.5GB and compresses to 120MB) and upload it. You should do that, but put it at students.cs.byu.edu/~ntoronto/... and email the link. I will look for that email and copy it into the course site directory.
+
+--- Other comments ---
+
+Always always always use the design recipe. It is crucial that they see you do it. This means everything: contracts, purposes, data definition, tests, etc.
+
+Make sure you look at the old notes to realize what pieces of Java I've never used. You'll be introducing a lot of new Java and it is crucial that you make a big deal of it.
+
+If you ever run out of content, it would be better to look at the homework and do an isomorphic problem in class, than to go on to the next day. That's my taste, but you should decide for yourself.

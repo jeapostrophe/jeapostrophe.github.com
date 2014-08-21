@@ -1,0 +1,13 @@
+* Factorial in FAE
+** Must add - and *
+** Can't work, because 'fac' is not bound in body
+* Add 'rec'
+** Like with, it introduces a name
+** It changes the environment
+** What environment should it produce?
+** One with a binding for 'fac' to a closure
+** But that needs an env
+** And so on
+** The environment must be a cyclical structure
+** Recursive vs. cyclic
+* Recursive procedures vs values

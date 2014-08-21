@@ -1,0 +1,19 @@
+Family trees
+
+A child is a father, mother, name, blood type, eyes
+
+This is useless, because we can't construct finite family trees
+
+Person is either a child or unknown
+
+blueEyedAncestorHuh : tree -> boolean
+
+countPersons : tree -> int
+
+eyeColors : tree -> ListOfString [use append]
+
+-- Separate tree into info and left/right
+
+allInfos : tree -> ListOfInfo
+
+oldestMatriach : tree -> Info

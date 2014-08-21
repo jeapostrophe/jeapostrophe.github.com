@@ -1,0 +1,41 @@
+- 20 -
+At the end of today's class you should
+
+KNOW:
+- What an array is
+
+BE ABLE TO:
+- Write array functions
+- Use the Java 'for' construct
+
+Exercises:
+
+0. Write a function called anyTrue that takes an array of booleans and returns true if any is true. Write with only function calls, then write with 'while', then write with 'for'.
+
+1. Write a function called translateAll that takes an array of Posns, a dx, and a dy, and modifies the /array/ such that it contains new Posns that have been translated. Perform store tracking on a Posn array of length 5.
+
+2. Write a function called translateAllNoNew that takes an array of Posns, a dx, and a dy, and modifies the Posns such that they are all translated. Perform store tracking on a Posn array of length 5.
+
+3. Recall binary search trees for day #14's exercsises. Write a function call 'update' which takes a BST, a key, and a string and returns a BST where the key's value has been updated. Do not use mutation. For the binary search tree:
+
+    12
+   /  \
+ 8     23
+/\   /   \
+1 9 15   29
+
+where each node's value is the Japanese version of number (for example, 23 is "二十三").
+
+What is the fewest number of new nodes that must be created to update the tree so that 15 is mapped to "Fifteen" rather than "十五"?
+
+4. Modify #3 so that the node's value is modified in place. Perform store tracking on the example from #3.
+
+5. Write a function called 3DayMovingAverage that takes a list of prices, where each represents a day, and returns a list of 3 day price averages. For example,
+
+1:2:3:4:! would return ((1+2+3)/3) : ((2+3+4)/3) : !
+
+6. Modify #5 so that it takes a vector of prices and replaces the values with their moving averages. If there is not enough data for a three day average for the day, replace it with NaN. (Remember that Math.sqrt(-1) is a great way to get NaN.)
+
+Optional Exercises:
+
+1. Write the function distances that takes an array of numbers and modifies the array such that each number is replaced with the difference between it and the previous number. For the first number, assume the previous number was 42.

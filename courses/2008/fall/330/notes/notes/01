@@ -1,0 +1,128 @@
+* Administrative	
+
+Open with prayer for course
+
+** Textbook
+
+Online, free, use instead of lecture notes
+	
+** Lectures
+
+No schedule, at your pace
+
+** Final
+
+Exists
+
+** Scheme
+
+Not about Scheme, but we will use it
+
+** Team Work
+
+Assignments divided into groups, different partner for each group,
+don't collaborate with others, you can talk to anyone about the class
+(but not the homework)
+
+Responsible for everything
+
+Suggest pair programming
+
+** Assignments
+
+Email in, 
+
+Essays must be PDFs
+
+Short on code, long on thinking
+
+20% of grade for design, style, and comments
+
+The rest is based on the quality of your test cases --- not graded for
+untested functionality, even if it is correct
+
+** Codewalks
+
+Two assignments will be code-walked.
+
+You won't know before you turn it in.
+
+* Topic
+
+** Why are we here?
+
+PLs are fundamental. Ultimate form of abstraction
+
+Cambrian explosion of PLs
+
+Many general PLs, and DSLs are huge
+
+Few design mainstream, almost all will make a small language
+(implicitly or explicitly)
+
+Periodic table
+
+Industrial fashions vs eternal truths
+
+** Modeling languages
+
+Syntax, Behavior, Libraries, Idioms
+
+All are important, one is profound
+
+*** Syntax
+
+{Java} a [25]
+{Scheme} (vector-ref a 25)
+{C} a [25]
+{ML/Haskkell} a [25]
+
+1 & 2
+
+Misleading
+
+*** Libraries
+
+Important, but "just" engineering
+
+Interesting in as much as they demonstrate linguistic power
+
+*** Idioms
+
+Human --- More about programmers than the languages
+
+*** Semantics
+
+It's all there is
+
+** How to study semantics?
+
+Denotational / Operational / Axiomatic
+
+Interpreter
+
+But it's a program? Circular
+
+Use a well-understood, succinct language
+
+** Syntax
+
+Infix, Postfix, Prefix
+
+Essence is a tree 
+
+DEFINE AE
+
+** Parsing
+
+Concrete -> Abstract
+
+Glory of read
+
+WRITE AE in BNF
+
+WRITE parse (no error checking)
+
+Bicameral syntax: Read / Parse
+
+How is XML like this: well-formed and valid

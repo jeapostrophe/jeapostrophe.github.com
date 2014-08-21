@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Garbage Collection (Written)</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>You must complete this assignment with the same partner you had for
+&quot;Continuations (Written)&quot;.  This will be your team for the next few assignments.</em></p>
+
+<h3>Garbage Collection (Written)</h3>
+
+<h4> Problem 1 </h4>
+
+<p>We have discussed why, at least on paper, mark-and-sweep is an inferior
+garbage collection strategy for languages (such as ones that do not expose
+pointer operations) that permit implementations to move data in memory. Yet even
+for such languages, most memory managers use a mark-and-sweep strategy for their
+large-object space. Give one reason why mark-and-sweep might be preferable on
+such objects.</p>
+
+<p>State two standard objections to mark-and-sweep, and explain why they
+don&#8217;t apply in this context. For each reason, first state the objection,
+then explain why it doesn&#8217;t apply.</p>
+
+
+<hr />
+
+
+<h4>Problem 2</h4>
+
+<p>Suppose we have multiple kinds of data of different sizes. In
+typical heap representations, the type tag is always at the first
+address (i.e., at offset 0) that represents a value. Should it matter
+where the tag resides? For instance, why not put the tag at the last
+address rather than the first? (The more concrete you are, the more
+brief you can be.)</p>
+
+<hr />
+
+
+<h4> Problem 3 </h4>
+
+<p>A generational garbage collector naturally handles references from newer objects
+(those allocated more recently) to older ones. A major challenge is keeping
+track of references that go the other way: from old objects to new.  What in
+the design of a copying generational collector makes it straightforward for the
+collector to handle references from new to old, rather than vice versa?</p>
+
+<p>Distinguish between variable mutation and value mutation. In variable
+mutation, we change the value held by a variable itself. In value mutation, the
+variable still refers to the same object; it&#8217;s the content of the object
+that changes. (For example, <code>set!</code> in Scheme implements variable
+mutation, while <code>vector-set!</code> implements value mutation.) Which of
+these does a generational collector need to track specially? For each one, state
+whether it is or isn&#8217;t tracked, with a brief justification for why or why
+not.</p>
+
+</div>
+</body>
+</html>
+

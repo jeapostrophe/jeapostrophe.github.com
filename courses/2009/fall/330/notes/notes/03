@@ -1,0 +1,25 @@
+* Review
+** Write WAE BNF
+** Write WAE define-type
+* Define substitution
+** Try 1: Replace all identifiers with name with expression v
+*** Error: Capture internal withs
+*** This makes syntactically illegal programs
+** Try 2: Replace all non-binding instances of identifiers
+*** Error: Disallows shadowing
+** Try 3: Try 2 + don't go inside withs
+*** Error: Unrelated withs disallow substitution (ie (with y ... x))
+** Try 4: Try 3 modulo only withs of i
+** Try 5: Replace free occurrences 
+** Write 'subst' (error: don't subst in named-expressions)
+** Write 'calc' using 'subst'
+*** Test case to catch bug (with (x 5) (with (y x) y))
+** Write 'subst' (error: on id-=, don't subst in named-expr)
+*** Test case to catch bug: (with (x 5) (with (x x) x))
+* What kind of redundancy do identifiers eliminate?
+** Static (textual) or Dynamic (execution)?
+** How can we tell?
+** Does it matter, will the answer be the same?
+** Is one always faster?
+* Do names matter?
+** De-Bruijn indices

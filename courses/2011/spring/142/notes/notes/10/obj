@@ -1,0 +1,26 @@
+At the end of today's class you should
+
+KNOW:
+what is meant a list
+
+BE ABLE TO:
+write a data definition for a list
+write a function over lists
+
+Exercises:
+
+0. Write a function called containsHuh that determines if a string given as an argument is in a list of strings.
+
+1. Write a function called dollarStoreHuh that determines if every number in a list is less than a dollar
+
+2. Write a function called anyFreezingHuh that determines if any temperature in a list of Fahrenheit temperatures is below freezing.
+
+3. Write a function called convertList that consumes a list of digits and returns the corresponding number. The first digit is the least significant digit. (Refer to convert3 if you are unsure what this means.)
+
+4. Develop the function delta, which consumes two price lists, that is, lists of numbers. The first represents the inventory at the beginning of a time period, the second one the inventory at the end. The function outputs the difference in value. If the value of the inventory has increased, the result is positive; if the value has decreased, it is negative.
+
+5. Develop a function that returns the longest string in a list of strings.
+
+Optional Exercises:
+
+0. Define the function averagePrice. It consumes a list of toy prices and computes the average price of a toy. The average is the total of all prices divided by the number of toys.

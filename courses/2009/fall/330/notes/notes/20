@@ -1,0 +1,94 @@
+* Automatic memory management
+** When we introduced the store, it contained data that was no longer necessary
+** Ideally, this should be reclaimed automatically
+** We should program as-if there is an infinite amount of memory
+* Whose should reclaim space?
+** The receiver can't assume it is the only receiver ever
+** The producer doesn't know how long the value is necessary
+** It is painful to mix low-level resource management with high-level tasks
+** We could multiply all functions to reclaim and non-reclaim versions... but there is an exponential number of combinations
+* AMM = Garbage collection
+** GC's job is to reclaim memory "when it is no longer necessary"
+** GC must know if a datum is used again
+** This is an AI problem
+* Truth and Provability
+** Some things are true, others are provability: sets aren't the same
+* GC Constraints
+** Useful: Actually reclaims garbage
+** Sound: Never reclaim a datum that is used subsequently
+** Efficient: Must not slow down the program too much
+* Reachability approximates truth
+** Start from roots, find the live set
+** Basically finds a possible expression to get to the value
+*** What assumptions about the lang is made?
+** Unreachable /will/ not be used
+** Reachable /may/ be used
+*** Consider getting the length of a large vector
+
+**************
+
+* Wilson (1)
+** GC removes 'free' from the language
+** GC is *necessary* for modular programming
+*** Because liveness is a global property
+** Most system implement application-specific GC
+*** These are typically buggy or incomplete
+** GC is cheaper than manual work
+*** Alloc is O(1) in semi-space, free is free
+* Implementation
+** Needs a way to know what kind of object is stored at an address
+
+* Basic techniques
+** Reference counting (2.1)
+*** Each object has a count of how many pointers point to it
+*** This count is maintained and the object is freed when zero is hit
+*** This has a cascading effect
+*** Adv: RC is /incremental/
+*** Dis: The count takes space
+*** Dis: How do you deal with cycles?
+**** Trial deletion is one technique or adding a tracing step
+*** Dis: Expensive and interferes with caches/registers/etc
+*** Dis: Freed objects must be given back in some way (free list)
+*** Most common ad-hoc application-specific GC
+
+** Mark-Sweep (2.2)
+*** Tracing: Start with a root set and find objects
+*** Mark objects in some way
+*** Reclaim garbage by looking at all objects and removing ones without mark
+*** Problems:
+**** Fragmentation
+**** Collection is proportional to size of heap (not live, not garbage)
+**** No locality optimization
+**** Several passes are required (mark, reclaim/unmark)
+
+** Mark-Compact (2.3)
+*** Like Mark-Sweep, except live objects are moved to the beginning of the heap
+*** This makes them contiguous, and the free space contiguous as well
+**** A contiguous free space removes fragmentation problems
+*** More passes, because objects need to be moved and pointers updated
+*** Cleverness: Two-pointer algorithm (live from back, holes from front)
+
+** Copying (2.4)
+*** Moves all the live objects to one area
+*** Not exactly GC (technically)
+*** Work proportional to live objects
+
+** Stop-and-Copy w/ Semispaces (2.4.1)
+*** Semispace collector w/ Cheney algorithm
+*** Heap divided into two
+*** Only one semispace used at a time
+*** Allocation is free
+*** Fragmentation is avoided
+*** If more space is needed during an allocation, GC is triggered
+*** Objects moved fromspace -> tospace
+*** Cheney: Root set put in queue, children in queue, end-of-queue = no objs
+*** Forwarding pointers
+**** What if there are multiple paths to an object?
+**** The obj is replaced with a pointer to where it is in the tospace
+
+** Efficiency (2.4.2)
+*** Arbitrarily efficient given enough memory
+*** Decreasing GC time means less frequent collection
+*** Less frequent collection means larger semispaces
+*** Alt: Less frequent means older average object age
+*** Thus, probability an object becomes garbage is higher

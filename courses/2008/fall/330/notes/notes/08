@@ -1,0 +1,20 @@
+* Substitution homework out
+** Two questions
+** Work with a partner
+* Laziness
+** {with {x {+ 4 5}}
+    {with {y {+ x x}}
+     {with {z y}
+      {with {x 4}
+       z}}}}
+** How does it evaluate with environments? [dynamic scope]
+** How does it eval with subst?
+** Dynamic scope!
+** Intro expression closures
+* New language: CFAE/L
+** New value: exprV
+** New 'app' clause
+* We need to write 'strict'
+** Where are strictness points?
+* Caching computations
+** exprV has a box

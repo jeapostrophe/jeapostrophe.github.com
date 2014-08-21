@@ -1,0 +1,20 @@
+* Review
+** Write F1WAE BNF and define-type
+* Deferring Substitutions
+** subst is O(n)
+** If there are n substs, then eval is O(n^2)
+** Keep a list of future substitutions
+** Evaluating an id now means looking it up
+** Define DefrdSub type
+** Augment interp contract
+** Define lookup
+** Augment interp
+*** Error: give functions the entire current deferred substitutions
+*** This is a bug: deferring substitutions is an optimization!
+*** Static Scope: Syntactically delimited region
+*** Dynamic Scope: The remainder of the execution
+**** Entirely wrong: cannot be understood
+** Fix interp
+*** Look at the subst-based app rule
+** Why do we never "undo" additions to the repository?
+** How efficient is this? Can we do it better?

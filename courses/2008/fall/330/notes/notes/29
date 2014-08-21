@@ -1,0 +1,30 @@
+* Type Inference
+
+* "Occurs" check
+** list([X]) = list(list([X]))
+** Step 4: Push [X] = list([X])
+** But, subst doesn't remove occurrences of X
+** So, in 2 and 3, we see if the substituted id occurs on the right
+
+* Underconstrained Systems
+** Ex: map
+** There are unconstrainted types in the output
+** Unification found polymorphism!
+
+* Principal Types
+** For a term t, consider type T. T is a principal type of t if, for any type T' that types t, these is a substitution that, when applied to T, yields T'.
+** I.e. a MOST general type
+** I.e. the one with the fewest constraints
+** I.e. as polymorphic as possible 
+
+* Implicit Polymorphism
+** What is the inferred type of (lambda (x) x)?
+** Judgment of let
+*** Uses must be the same
+** Or, type check the program with the expression substituted
+*** let-based polymorphism
+** Or, instantiate fresh type variables at each use
+*** This is a TYPE CLOSURE... really a closure, must remember env
+
+* Value restriction
+** What about box/unbox/set-box

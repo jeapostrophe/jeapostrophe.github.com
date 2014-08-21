@@ -1,0 +1,44 @@
+* We've used boxes, let's implement them
+* This is state
+** A common feature, but we haven't needed it yet
+** Indeed, Haskell doesn't have it
+** State is hard to reason about, so it is good to avoid
+
+* BCFAE
+** newbox, setbox, openbox, seqn
+
+* We can't use boxes to implement boxes (meta)
+
+* Examples:
+{with {b {newbox 0}}
+ {seqn {setbox b {+ 1 {openbox b}}}
+       {openbox b}}}
+
+* Can't use begin, because no connection between interps
+
+* Should we update the environment and return it? What about:
+{with {a {newbox 1}}
+ {seqn {with {b 3}
+        b}
+       b}}
+
+* We could remove old things when we return, like in HW
+** But what about closures?
+
+* New entity: The Store
+** The store holds location -> value mapping
+** The env holds name -> location mapping
+* Simple example updates... what about if0?
+** Must return a modified store
+** So, -> Value x Store
+* Toggle or counter example
+
+* Store passing style!
+
+* Create a new location whenever we create a binding
+* New 'box' value
+
+* Env-passing is linear, but store is threaded
+** Scope vs Extent
+** Difference between names and values
+** Some languages (C/C++) confuse them and destroy values when names go away

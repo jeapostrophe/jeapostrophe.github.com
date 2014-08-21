@@ -1,0 +1,36 @@
+At the end of today's class you should
+
+KNOW:
+function definitions mirror data definitions
+
+BE ABLE TO:
+write a function over lists of objects
+
+Exercises:
+
+0. Develop a data definition for CDs. You should at least keep track of the title, artist, price, number in stock, and its category (such as "J-Pop", "Soundtrack", "Nerdcore", etc.)
+
+1. Make 8 CD objects with at least three categories.
+
+2. Develop a data definition for CD inventories---lists of CDs.
+
+3. Write an example of a CD inventory.
+
+4. Write a function, copiesInStock, that consumes a CD title, artist, and inventory and produces the number of copies of the item in stock---return 0 if it isn't in the inventory (because that means it isn't in stock.)
+
+5. Write a function, restock, that consumes a CD title, a number of new copies, and an inventory and produces an inventory where the named CD's stock has increased. Assume the CD is in the inventory.
+
+6. Write a function, titlesBy, that consumes an artist and inventory, and returns a list of titles by that artist in the inventory.
+
+7. Write a function, jpopSale, that consumes an inventory and produces an inventory where all J-Pop CDs are discounted by 10%.
+
+8. Write a function, categoryStock, that consumes an inventory and a category and produces a list of all CDs in the named category that have more than 0 copies in stock.
+
+9. Write a function, uniqueCategories, that consumes an inventory and produces a list of categories. The result must not contain duplicates.
+
+Optional Exercises:
+
+0. Propose and write your own function on inventories.
+
+1. Propose and write your own function on inventories.
+

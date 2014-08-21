@@ -1,0 +1,11 @@
+inventory record (name, price)
+
+sumInventory : inv -> nat
+
+containsDollHuh : inv -> boolean
+
+priceOf : name inv -> price
+
+extract1 : inv -> inv (less than $1)
+
+tax : inv -> inv (prices raised by 5%)

@@ -1,0 +1,26 @@
+* Type Soundness
+
+* How do we say that the type system makes accurate predictions?
+
+* \forall p, p:t -> p => v && v :t
+** But what about non-termination?
+
+* What about (first empty)?
+** Could return some number, like -1
+** Could go into an infinite loop... why?
+** Raise an exception
+
+* \forall p, p:t -> p => v -> v:t || "well-defined" exception
+** Exceptions are a cop out
+
+* Well-typed programs do not go wrong.
+** The type checker explores all paths, while executions only explore one
+** The checker only looks at recursion once, with no iteration
+** Soundness is NOT obvious
+** Type systems make abstract, run-time systems enforce them
+
+* Type Safety
+** No primitive operation ever applies to values of the wrong type
+** Distinct from static checking
+
+* "Strong typing" doesn't make sense

@@ -1,0 +1,26 @@
+HtDP 9
+
+Compounds are for a known number of things, what if we don't know how many there are?
+
+How could we break down any number of things into a mixed data definition?
+
+We'd know what to do if there was 0, if there was 1, etc
+
+How could we get any number? 1 More! And then some...
+- this is a structure reference just like we've seen before
+- but a little funny, because it is a reference to the same thing
+
+Try list of planets (strings)
+
+Write length
+=> num
+
+Write sumLength
+=> num
+
+Write averageLength
+=> sum / len
+
+Write containsLessThan4
+=> bool
+

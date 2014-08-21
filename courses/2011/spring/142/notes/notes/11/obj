@@ -1,0 +1,26 @@
+At the end of today's class you should
+
+KNOW:
+
+BE ABLE TO:
+write a function that produces a list
+
+Exercises:
+
+0. Write a function called replaceNegatives that takes a list of numbers and a positive number and produces a list identical to the given list except that all negative numbers in the list have been replaced by the positive number.
+
+1. Write a function called convertFCs that takes a list of Fahrenheit temperatures and produces a list of Celsisu temperatures.
+
+2. Write a function eliminateExpensive that takes a list of toy prices and returns a list with all the elements of the given list, except those that cost more than $10.
+
+3. Write the function nameRobot that takes a list of toy descriptions (strings) and returns a more specific list where "robot" has been replaced with "wally".
+
+4. Generalize #3 to substitute that takes a list of toy descriptions, a target, and new. It replaces all occurrences of the target with the new.
+
+5. Write a function called insert that takes a number and a sorted list of numbers and returns a new sort list of number where the new number is added in the correct spot. [Sorted meaning the numbers go from smallest to largest.]
+
+6. Write a function called sort that takes an unsorted list of numbers and returns a sorted list of numbers. [Hint: Use #5!]
+
+Optional Exercises:
+
+0. Write the function recall that takes a list of toy descriptions and a target and produces a list that does not contain the target but contains everything else in the input list.

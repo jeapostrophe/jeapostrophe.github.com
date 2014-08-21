@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BYU CS 330: Web Programming in Scheme</title>   
+    <link href="../course.css" rel="stylesheet" type="text/css"> 
+  </head>    
+  
+  <body>
+    <div id="mainmenu">
+      <img src="../PLT-206.png" style="width: 13em;" />
+    </div>
+
+  <div id="header">
+    <h1>CS 330: Programming Language Design (Fall 2008)</h1>
+
+    <h2>Professor: <a href="http://faculty.cs.byu.edu/~jay">Jay McCarthy</a></h2>
+    <h2>Location: 373 MARB</h2>
+    <h2>Time: (S1) 1-1:50p MWF / (S2) 2-2:50p MWF</h2>
+
+    </div>
+
+<br />
+<div id="info-frame">
+
+<p><em>Complete this assignment with the same team you worked with for
+Continuations (Written). You and your partner should each understand the
+entire program but you only need one hand in.</em></p>
+
+<h2>Web Programming in Scheme</h2>
+
+<h3>Assignment Task</h3>
+
+<p>Repeat the <a href="rawweb.html">Raw Web Programming assignment</a> using the
+PLT Scheme Web Server.  Instructions for using the PLT Web Server
+follow.</p>
+
+<p>Include a readme file in your submission. In it, list the names of the people
+in your group. Additionally, contrast 3-5 language features that you used in
+this assignment to the language features encountered in the Raw Web assignments.
+Even if the members of your group used different languages in the Raw Web
+assignment, all of you are still responsible for understanding the presented
+response. The analysis should be 2 paragraphs or fewer. Grammar and word choice
+matter.</p>
+
+<h3>Writing Servlets</h3>
+
+<p>You may write your servlets in DrScheme and save them anywhere. If
+you use this template for your servlets:</p>
+
+<pre>
+#lang plai/web
+
+(define (start initial-request)
+  ; initial page goes here
+  ...)
+</pre>
+
+<p>Then you can run the servlet with the server by pressing "Run".</p>
+
+<h3>Quasi-Quoting</h3>
+
+<p>You may notice sample servlets quoting lists with <code>`</code> instead of
+<code>'</code>. This is called quasiquoting, as opposed to quoting.
+Quasiquoting lets you evaluate specific elements of a quasiquoted expression
+instead of directly returning the expression. To force evaluation of an element
+in a quasiquoted expression, prefix the element with a comma. For example, to
+generate the list <code>'(1 2 3 4)</code> you may write <code>`(1 2 ,(+ 0 3)
+4)</code>. Quasiquoting is a convenient way to insert dynamic elements into
+HTML templates.  If you want more information or examples, the <a
+href="http://www.schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-7.html#%_sec_4.2.6">Scheme
+standard</a> is a good place to look.</p>
+
+</div>
+</body>
+</html>
+

@@ -1,0 +1,13 @@
+* Implementing Recursion
+* Start with interpreter's rule for with
+** Can't adapt with 'recSub'
+* Instead, 'cyclically-bind-and-interp'
+** Dummy value holder
+** New environment
+** Evaluate nexpr
+** Half right / half wrong
+** How do we change it?
+* Add a box and new Env type
+** Box the dummy
+** Mutate and return
+** Update lookup procedure
