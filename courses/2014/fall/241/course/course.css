@@ -10,6 +10,9 @@ table.lectures td:nth-child(6) {
 table.lectures td:nth-child(8) {
     text-align: right;
 }
+table.lectures td:nth-child(10) {
+    text-align: left;
+}
 
 table.assignments {
     text-align: center;
