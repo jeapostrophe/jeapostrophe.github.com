@@ -9,10 +9,26 @@ interface List {
     public int length();
 
     // remove : List int -> List
-    public List remove( int elt );
-    // returns a list that does not contain elt (and btw we assume
-    // lists don't contain duplicates)
+    public List remove( /* ListWithoutDuplicates this */ int elt );
+    // REQUIRES: the list not contain any duplicates, elt is even
+    //           (you put DATA INVARIANTS here)
+    // returns a list that does not contain elt
+
+    // public Object LooseRemove( Object elt );
+    // REQUIRES: elt is a int and return is a List
 }
+
+// If req'd is not met...
+// - contract not filed error?
+// - doesn't give the right answer?
+// - some error later because of data-flow
+// - won't compile (we assume the REQUIRES means "Java doesn't enforce")
+// - ANYTHING GOES and it's okay
+//    if AG is little, then language is SAFE. C is not Safe. Java is pretty Safe.
+
+
+
+// CYA
 
 class Empty implements List {
     Empty() { }
@@ -22,7 +38,17 @@ class Empty implements List {
     }
 
     public List remove( int elt ) {
-        return this;
+        if ( 4 < 5 ) {
+            return this;
+        } else {
+            // return 17;
+            return this;
+            // Godel Incompleteness Theorem
+        }
+    }
+
+    public String toString () {
+        return "";
     }
 }
 
@@ -46,10 +72,14 @@ class Cons implements List {
             return this.rest;
         }
     }
+
+    public String toString () {
+        return "" + first + "::" + rest;
+    }
 }
 
 
-class C5 {
+class C6 {
     // For all l and elt,
     //  (remove l elt).length() = (l.length() - 1) \/ l.length()
 
@@ -99,13 +129,20 @@ class C5 {
             List l = randomList(len);
             checkList_remove_length( l, elt );
         }
+
+        System.out.println("The list is " + randomList(20).remove(5) + " and we removed 5 ");
+
+        // Integer xcrazy = 5;
+        // List lcrazy = xcrazy.remove(7);
+
+        // List lcrazy = l5.remove( true );
     }
 
     public static List randomList( int len ) {
         if (len == 0) {
             return new Empty();
         } else {
-            return new Cons( randomInt(0, 100), randomList( len - 1 ) );
+            return new Cons( randomInt(0, 10), randomList( len - 1 ) );
         }
     }
 
@@ -114,3 +151,60 @@ class C5 {
         return rand.nextInt((max - min) + 1) + min; }
 
 }
+
+/// Remove something from a tree
+
+// If it is there
+// Branch( left : Tree, target : Element, right : Tree )
+
+//       target
+//      /     \
+//     left   right
+
+// The left stays
+// The target goes
+// The right stays
+
+// Turn two Trees into one Tree
+
+/// Subset
+
+// A leaf and a tree... True
+
+// t = A branch(left : Tree, root, right : Tree) and some tree u....
+
+// All the elements in t are in u
+// All the elements in t === root, everything in left, and everything in the right
+
+/// Is "root" in u? ---> u.member
+/// ...
+/// Is "everything in the right" in u? ---> right.subset(u)
+
+// forall x y s,
+// x.union(y).subset(s) = x.subset(s) && y.subset(s)
+
+// forall x y
+// max(x.cardinality(), y.cardinality()) <= 
+//   x.union(y).cardinality() <= x.cardinality() + y.cardinality()
+
+/*
+class Evens implements FiniteSet {
+    public boolean member ( int elt ) {
+        return ( elt % 2 ) == 0;
+    }
+}
+*/
+
+// interface X; // X = FiniteSet
+// class A;     // A = Leaf
+// class B;     // B = Branch
+
+// forall a b c d,
+// Set x = empty().add(a).add(c);
+// Set y = empty().add(b).add(d);
+// x.union(y).member(1) == true;
+// four times
+
+// member (inter t u) x == true
+// <->
+// member u x && member t x
