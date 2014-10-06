@@ -325,3 +325,7 @@ class C15 {
 
 // Next time: implement for ring buffers and continuing amazement
 // Are AS just lists? (They are LAZY lists.)
+// Other kinds of AS, like Mapped, Naturals, Fibs, Primes
+// Type-genericity
+// MutableAS
+// Fold
