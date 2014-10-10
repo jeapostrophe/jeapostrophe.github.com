@@ -5,7 +5,11 @@ finite bag data-structure. A <font class="badlink"><span class="techoutside"><sp
 set, but each element may occur many times. Your bags should be
 polymorphic, i.e. use generics to allow any kind of
 contents. By "pure", we mean that operations on the set return new
-sets and do not modify the old set.</p><p>You should first design the API for your bags. Please run it by me to
+sets and do not modify the old set. I expect your sets to be
+implemented efficiently. Using basic binary search trees is no longer
+sufficient, instead use a
+<a href="https://en.wikipedia.org/wiki/Self-balancing_binary_search_tree">self-balancing
+binary tree</a>.</p><p>You should first design the API for your bags. Please run it by me to
 make sure you&rsquo;re on the right track before you dig into the code. You
 should include the
 <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Iterable.html">Iterable</a>
