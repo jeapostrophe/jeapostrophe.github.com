@@ -66,12 +66,6 @@ class IHash_Array<K extends Comparable,V> implements IHash<K,V> {
     }
 }
 
-interface Ring<O> {
-    public O add ( O y );
-    public O zero();
-    public O negate ();
-}
-
 class C21 {
     public static void main( String[] args ) {
         PHash<Integer,String> ht0 = new PHash_MT<Integer,String>();
@@ -83,7 +77,7 @@ class C21 {
 
         System.out.println(ht2.lookup( 0, "Not Answer" ) + " should be " + "Answer" );
 
-        IHash<Integer,String> iht = new IHash_Array<Integer,String>(50);
+        IHash<Integer,String> iht = new IHash_Array<Integer,String>(20);
         iht.add( 0, "Answer" );
         for ( int i = 1; i < 100; i++ ) {
             iht.add( i, "Not Answer" );
