@@ -92,8 +92,6 @@
   (define after-step1 (step1 T))
   (step2 after-step1))
 
-(maybe-rotate (insert t k v))
-
 (define (insert-n insert T Ks)
   (if (empty? Ks)
       T
