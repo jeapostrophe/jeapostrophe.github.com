@@ -47,6 +47,13 @@
 ;; - Think about how to VERIFY if a particular entry is the answer
 ;; - Then think about how to SEARCH for that entry
 
+;; X[k] is the median then there are n to the left and n-1 to the right
+;; From X there are K on the left and (N - K) on the right
+;; From Y there are (N - K) on the left and K on the right
+;; Check what Y[N-K] is, if it ISN'T then K isn't the median
+
+;; We know that first k things in X are some of the n things to the left in the whole thing
+
 ;; 9-1
 ;; - I hope that this problem is easy for you because you're applying
 ;; other things.
