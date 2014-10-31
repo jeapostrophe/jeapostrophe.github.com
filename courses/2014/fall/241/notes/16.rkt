@@ -13,6 +13,16 @@
 ;; 11.1-2
 ;; - Use the logarithm.
 
+(define (bitset-mt) 0)
+(define (bitset-set? bv k)
+  (not (zero? (bitwise-and bv (expt 2 k)))))
+(define (bitset-add bv k)
+  (bitwise-ior bv (arithmetic-shift 1 k)))
+
+(bitset-add (bitset-add (bitset-add (bitset-mt) 0) 1) 2)
+7 
+#b111
+
 ;; 11.2
 ;; - Pidgey and Collisions
 ;; - What to do when colliding?
@@ -21,6 +31,20 @@
 
 ;; 11.2-1
 ;; - How many different "k,l"s are there?
+
+(define (fac n)
+  (if (zero? n)
+      1
+      (* n (fac (sub1 n)))))
+(define (choose n k)
+  (/ (fac n) (* (fac k) (fac (- n k)))))
+
+(define (prob n m)
+  (/ (choose n 2) m))
+
+(real->decimal-string (prob 100 20))
+
+;; (= x (modulo (+ (* y m) x) m))
 
 ;; 11.2-3
 ;; - Work through this... what does sorted do?
