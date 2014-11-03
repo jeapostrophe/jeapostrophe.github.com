@@ -20,18 +20,26 @@ class AS_MT implements Sequence {
 }
 
 class AS_One implements Sequence {
-    int here;
+    public int element;
     Sequenced next;
-    AS_One(int here, Sequenced next) {
+    AS_One(int element, Sequenced next) {
         System.out.print(":");
-        this.here = here;
+        this.element = element;
         this.next = next;
     }
 
     public Sequence seq() { return this; }
     public boolean notEmpty() { return true; }
-    public int here() { return this.here; }
+    public int here() { return this.element; } // <-- AS_One's here
     public Sequence next() { return this.next.seq(); }
+}
+
+class AS_Two extends AS_One {
+    AS_Two(int element, Sequenced next) {
+        super(element, next);
+    }
+    public int here() { return this.element * 2; }
+    public int uniq() { return 42; }
 }
 
 class AS_App implements Sequence {
@@ -108,7 +116,13 @@ class Cons implements Set {
         return this.first == there || this.rest.isIn(there);
     }
 
-    public Sequence seq() { return new AS_One( first, rest ); }
+    public Sequence seq() {
+        if ( first % 2 == 0 ) {
+            return new AS_One( first, rest );
+        } else {
+            return new AS_Two( first, rest );
+        }
+    }
 }
 
 class Branch implements Set {
@@ -139,9 +153,64 @@ class Branch implements Set {
     }
 }
 
+// An AS_One is...
+//   VTable = [ Ptr to here() code, Ptr to isEmpty() code, Ptr to next() code ]
+//   Fields = [ 32bits for element, 32bits for next ]
+//   [ "I am an AS_One", VTable, Fields .... ]
+
+// AS_One's constructor:
+//  Java writes this part:
+//  this = new memory ( exactly 32 * 5 bits )
+//  this.vtable.here = AS_One.here;
+//  this.vtable.isEmpty = AS_One.isEmpty;
+//  this.vtable.next = AS_One.next;
+//  You write this part:
+//  this.fields.element = element;
+//  this.fields.next = next;
+
+//   [ a bunch of bits for .element, a bunch of bits for .here() ]
+
+// An AS_Two is an AS_One is...
+//   VTable = [ Ptr to uniq() code ]
+//   Fields = [ 32bit secondElement ]
+//   [ "I am an AS_Two", AS_One, VTable, Fields ... ]
+//  Java writes this part:
+//  this = new memory ( exactly 32 * 5 bits )
+//  this.vtable.here = AS_Two.here;
+//  this.vtable.isEmpty = AS_One.isEmpty;
+//  this.vtable.next = AS_One.next;
+//  You write this part:
+//  this.fields.element = element;
+//  this.fields.next = next;
+
+//   [ a bunch of bits for .element, a bunch of bits for .here() ]
+
+// because .here() is different, bits must be different
+//   take the pointer, go to the vtable, and look at the first code pointer
+// BUT because .element is same, bits must be similar?
+//   take the pointer, go to the fields, and look at the first field
+// .secondElement
+//   take the pointer, go to the second fields, and look at the first field
+
+
 class C24 {
     public static void printS ( Sequence as ) {
         while ( as.notEmpty() ) {
+            if ( as instanceof AS_One ) {
+                System.out.println("Coming from a one!");
+                // javac (compiler) vs java (runner)
+                // Q1: Does Java know what it actually is?
+                // Q1a: Does javac know what it actually is?
+                // Q1b: Does java know what it actually is?
+
+                // Q2: Does a cast tell Java "not to worry" and treat it like the casted to type?
+                // Q2a: Does a cast have an effect in javac? (javac RELIES on the runtime)
+                // Q2b: Does a cast have an effect in java? (i.e. does it print out 3 NOT 6) (java GUARANTEES the javc)
+                AS_One it = ((AS_One) as);
+                System.out.println("The first is this: " + it.element );
+                // here-ness is in the object (runtime) NOT in the type (compiler)
+                System.out.println("The here is this: " + ((AS_One) as).here() );
+            }
             System.out.print(as.here() + " ");
             as = as.next();
         }
