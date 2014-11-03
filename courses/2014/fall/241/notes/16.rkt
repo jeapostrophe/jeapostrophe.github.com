@@ -82,7 +82,7 @@
 
 ;; 11.4-1
 ;; - Practice your grasp of these hashing ideas
-
+                                   
 ;; 11.4-3
 ;; - Practice your grasp of the analysis
 

@@ -40,20 +40,6 @@
 (struct T:0 T () #:transparent)
 (struct T:2 T (left key val right) #:transparent)
 
-(module+ test
-  (require slideshow
-           pict/tree-layout)
-
-  (define (tree->layout t)
-    (match t
-      [(T:0) #f]
-      [(T:2 L K V R)
-       (tree-layout #:pict (text (format "~a is ~a" K V))
-                    (tree->layout L)
-                    (tree->layout R))]))
-  (define (show-tree T)
-    (slide (scale-to-fit (naive-layered (tree->layout T)) client-w client-h))))
-
 (define (insert T k v)
   (match T
     [(T:0)
@@ -73,6 +59,20 @@
       (insert-n insert
                 (insert T (first Ks) (first Ks))
                 (rest Ks))))
+
+(module+ test
+  (require slideshow
+           pict/tree-layout)
+
+  (define (tree->layout t)
+    (match t
+      [(T:0) #f]
+      [(T:2 L K V R)
+       (tree-layout #:pict (text (format "~a is ~a" K V))
+                    (tree->layout L)
+                    (tree->layout R))]))
+  (define (show-tree T)
+    (slide (scale-to-fit (naive-layered (tree->layout T)) client-w client-h))))
 
 (module+ test
   (define T15
