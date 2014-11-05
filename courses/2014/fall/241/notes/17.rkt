@@ -29,7 +29,7 @@
 
 ;; 12.2-5
 ;; - The two sides are the same.
-;;- Think about what successor and predecessor-ness means and where
+;; - Think about what successor and predecessor-ness means and where
 ;;they are in the tree
 
 ;; 12.3
@@ -71,13 +71,42 @@
        (tree-layout #:pict (text (format "~a is ~a" K V))
                     (tree->layout L)
                     (tree->layout R))]))
-  (define (show-tree T)
-    (slide (scale-to-fit (naive-layered (tree->layout T)) client-w client-h))))
+  (define (render-tree T)
+    (naive-layered (tree->layout T)))
+  (define (show-tree #:label [label ""] T)
+    (slide
+     (t label)
+     (scale-to-fit (render-tree T)
+                   client-w
+                   (* .8 client-h)))))
 
 (module+ test
   (define T15
     (insert-n insert (T:0) (shuffle (for/list ([i (in-range 15)]) i))))
-  (show-tree T15))
+
+  (when #f
+    (show-tree
+     #:label "Counter example"
+     (T:2 (T:0) 2 2 (T:2 (T:2 (T:0) 4 4 (T:0)) 5 5 (T:2 (T:0) 7 7 (T:0))))))
+
+  (when #f
+    (for/fold ([T (T:0)])
+              ([i (in-range 25)])
+      (define k (random 25))
+      (define Tp (insert T k k))
+      (show-tree
+       #:label (format "Inserting ~a" k)
+       Tp)
+      Tp))
+
+  (when #f
+    (show-tree #:label "T15" T15)
+
+    (show-tree #:label "Perfect order"
+               (insert-n insert (T:0)
+                         '(   4
+                           2   6
+                           1 3 5 7)))))
 
 ;; - Similarly, delete looks really complicated. Here's a simpler way
 ;; to do it. But what's the performance of this implementation? _Why_
@@ -104,7 +133,7 @@
      (insert (union (union L R) Y) K V)]))
 
 (module+ test
-  (show-tree (slow-delete T15 4)))
+  (when #f (show-tree (slow-delete T15 4))))
 
 (define (fast-delete T k)
   (match T
@@ -136,11 +165,52 @@
      (T:2 L yk yv (T:2 X rk rv RR))]))
 
 (module+ test
-  (show-tree (fast-delete T15 4))
-  (show-tree (fast-delete T15 7)))
+  (when #f
+    (show-tree (fast-delete T15 4))
+    (show-tree (fast-delete T15 7))))
 
 ;; 12.3-2
 ;; - Do it a few times
 
 ;; 12.3-4
 ;; - I love this problem
+
+(module+ test
+  (let/ec break
+    (for ([n (in-naturals 2)])
+      (define l (build-list n add1))
+      (for ([p-of-l (in-list (permutations l))])
+        (define tr (insert-n insert (T:0) p-of-l))
+        (for ([x (in-list p-of-l)])
+          (for ([y (in-list p-of-l)]
+                #:unless (= x y))
+            (define t-x (fast-delete tr x))
+            (define t-x-y (fast-delete t-x y))
+            (define t-y (fast-delete tr y))
+            (define t-y-x (fast-delete t-y x))
+            (unless (equal? t-x-y t-y-x)
+              (define (recty p)
+                (cc-superimpose
+                 (colorize
+                  (filled-rectangle
+                   (pict-width p)
+                   (pict-height p))
+                  "salmon")
+                 p))
+              (slide
+               (t (format "Deleting ~a and ~a"
+                          x y))
+               (scale-to-fit
+                (naive-layered
+                 (tree-layout
+                  #:pict (recty (render-tree tr))
+                  (tree-layout
+                   #:pict (recty (render-tree t-x))
+                   #f
+                   (tree-layout #:pict (recty (render-tree t-x-y))))
+                  (tree-layout
+                   #:pict (recty (render-tree t-y))
+                   (tree-layout #:pict (recty (render-tree t-y-x)))
+                   #f)))
+                client-w client-h))
+              (break))))))))
