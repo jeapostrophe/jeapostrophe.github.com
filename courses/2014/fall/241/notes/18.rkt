@@ -95,6 +95,58 @@
                                "white"))
                     (tree->layout L)
                     (tree->layout R))]))
+  (define (2-3tree->layout t)
+    (match t
+      [(T:0) 
+       (tree-layout #:pict (colorize (filled-rectangle 15 15) "black"))]
+      [(T:2 C (and L (or (T:0) (T:2 'B _ _ _ _))) K V (and R (or (T:0) (T:2 'B _ _ _ _))))
+       (tree-layout #:pict
+                    (cc-superimpose
+                     (colorize (disk 45)
+                               (match C
+                                 ['B "black"]
+                                 ['R "red"]))
+                     (colorize (text (format "~a" K))
+                               "white"))
+                    (tree->layout L)
+                    (tree->layout R))]
+      [(T:2 C (and L (T:2 'R LL LK LV LR)) K V (and R (or (T:0) (T:2 'B _ _ _ _))))
+       (tree-layout #:pict
+                    (cc-superimpose
+                     (colorize (disk 45)
+                               (match C
+                                 ['B "black"]
+                                 ['R "red"]))
+                     (colorize (text (format "~a ~a" LK K))
+                               "white"))
+                    (tree->layout LL)
+                    (tree->layout LR)
+                    (tree->layout R))]
+      [(T:2 C (and L (or (T:0) (T:2 'B _ _ _ _))) K V (and R (T:2 'R RL RK RV RR)))
+       (tree-layout #:pict
+                    (cc-superimpose
+                     (colorize (disk 45)
+                               (match C
+                                 ['B "black"]
+                                 ['R "red"]))
+                     (colorize (text (format "~a ~a" K RK))
+                               "white"))
+                    (tree->layout L)
+                    (tree->layout RL)
+                    (tree->layout RR))]
+      [(T:2 C (and L (T:2 'R LL LK LV LR)) K V (and R (T:2 'R RL RK RV RR)))
+       (tree-layout #:pict
+                    (cc-superimpose
+                     (colorize (disk 45)
+                               (match C
+                                 ['B "black"]
+                                 ['R "red"]))
+                     (colorize (text (format "~a ~a ~a" LK K RK))
+                               "white"))
+                    (tree->layout LL)
+                    (tree->layout LR)
+                    (tree->layout RL)
+                    (tree->layout RR))]))
   (define (show-tree T)
     (scale-to-fit (naive-layered (tree->layout T)) client-w (* 0.4 client-h))))
 
