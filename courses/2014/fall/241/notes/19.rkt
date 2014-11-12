@@ -2,6 +2,41 @@
 (require racket/match
          racket/list)
 
+
+(define (split-list-at l k)
+  (cond
+   [(or (empty? l) (zero? k))
+    (values empty l)]
+   [else
+    (define-values (before after) (split-list-at (rest l) (sub1 k)))
+    (values (cons (first l) before) after)]))
+(define (split-list l)
+  (define half (quotient (length l) 2))
+  (define-values (before after) (split-list-at l half))
+  (vector before after))
+(module+ test
+  (require rackunit)
+  (check-equal? (split-list '(1 2 3 4))
+                (vector '(1 2)
+                        '(3 4)))
+
+  (for ([i (in-range 100)])
+    ;; Not in your program
+    #;(collect-garbage)
+    (printf "Gathering data\n")))
+
+(define (f n)
+  (printf " ~a " n)
+  (if (or (= n 1) (even? n))
+      n
+      (* (f (quotient n 3))
+         (f (quotient n 5)))))
+
+(module+ test
+  (for ([i (in-range 20)])
+    (printf "~a = " i)
+    (printf "= ~a\n" (f i))))
+
 ;; Chapter 15 - Dynamic Programming
 ;; - Divide and conquer is for separate work
 ;; - DP is for duplicated work
@@ -44,6 +79,48 @@
   (fast-fib N)
   (printf "Fast was ~a steps.\n" COUNT))
 
+(define BU-FIB-TABLE (make-hasheq))
+(define (bu-fast-fib n)
+  (for ([n (in-range (add1 n))])
+    (count!)
+    (hash-set! BU-FIB-TABLE n
+               (if (< n 2)
+                   1
+                   (+ (hash-ref BU-FIB-TABLE (- n 1))
+                      (hash-ref BU-FIB-TABLE (- n 2))))))
+  (hash-ref BU-FIB-TABLE n))
+
+(module+ test
+  (reset-count!)
+  (bu-fast-fib N)
+  (printf "BU Fast was ~a steps.\n" COUNT))
+
+(define (buc-fast-fib n)
+  (define val-of-n-minus-one 1)
+  (define val-of-n-minus-two 1)
+  (for ([n (in-range 3 (+ n 2))])
+    (count!)
+    ;; Compute n
+    (define val-of-n
+      (+ val-of-n-minus-one
+         val-of-n-minus-two))
+    ;; Push the others down
+    (set! val-of-n-minus-two
+          val-of-n-minus-one)
+    (set! val-of-n-minus-one
+          val-of-n))
+  val-of-n-minus-one)
+
+(module+ test
+  (reset-count!)
+  (buc-fast-fib N)
+  (printf "BUC Fast was ~a steps.\n" COUNT))
+
+;; 1 * 0 + 1 * 1 + (N - 2) * 2  
+;; 1 + 2N - 4
+;; 2N - 3
+;; O(N)
+
 (require racket/stream)
 (define (stream-map2 f x y)
   (stream-cons
@@ -57,7 +134,7 @@
   (stream-cons 1 (stream-cons 1 (stream-map2 count+ FIBS (stream-rest FIBS)))))
 ;;           FIBS = 1 1 2 3 5 8
 ;;      REST FIBS = 1 2 3 5 8
-;; REST REST FIBS = 2 3 5 8 
+;; REST REST FIBS = 2 3 5 8
 (define (awesome-fib n)
   (stream-ref FIBS n))
 
