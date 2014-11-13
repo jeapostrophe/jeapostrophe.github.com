@@ -81,7 +81,7 @@
   (buc-fast-fib N)
   (printf "BUC Fast was ~a steps.\n" COUNT))
 
-;; 1 * 0 + 1 * 1 + (N - 2) * 2  
+;; 1 * 0 + 1 * 1 + (N - 2) * 2
 ;; 1 + 2N - 4
 ;; 2N - 3
 ;; O(N)
@@ -116,6 +116,11 @@
 
 ;; 15.1
 ;; - Is this a real problem? Can you think of something like it?
+
+;; 2^n = 1 + \Sigma^{n-1}_{j=0} 2^j
+;; 2^n = 1 + (1-2^n/(1-2) [A.5]
+;; 2^n = 1 + (2^n-1)
+;; 2^n = 2^n
 
 ;; Here is some code that is the example:
 
@@ -161,11 +166,71 @@
 ;; 15.2-3
 ;; - Substitution
 
+;; Math
+;; 2^n < \Sigma^{n times} P(k)P(n-k)
+;; 2^n < \Sigma^{n times} 2^(k)2^(n-k)
+;; 2^n < \Sigma^{n times} 2^(n)
+;; 2^n < n 2^(n)
+
+;; Intui
+;; 000
+;; ...
+;; 111
+;;
+;; A_B_C_D
+
+;; A0B0C1D = (ABC)(D)
+
+;; A0B1C0D = (AB)(CD)
+;; A1B1C1D = ((A)(B))((C)(D))
+
+
+(define (minimum l)
+  (apply min +inf.0 l))
+(define (mco p)
+  (define TABLE (make-hash))
+  (define (mco/range i j)
+    (hash-ref! TABLE (cons i j)
+               (λ ()
+                 (cond
+                  [(= i j) 0]
+                  [else
+                   (define opts
+                     (for/list ([k (in-range i j)])
+                       (+ (mco/range i k)
+                          (mco/range (+ k 1) j)
+                          (* (vector-ref p (- i 1))
+                             (vector-ref p k)
+                             (vector-ref p j)))))
+                   (define m (minimum opts))
+                   (printf "~a, ~a -> ~a -> ~a\n"
+                           i j opts m)
+                   m]))))
+  (mco/range 2 (sub1 (vector-length p))))
+(module+ test
+  (mco (vector 0 30 35 15 5 10 20 25)))
+
 ;; 15.3
 ;; - This section is the most important.
 ;; - In particular, the counter-example to opitmal substructure
 ;; - The idea of independent sub-problems
 ;; - Costs of bottom-up vs top-down
+
+;; src = one of V
+;; dest = one of V
+;; disallowed-nodes = one subset of V = one of 2^|V|
+;; MATRIX = VxVx2^V
+(define (longest-simple-path src dest disallowed-nodes)
+  (if (eq? src dest)
+      empty
+      (for ([neighbor (in-list (src))]
+            #:unless (not (member neighbor disallowed-nodes)))
+        (cons (cons src neighbor)
+              (longest-simple-path neighbor dest
+                                   (cons src disallowed-nodes))))))
+;; (longest-simple-path src dest empty)
+
+;; WE STOPPED HERE.
 
 ;; 15.3-2
 ;; - Duplicated sub-problems
