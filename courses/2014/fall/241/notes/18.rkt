@@ -83,7 +83,8 @@
   (define (tree->layout t)
     (match t
       [(T:0) 
-       (tree-layout #:pict (colorize (filled-rectangle 15 15) "black"))]
+       (tree-layout #:pict (colorize (filled-rectangle 15 15) "black")
+                    #f #f)]
       [(T:2 C L K V R)
        (tree-layout #:pict
                     (cc-superimpose
@@ -148,7 +149,7 @@
                     (tree->layout RL)
                     (tree->layout RR))]))
   (define (show-tree T)
-    (scale-to-fit (naive-layered (tree->layout T)) client-w (* 0.4 client-h))))
+    (scale-to-fit (#;binary-tidier naive-layered (tree->layout T)) client-w (* 0.4 client-h))))
 
 (module+ test
   (define K 6)
