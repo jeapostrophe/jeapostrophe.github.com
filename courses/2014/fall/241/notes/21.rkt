@@ -23,6 +23,11 @@
 ;; - What if it were something different?
 ;; - The proof of BFS finding shortest paths is simple and shows you the structure of proofs about graphs
 
+;; if v.color == GRAY
+;;  v.d = min(v.d, u.d+1)
+;;  if min(v.d, u.d+1) = u.d+COST(u,v)
+;;   v.π = u
+
 ;; 22.2-1
 ;; - Practice the algorithm
 
