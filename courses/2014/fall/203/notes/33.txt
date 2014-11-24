@@ -1,0 +1,64 @@
+# How do you know if a program is correct?
+
+# Algebra
+
+> 0 + n = n
+
+> n = m -> n + n = m + m
+
+f(x) = 2*x + 1
+> x < f(x)
+
+# Induction
+
+> n + 0 = n
+
+> len (l1 ++ l2) = (len l1) + (len l2)
+
+> In x (filter p l) -> p x = true
+
+> map f (map g l) = map (compose f g) l
+
+# Hoare Logic
+
+{P} C {Q}
+
+C = skip
+  | x := E
+  | C; C
+  | (if B C C)
+  | (while B C)
+
+{P} skip {P}
+
+{P[E/x]} x := E {P}
+NOT {P} x := E {P[E/x]}
+NOT {P} x := E {P & x = E}
+NOT with aliasing
+
+{P} S {Q}
+      {Q} T {R}
+---------------------
+   {P} S; T {R}
+
+   {B & P} S {Q}
+  {!B & P} T {Q}
+-------------------
+{P} (if B S T) {Q}
+
+ P1 -> P2
+{P2} S {Q2}
+ Q2 -> Q1
+-----------
+{P1} S {Q1}
+
+     {P & B} S {P}
+------------------------
+{P} (while B S) {!B & P}
+
+# Total Hoare Logic
+
+< is a well-founded ordering on D
+[P & B & t ∈ D & t = z] S [P & t ∈ D & t < z]
+--------------------------------------------
+[P & t ∈ D] (while B S) [!B & P & t ∈ D]
