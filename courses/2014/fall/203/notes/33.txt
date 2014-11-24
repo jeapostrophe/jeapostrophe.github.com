@@ -2,32 +2,188 @@
 
 # Algebra
 
+1.      0 + m = m
+2. (1+ n) + m = 1+ (n + m)
+
 > 0 + n = n
 
+Apply rule 1 of +
+
+1. (first (cons a b)) = a 
+
+> (first (cons 1 2)) = 1
+
+Apply rule 1 of first
+
 > n = m -> n + n = m + m
+
+Remember "n = m" as Rule H
+We're trying to "n + n = m + m"
+Apply rule H
+"m + m = m + m"
+Trivial, reflexivity
 
 f(x) = 2*x + 1
 > x < f(x)
 
+x < 2*x + 1
+"consider cases of x"
+     0 < 2*0 + 1 [simplify]
+     0 < 1 [true by defn of <]
+
+(1+ N) < 2*(1+ N) + 1 [simpl]
+(1+ N) < (1+ N) + (1+N) + 1  [simpl]
+     0 < (1+ N) + 1 [by chaining <]
+
 # Induction
+
+1.      0 + m = m
+2. (1+ n) + m = 1+ (n + m)
+
+Surjection:
+(1+ n) = (1+ m) <-> n = m 
 
 > n + 0 = n
 
+Natural Induction:
+ 0 + 0 = 0 [rule 1]
+ 0 = 0 [reflexivity]
+
+   Assume (N+0) = N
+   (1+ N) + 0 = (1+ N) [rule 2]
+ (1+ (N + 0)) = (1+ N) [surjectiveness]
+      (N + 0) = N [by assumption]
+
 > len (l1 ++ l2) = (len l1) + (len l2)
+
+len mt = 0
+len (cons a d) = 1+ (len d)
+mt ++ l2 = l2
+(cons a d) ++ l2 = (cons a (d ++ l2))
+
+> len (l1 ++ l2) = (len l1) + (len l2)
+
+Lists Induction:
+Base:
+ len (mt ++ l2) = (len mt) + (len l2)
+ len l2 = 0 + (len l2)
+ len l2 = len l2
+
+Inductive:
+ Assume: len (l1' ++ l2) = (len l1') + (len l2)
+ len ((cons a l1') ++ l2) = (len (cons a l1')) + (len l2)
+ len (cons a (l1' ++ l2)) = (len (cons a l1')) + (len l2)
+ 1+ (len (l1' ++ l2)) = (len (cons a l1')) + (len l2)
+ 1+ (len (l1' ++ l2)) = (1+ (len l1')) + (len l2)
+ 1+ (len (l1' ++ l2)) = (1+ ((len l1') + (len l2)))
+(len (l1' ++ l2)) = (len l1') + (len l2)
+(len l1') + (len l2) = (len l1') + (len l2)
 
 > In x (filter p l) -> p x = true
 
-> map f (map g l) = map (compose f g) l
+Define the relation (In : Elem x List -> Prop)
 
-# Hoare Logic
+---------------
+In x (cons x l) 
+
+In x l
+---------------
+In x (cons y l)
+
+filter p mt = mt
+filter p (cons a d) =
+ if p a == true then
+  (cons a (filter p d))
+ else
+  (filter p d)
+
+> In x l /\ p x == true <-> In x (filter p l)
+
+List induction l:
+Base:
+  In x mt /\ p x == true <-> In x (filter p mt)
+  In x mt /\ p x == true <-> In x mt
+  FALSE /\ p x == true <-> FALSE
+
+Ind:
+  In x (cons a l') /\ p x == true <-> In x (filter p (cons a l'))
+  In x (cons a l') /\ p x == true <-> In x (if p a == true then
+                                            (cons a (filter p l'))
+                                              else
+                                            (filter p l'))
+                                           
+   Case of "p a == true"
+   True:
+     p a == true ->
+     In x (cons a l') /\ p x == true <-> In x (cons a (filter p l'))
+
+   False:
+     p a == false ->
+     In x (cons a l') /\ p x == true <-> In x (filter p l')
+
+   Case of "x == a":
+   True & Eq:
+     p x == true ->
+     In x (cons x l') /\ p x == true <-> In x (cons x (filter p l'))
+     FOLLOWS from DEFNs of In
+   True & Neq:
+     p !x == true ->
+     In x (cons !x l') /\ p x == true <-> In x (cons !x (filter p l'))
+     In x (cons !x l') /\ p x == true <-> In x (filter p l')
+     In x l' /\ p x == true <-> In x (filter p l')
+     FOLLOWS from INDUCTIVE HYPOs
+
+   False & Eq:
+     p x == false ->
+     In x (cons x l') /\ p x == true <-> In x (filter p l')
+     CONTRADICTION false != true
+     
+   False & !Eq:
+     p !x == false ->
+     In x (cons !x l') /\ p x == true <-> In x (filter p l')
+     In x l' /\ p x == true <-> In x (filter p l')
+     FOLLOWS from INDUCTIVE HYPOs
+
+> In x (filter p l) -> In x l /\ p x = true
+
+# Surjectiveness
+
+> f(1 + 1) == f(2)
+
+Assumes no EFFECTS
+- random number generation
+- mutation
+- printing to the screen
+- reading from the keyboard
+Stay tuned for MONADS
+
+# C. A. Hoare Logic
 
 {P} C {Q}
+P = pre condition
+Q = post condition
 
 C = skip
   | x := E
   | C; C
   | (if B C C)
   | (while B C)
+
+------------
+{P} skip {P}
+
+------------
+{?} x := E {?}
+
+{y = 2} x := 5 {y = 2 /\ x = 5}
+{P} x := 5 {P /\ x = 5} <-- WRONG
+          {x = 4} x := 5 {x = 5}
+{y = (5 + y) - 5} x := 5 + y {y = x - 5}
+{y = y} x := 5 + y {y = x - 5}
+{y = 5} x := 5 {y = x}
+{P[replace all xs with E]} x := 5 {P}
+
+////////
 
 {P} skip {P}
 
@@ -46,6 +202,10 @@ NOT with aliasing
 -------------------
 {P} (if B S T) {Q}
 
+{0 >= 0} x:=0 {x >= 0}
+{x>=0} skip {x >= 0}
+{True} (if (x < 0) (x:=0) skip) {x >= 0}
+
  P1 -> P2
 {P2} S {Q2}
  Q2 -> Q1
@@ -55,6 +215,18 @@ NOT with aliasing
      {P & B} S {P}
 ------------------------
 {P} (while B S) {!B & P}
+
+{True} c1 {ans = 1} -> {ans = ans} c1 {ans = 1} // c1 is "ans := 1"
+{ans = n !} c2 {n == input & ans = n !} // c2 is "while ..."
+{ans = n !} c2 {ans = input !} // c2 is "while ..."
+
+{True}
+[ans := 1 ;
+ n := 0;
+ while (n < input)
+  (ans := ans * n;
+     n := n + 1)]
+{ans = input ! }
 
 # Total Hoare Logic
 
