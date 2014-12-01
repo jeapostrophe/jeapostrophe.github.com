@@ -12,6 +12,10 @@
 ;; - You will probably flip back and forth to revisit the definition of terms like "respects"
 ;; - Corollary 23.2 is subtle due to the mass of text for a simple idea, watch out!
 
+;; A = {edges}
+;; S = {vertices}
+;; S respects A iff NOT (exists (u,v) in A s.t. u /\ v \in S OR u /\ v \in (V - S))
+
 ;; 23.1-1
 ;; - The key word is "some MST"
 ;; - Interpret "minimum-weight edge" as an edge at the bottom of a <= chain (min in the sorted list of edges)
