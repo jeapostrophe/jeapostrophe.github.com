@@ -14,6 +14,13 @@
 ;; - Optimization vs decision problems
 ;; - Reductions (Fig 34.1)
 
+;; Approximiation
+;; === You want 2 * Minimum and you can do that in n^4 but the Minimum is NP
+
+;; Approximiation scheme
+;; === You want (1+e) * Minimum and you can do that in n^f(e) but the Minimum is NP
+
+
 ;; 34.1
 ;; - The closure properties of polynomials are a big deal.
 ;; - These definitions are nice, but don't bother memorizing them
@@ -25,6 +32,24 @@
 ;; 34.1-5
 ;; - What do these calls look like in math?
 ;; - Solve the formula
+
+
+;; P(X) = P_0*X^0 + ... + P_n*X^n
+;; T(X) = T_0*X^0 + ... + T_n*X^n
+
+;; R_i = K*P_i + R_i
+
+;; R(X) = K * P(X) + T(X)
+;; R(X) = R_0*X^0 + ... + R_n*X^n
+
+;; R'(X) = X * P(X) + T(X)
+
+;; R'(X) = X^K * P(X) + T(X)
+
+;; R'(X) = 2^X * P(X) + T(X)
+;; R'(X) = P(2^X) + T(X)
+
+;; R'(X) = X * P(X) + R'(X-1)
 
 ;; 34.2
 ;; - "(It is always nice to know that an important set is nonempty.)"
@@ -57,5 +82,27 @@
 ;; - Don't feel like you need to read every one
 
 ;; 34.5-2
+;; A is MxN
+;; x is Nx1
+;; b is Mx1
+;; Ax <= b
 ;; - n = 3, + = OR, * = and, b
 
+;; 3-CNF-SAT...
+;; (A || B || C) /\ (A || B || C) /\ (A || B || C)
+;; C = Clauses
+;; every Clause mentions 3 variables
+;; every Clause will be a Row
+;; every Row * Column (x) is going to be an Answer
+;; Answer must be "True"
+;; "True" is "> 0"
+
+;; x is going to be at least one spot for every variable plus one 1 at end
+;; {A} ... {B} ... {C} > 0
+
+;; x_1 \/ !x_2 \/ x_3
+;; x_1 + (1 - x_2) + x_3 > 0
+;; x_1 + -x_2 + x_3 + 1 > 0
+;; (1, -1, 1, 1) (x) (x_1, x_2, x_3, 1) > 0
+;; -1 * (1, -1, 1, 1) (x) (x_1, x_2, x_3, 1) <= 0
+;; (-1, 1, -1, 0, -1,) (x) (x_1, x_2, x_3, x_4 1) <= 0
