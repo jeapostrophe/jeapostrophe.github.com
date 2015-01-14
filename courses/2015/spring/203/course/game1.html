@@ -10,8 +10,7 @@ Tetris</a>.</p><p>It is up to you what kind of game you make, but it must contai
 elements, which I will describe using Tetris.</p><ul><li><p>A field of play where the blocks move.</p><p>This is the grid where the Tetriminos lay.</p></li><li><p>A set of "live" blocks that are player controlled. (This "set" may contain one block.)</p><p>This is the falling Tetrimino.</p></li><li><p>A set of "dead" blocks that are no longer player controlled.</p><p>This is the set of Tetriminos that are resting on the ground due to gravity.</p></li><li><p>A scoring system.</p><p>In Tetris you get points for filling rows and higher scores for more at the same time.</p></li><li><p>A win or fail state.</p><p>In Tetris you fail when a Tetrimino would spawn in a resting state.</p></li><li><p>A control mechanism.</p><p>In Tetris the player can move the live block left and right, rotate it, and drop it to the bottom of the field.</p></li></ul><p>Graphics and control can be a major time sink in game projects. I
 highly recommend that you drastically simplify things and use either
 <a href="http://www.ccs.neu.edu/javalib/World/index.html">Game Worlds</a>,
-<a href="https://sites.google.com/site/blackenlib/home">Blacken</a>, or
-<a href="http://slashie.net/libjcsi/">libjcsi</a>.</p><p>You should write a short game manual that describes the rules of your
+or <a href="http://slashie.net/libjcsi/">libjcsi</a>.</p><p>You should write a short game manual that describes the rules of your
 game. You should run this past me so we can agree that the game is
 complex and interesting enough. You should use the invariants of your
 game to design testable components. You should be able to build a
