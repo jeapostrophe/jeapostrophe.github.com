@@ -1,0 +1,3 @@
+http://en.wikipedia.org/wiki/Mathematical_optimization
+
+http://en.wikipedia.org/wiki/Branch_and_bound

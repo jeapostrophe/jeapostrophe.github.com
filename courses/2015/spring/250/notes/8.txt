@@ -1,0 +1,7 @@
+http://en.wikipedia.org/wiki/Numerical_integration
+
+http://en.wikipedia.org/wiki/Rectangle_method
+
+http://en.wikipedia.org/wiki/Trapezoidal_rule
+
+http://en.wikipedia.org/wiki/Simpson%27s_rule

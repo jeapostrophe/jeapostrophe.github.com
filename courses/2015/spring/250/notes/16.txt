@@ -1,0 +1,5 @@
+http://en.wikipedia.org/wiki/Point_estimation
+
+http://en.wikipedia.org/wiki/Interval_estimation
+
+http://en.wikipedia.org/wiki/Stochastic

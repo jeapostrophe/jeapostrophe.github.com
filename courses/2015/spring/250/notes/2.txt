@@ -1,0 +1,3 @@
+http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic
+
+http://en.wikipedia.org/wiki/Floating_point

@@ -1,0 +1,9 @@
+http://en.wikipedia.org/wiki/Numerical_partial_differential_equations
+
+http://en.wikipedia.org/wiki/Finite_difference
+
+http://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods
+
+http://en.wikipedia.org/wiki/Numerical_methods_for_ordinary_differential_equations
+
+http://en.wikipedia.org/wiki/Numerical_stability

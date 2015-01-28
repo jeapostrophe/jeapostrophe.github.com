@@ -1,0 +1,5 @@
+http://en.wikipedia.org/wiki/Random_number_generation
+
+http://en.wikipedia.org/wiki/Pseudorandom_number_generator
+
+http://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator

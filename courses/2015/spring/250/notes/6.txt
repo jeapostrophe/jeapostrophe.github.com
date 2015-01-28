@@ -1,0 +1,7 @@
+http://en.wikipedia.org/wiki/Interpolation
+
+http://en.wikipedia.org/wiki/Extrapolation
+
+http://en.wikipedia.org/wiki/Regression_analysis
+
+http://en.wikipedia.org/wiki/Newton%27s_method

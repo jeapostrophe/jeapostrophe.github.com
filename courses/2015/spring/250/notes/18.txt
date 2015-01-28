@@ -1,0 +1,7 @@
+http://en.wikipedia.org/wiki/Monte_Carlo_method
+
+http://en.wikipedia.org/wiki/Simulated_annealing
+
+http://en.wikipedia.org/wiki/Distributed_ray_tracing
+
+http://en.wikipedia.org/wiki/Cholesky_decomposition

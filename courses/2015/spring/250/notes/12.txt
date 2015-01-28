@@ -1,0 +1,5 @@
+http://en.wikipedia.org/wiki/Linear_programming
+
+http://en.wikipedia.org/wiki/Branch_and_cut
+
+http://en.wikipedia.org/wiki/Numerical_stability
