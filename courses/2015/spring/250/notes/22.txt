@@ -1,0 +1,3 @@
+http://en.wikipedia.org/wiki/Discrete_event_simulation
+
+http://en.wikipedia.org/wiki/Continuous_simulation
