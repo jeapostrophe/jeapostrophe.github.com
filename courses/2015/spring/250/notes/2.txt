@@ -1,3 +1,22 @@
 http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic
 
 http://en.wikipedia.org/wiki/Floating_point
+
+... unary numbers
+... binary numbers
+... modulo numbers
+... arb numbers
+
+... fixed point numbers
+... float point numbers w/ arb
+    n = s * m * 2^e
+
+... float point numbers w/ width
+    6 bits: 1 for sign, 2 for m in [4...7], 3 for e in [-4...1]
+    special exponent patterns: 0, inf, NaN, and the three smallest (in
+    magnitude) numbers
+    should be 58 and -1/1 should be 12th with pattern 0 01 100
+
+
+
+... error in computations
