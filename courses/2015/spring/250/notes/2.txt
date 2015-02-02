@@ -7,6 +7,8 @@ http://en.wikipedia.org/wiki/Floating_point
 ... modulo numbers
 ... arb numbers
 
+See 2.java for examples
+
 ... fixed point numbers
 ... float point numbers w/ arb
     n = s * m * 2^e
@@ -18,5 +20,5 @@ http://en.wikipedia.org/wiki/Floating_point
     should be 58 and -1/1 should be 12th with pattern 0 01 100
 
 
-
 ... error in computations
+
