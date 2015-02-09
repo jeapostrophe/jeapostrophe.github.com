@@ -1,5 +1,147 @@
 http://en.wikipedia.org/wiki/Random_number_generation
-
 http://en.wikipedia.org/wiki/Pseudorandom_number_generator
-
 http://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator
+
+Random numbers
+- Truly random or un-discernible patterns?
+
+- Simulation or unpredictable?
+- Deck has 52 cards... shuffle : -> permutation(52)
+
+- Appearing random: Do you want "shuffle" to play "Let it Go" 10 times
+  in a row?
+  
+- Local randomness: frequency (counts of possibilities), serial test
+(two at a time), poker test (five at a time), gap test (gaps between
+same numbers) [Tetris example]
+
+0 2 3 5 7 8 9 1 8 5 4 7 0 3 1 -- 15 values for 10 times.. 1.5 value times
+measure the information... you can try to compress it
+0 - 2 1 - 2 2 - 1 3 - 2 4 - 1 5 - 2 6 - 0 7 - 2 8 - 2 9 - 1
+00 01 56 38
+
+True random:
+- Harvest "entropy" from reality... with dice and coins (dynamical
+systems) and radioactive decay
+- RAND Corporation
+- (often blocking)
+- Reality may have biases that are hard to detect (dice, hard drive
+arms, and human arms [mice & keyboard])
+- Humans often alternate "too much"
+
+Cryptographic:
+- Next bit test: For all k, If you have all K bits, then you can't guess the
+(k+1) bit with more than 50% accuracy in polynomial time. (O(n^m))
+
+rand : State -> (Num x State)
+
+rand n = n, n+1
+0 1 2 3 4 5 
+
+- State compromise: If you know the internal state at bit k, you can't compute
+the "old" bits (i < k) [enumerate bits of pi]
+
+--------------- ALGORITHMS -----------------------
+
+Pseudo-random:
+- The sequence WILL repeat, it is just a matter of when. (If its state
+is n bits then at most 2^n results are possible.)
+
+exists i j k,
+rand State_i = n x State_j s.t. State_j = State_k where k < i
+assuming State is Finite
+
+- Not all seeds have the same (good) period length
+
+9 8 7 6 5 4 3 2 1 0 0 0 0 0 0 0 0 0
+
+Starting at n makes the period n.
+
+- Some numbers and patterns are inherently unlikely
+
+If the period is 16, and you want a 32 length sequence with no
+repeats... it doesn't exist
+
+- Successive values are often correlated
+- Often of the form:
+
+X_n+1 = (aX_n + b) mod m
+
+- Often initialized with clock
+
+Middle square:
+- von Neumann
+- Square a number and take the middle digits (extending the left if
+necessary)
+
+4 -> 16 -> 016 -> 1
+
+4789 -> 22 9345 21 -> 9345 -> 87 3290 25 -> 3290 -> 10824100
+
+Linear feedback shift register:
+
+--->---->--->--->-->->
+0 0 1 0 1 0 1 0 1 0 1
+                    ^--- output
+
+--->---->--->--->-->->
+_ 0 0 1 0 1 0 1 0 1 0 
+^--- new value
+
+new value = output XOR bit5 + output XOR bit3
+
+- Shift values to the right
+- Compute the new value on the left with an XOR of the other values
+- Some interesting theory to get good cycles of maximal-length
+
+Multiply-with-Carry:
+- A generalization of the form above.
+
+X_0 ... X_n, c(arry)
+
+X_n+1 = (a * X_n + b ) mod m
+
+X_2 = f(X_1, c)
+c = f(X_0, ..., X_n)
+
+Blum Blum Shub:
+- x_{n+1} = (x_{n})^2 mod M
+
+where M = pq and p, q are large primes
+
+- x_0 should be co-prime to M (p and q are not factors) and not 0 or 1
+- p and q should be congruent to 3 (mod 4)
+- gcd( phi(p - 1), phi(q - 1) ) should be small (to have a large cycle)
+
+--- Example:
+p = 11, q = 19, and x_0 = 3
+gcd is 2
+
+9 81 82 36 42 92 104 157 196 169 137 168 --- 12
+9 81 82 36 42 92 104 157 196 169 137 168
+
+observation function or output function
+
+1 1 0 0 0 0 0 1 0 1 1 0
+
+Mersenne Twister:
+- A generalization of LFS
+- Most popular now
+- Period is 2^19937 − 1
+- The beginning is "highly non-random"
+- It passes a generalization of the poker test and many other tests
+
+05467 - 1/10^5
+
+- Not acceptable for crypto, stats, or numerical analysis (it only
+takes 624 numbers to know where in the sequence you are)
+- I have no idea why it works. Reading the code is not particularly instructive.
+
+.........................
+
+Send me...
+
+Questions -- that you want clarification
+More explanation and deeper --- what should we talk about next?
+
+Statistical methods for random generation...
