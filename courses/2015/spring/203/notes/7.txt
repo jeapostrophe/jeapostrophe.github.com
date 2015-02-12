@@ -1,0 +1,75 @@
+Qs:
+
+*. The text talks very broadly about informal and formal specification
+ language, can you provide a concrete example of the difference
+ between the two?
+
+*. I'm still unclear what static really means. Maybe a clear
+ definition and example when you would use it and when you wouldn't
+ use it would help.
+
+*. What exactly is a stand-alone procedure? Is it the same as a static
+ method? What are the advantages/ disadvantages of these and what is
+ the purpose of it?
+
+*. How does this form of overarching design level abstraction relate
+to the abstract class in Java? Are their similar names just a
+coincidence?
+
+First I thought the abstraction is somehow related to the abstract
+class but then I think it is unlikely. If there is any relation could
+you please explain?
+
+*. The structure of the specifications that the book uses are
+extremely similar to the contracts that we were taught to use in
+cmpu101, is there any notable difference between the two?
+
+Is a specification template just the book's name for what we call a
+contract?
+
+*. I am a little confused by what the book means by "underdetermined
+abstractions". Does this just mean that the procedure wasn't told what
+to do in some situations? Essentially it is under-coded?
+
+"An underdetermined abstraction usually has a deterministic
+implementations." Are there any exceptions?
+
+*. I would also like a more definitive explanation of the drawbacks to
+ parameterization and specification.
+
+I am not clear on what abstraction by parameterization looks like, or
+what the text means by saying that the parameters are irrelevant but
+the data is relevant. Obviously the data is relevant, but why aren't
+the parameters? And why does that constitute a method of abstraction?
+
+*. If the abstraction has no constraints on the algorithm, how do we
+ know that we should implement QuickSort using quick sort? Can we
+ implement it using bubble sort? Does an abstraction have any
+ constraints on time or space complexity?
+
+*. Something I struggled with though was the difference between total
+ and partial procedures, an example of which would be very helpful.
+ My understanding currently is that a partial procedure would be a
+ procedure specified to take any input of type int, for example, while
+ a total procedure would have specified output for some specific
+ collection of input values.  Even if this is correct though, I still
+ don't think I grasped the broader connotations of this distinction
+ that the text was trying to communicate.
+
+ Would partial procedures be the way that we would implement the
+ functions that we were talking about last class that only work on
+ either even or odd numbers?  If so what would be another example of
+ where a partial procedure would be better than a total procedure?
+
+*. Is there any benefit, contrary to Liskov's recommendation, to
+ constraining the way the implementer writes the program? [How] can we
+ assure the benefits of locality as in abstraction by specification
+ while still enforcing some element of "how" things should be done?
+
+*. Can a specification language define a programming language? Is JSON
+ (JavaScript Object Notation) a specification language? What kinds of
+ things qualify as specification languages, other than Javadoc?
+
+Give Points:
+- 
+

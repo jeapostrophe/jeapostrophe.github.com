@@ -1,0 +1,17 @@
+Q: What kind of simulations are important enough for number generation
+to be truly random? If we use pseudo random algorithms for
+cryptography, wouldn't that be sufficient for other applications?
+
+Q: I also was a little confused by the poker test. Maybe I missed a
+detail, but I'm unsure exactly what it says about a sequence of
+numbers.
+
+EX: Could you maybe create a concrete example for how the linear
+feedback shift works? I understand that it's sort of a cycle of bits
+but I'm still not sure I understand it entirely.
+
+-- Mersenne Twister -- x2
+
+-- Details of statistical definition --
+
+-- Truly random algorithms --
