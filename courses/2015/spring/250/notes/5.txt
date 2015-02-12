@@ -1,10 +1,16 @@
 Q: What kind of simulations are important enough for number generation
 to be truly random? If we use pseudo random algorithms for
 cryptography, wouldn't that be sufficient for other applications?
+> PRNGs aren't used for crypto, those are called C(rypto)PRNG
+> Monte Carlo simulations need VERY good random numbers
 
 Q: I also was a little confused by the poker test. Maybe I missed a
 detail, but I'm unsure exactly what it says about a sequence of
 numbers.
+
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4
+5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
 
 EX: Could you maybe create a concrete example for how the linear
 feedback shift works? I understand that it's sort of a cycle of bits
