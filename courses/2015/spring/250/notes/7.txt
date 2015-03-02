@@ -1,0 +1,242 @@
+This has been a crazy week. Two of my flights were delayed and I was
+at a meeting on Wednesday. I was planning on sending out the video on
+Thursday night, but that flight was delayed and I didn't get home
+until 2am. My next plan was to record it tonight but my last flight
+today was cancelled, so I rented a car and drove the rest of the way
+(5 hours!) to the place I'll be at tomorrow.
+
+As a result, I am going to answer questions and try to point at some
+more things about interpolation/etc via text. I know this isn't
+great. :(
+
+--
+
+First, your questions:
+
+"On the first day of class, I know we talked about the bounciness of
+the Android screen, and I would like it if you could talk more about
+the applicability of these mathematical principles."
+
+"I remember talking about interpolations when I took a Graphic
+Computation class. Is it the same kind of interpolation when it comes
+to making games?"
+
+Yes. It really has more to do with "animation" than "games", but of
+course games contain lots of animations. :)
+
+So here's the problem: films run at like 24 frames per second and we
+typically want games and other non-real-world-looking things to run at
+60 frames per second. That means that when you want to make a 5 minute
+animated video, you need to produce
+
+5 minutes * 60 seconds/minute * 60 frames/second = 18,000 frames
+
+There is no way that you could really draw that many individual
+pictures. Most old Disney movies were done at around 12 drawings per
+second, but that is a little misleading because sometimes they would
+draw a big picture and then "pan" around the camera on top of it which
+would give the sense of a much higher frame rate.
+
+So given that you aren't really going to draw all these
+pictures... how are you going to get each one? The basic idea is to
+break up all motion (i.e. animation) into discrete chunks called "key
+frames". For example: the ball starts on the left (0) and ends on the
+right (10):
+
++-----------+                   +-----------+
+|           |                   |           |
+|           |                   |           |
+| O         |                   |         O |
+|           |                   |           |
+|           |                   |           |
+|           |                   |           |
++-----------+                   +-----------+
+
+An artist manually "draws" these two scenes, then they pick two things
+for the computer to do. First, they pick the amount of time the
+animation will take. Then they pick an interpolation function for the
+computer to use to compute all the intermediate (or "in between")
+points. If the function is linear and the time is 10 frames, then you
+will get a picture of the ball everywhere from 0, 1, 2, 3, 4, etc up
+to 10. This process is commonly called "tweening", "lerping", or
+"easing" by artists, but we know it is "interpolation".
+
+Different interpolation functions will have a drastically different
+effect on the animation. Here is an awesome site to play with
+different functions (look at the presets on the right):
+
+http://www.timotheegroleau.com/Flash/experiments/easing_function_generator.htm
+
+This is a fairly deep subject.
+
+"I was also wondering which method of interpolation do most computer
+scientists use or does it depend on the data? Would it be better to
+use every method and then use Least Squares to figure out which has
+the least amount of error or is there an assumed "better" way of
+interpolating?"
+
+It is VERY dependent on the data. Basically in all of these
+situations, the mathematics just gives you a bunch of techniques, but
+you need to decide which to use based on what you think the data is
+REALLY like. For instance, if you have data from a real world
+phenomenon that you believe is linear, then it makes sense for you to
+do a linear interpolation. On the other hand, if you know your data
+isn't linear but represents some cyclic process, maybe you will try to
+approximate it by a composition of sine waves and use something like
+the FFT (which will talk about later) to figure out what they are.
+
+However, the R-square test and the chi-square test are INCREDIBLY
+common for evaluating interpolations.
+
+"Combining splines and linear algebra also confused me a bit in the
+last reading, could you talk more about that in relation to computer
+graphics?"
+
+Sure. A major challenge in graphics is being able to draw and specify
+curves. The central problem is that our screens and image formats have
+discrete points and lines are infinitely fine, so any attempt to
+"pointify" them will look blocky.
+
+[Note 1: This wasn't always true. Early monitors were basically
+oscilloscopes that could make fine lines. You can read a little about
+this on this Wikipedia page:
+
+http://en.wikipedia.org/wiki/Vector_monitor
+
+and then you can look at this video of using an oscilloscope to render
+a "modern" game:
+
+https://www.youtube.com/watch?v=aMli33ornEU ]
+
+[Note 2: The standard way to deal with this is called
+anti-aliasing. The Wikipedia page is very complicated. The simplest
+pages I could find for you about this are on drawing art manually,
+which I think gets the idea across. Look at this picture:
+
+http://blue3.deviantart.com/art/Anti-Aliasing-Tutorial-213141706
+
+and look at section 9 of this tutorial:
+
+http://makegames.tumblr.com/post/42648699708/pixel-art-tutorial ]
+
+So, how do splines come in? Basically, they are a great way to write
+down a curve based on a small amount of data (typically just three
+points: the start, the end, and a "control" point.) Here's a cute site
+that lets you play with that idea:
+
+http://cubic-bezier.com/
+
+"Also, when it says that "there exists a point c between the smallest
+and largest of x0, x1, ... , xn such that...", does it mean it could
+be the smallest/largest? Like, is it "smallest < c < largest" or
+"smallest <= c <= largest"? If it can't be equal, is there a reason
+for it?"
+
+I believe it can be equal.
+
+"And are there built-in functions for interpolations in languages like
+Java/C?"
+
+Not traditionally. The closest that comes to mind is the "lerp"
+function that is built into Nvidia's Cg language (an old language for
+writing graphics shaders):
+
+http://http.developer.nvidia.com/Cg/lerp.html
+
+---
+
+It has taken me a lot longer than I thought it would to write up these
+answers. I was going to write/have you read about some other things,
+but I think I will focus on interpolation in multiple dimensions,
+especially related to computer graphics.
+
+You may know that when you draw 3D graphics, the drawing is given in
+triangles. Each triangle is specified by its three end vertices and
+each vertex has some data associated with it. As a simple example,
+imagine that the data is the color of that vertex.
+
+Triangle 1: (0,0,0, "red"), (0,1,0, "blue"), (1,0,0, "green")
+
+A key problem of drawing this triangle is figuring out the color of
+the points inside of the triangle, like (0.5, 0.5, 0). It isn't an end
+point, so what color should it be?
+
+The way that 3D graphics engines normally do this is via
+interpolation. Imagine the engine could only draw 2D lines, then we
+could do something like:
+
+Line 1: (0, 0, "0% red"), (1,1, "100% red")
+
+then a point like (0.5, 0.5) would be "50% red" because it is half-way
+between the end-points and so the interpolation function would be
+called with START = 0% red, END = 100% red, and SPOT = 0.5. The
+function would look like this:
+
+float lerp(float v0, float v1, float t) {
+  return (1-t)*v0 + t*v1;
+}
+
+and be called like this:
+
+lerp( 0.0, 1.0, 0.5 ) =
+(1 - 0.5)*0.0 + 0.5*1.0 =
+0.5*0.0 + 0.5*1.0 =
+0.5*1.0 =
+0.5
+
+You could imagine that graphics engines would do this along the edges
+of the triangles, and they do. But that doesn't help us with what is
+inside the triangle. I find the rectangle case to be slightly simpler,
+so let's start there.
+
+Suppose now that you could draw a rectangle (NOT a quadrangle). This
+gives you four points and four different color values. You could
+imagine doing an interpolation in each direction (left to right, then
+top to bottom) and then combining the values. The tricky part is
+"combining" the values. Basically, you weight the value by the "area"
+of the vertical or horizontal part. With this background, the pictures
+on the Wikipedia page for bilinear interpolation are very informative,
+I think:
+
+http://en.wikipedia.org/wiki/Bilinear_interpolation
+
+Something neat about this is that although we described it on the
+basis of rendering a colored rectangle (like the second picture), it
+also makes sense to do this as a way of "blowing up" pictures. When
+you blow up a picture, you are basically adding blank space between
+the pixels and then you need to go back and fill them in. This is one
+technique to figure out how to fill them in.
+
+Okay, so given this background in rectangles, how does the triangle
+system work? You have the same idea, for each point you want to know
+"how close it is" to each vertex (called λ1, λ2, and λ3) and then
+combine the values at those vertexes through addition but weighted by
+the closeness. These closeness are called Barycentric coordinates:
+
+http://en.wikipedia.org/wiki/Barycentric_coordinate_system
+
+This is really how graphics are done. Here's a function I wrote a
+while ago to compute these things (the values λ1, λ2, and λ3):
+
+https://github.com/jeapostrophe/mode-lambda/blob/master/mode-lambda/backend/software.rkt#L105
+
+Something neat about this computation is that if the three values
+don't sum to 1.0, then the point isn't inside the triangle. This is
+useful to know when drawing, so you don't try to draw that point. It
+is essentially a "collision" detection function also. Weird!
+
+and then you can see later on how they are used to figure out the
+adjusted "tx" value of the point:
+
+(define tx
+ (fl+ (fl+ (fl* λ1 tx1.0)
+           (fl* λ2 tx2.0))
+           (fl* λ3 tx3.0)))
+
+https://github.com/jeapostrophe/mode-lambda/blob/master/mode-lambda/backend/software.rkt#L105
+
+--
+
+So, I hope from this set of reading you see that interpolation is very
+important in computer graphics and mathematical computations
+generally. Strange bed fellows, huh!
