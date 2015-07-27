@@ -32,11 +32,11 @@
 @centered{@emph{``Cowards die many times before their deaths, @(linebreak) The valiant never taste of death but once.''}}
 
 This is the blog of @link["http://jeapostrophe.github.io/home/"]{Jay
-McCarthy}. I am a visiting assistant professor at
-@link["http://www.vassar.edu/"]{Vassar College} in the
-@link["http://www.cs.vassar.edu/"]{Computer Science Department}. I
-work on @link["http://racket-lang.org/"]{the Racket programming
-language}.
+McCarthy}. I am an associate professor at
+@link["http://www.uml.edu"]{UMass Lowell} in the
+@link["http://www.uml.edu/Sciences/computer-science/default.aspx"]{Computer
+Science Department}. I work on @link["http://racket-lang.org/"]{the
+Racket programming language}.
 
 @itemize[
 
