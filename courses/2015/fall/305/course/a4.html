@@ -6,29 +6,28 @@ instruction.</p><p>In C, modify the
 assembler</a> to produce MIC-1 object files for this modified instruction
 set.</p><p><div class="SIntrapara">The details of the opcodes you must support in both are as follows:
 </div><div class="SIntrapara"><ul><li><p><span class="RktInBG"><span class="hspace"></span><span class="RktIn">MULT</span><span class="hspace"></span></span> - <span class="RktInBG"><span class="hspace"></span><span class="RktIn">1111111 1 00 mmmmmm</span><span class="hspace"></span></span> - multiply the
-value at the top of the stack by the 6-bit immediate unsigned value
-<span class="RktInBG"><span class="hspace"></span><span class="RktIn">mmmmmm</span><span class="hspace"></span></span>. The result of the multiplication should replace the
-value at the top of the stack, provided that no overflow occurred. If
-the multiplication would overflow a 16-bit result, the top of the
-stack must not be changed. After the operation, the accumulator must
-be set to 0 if the multiplication succeeded, and -1 if an overflow
-occurred.</p></li><li><p><span class="RktInBG"><span class="hspace"></span><span class="RktIn">RSHIFT</span><span class="hspace"></span></span> - <span class="RktInBG"><span class="hspace"></span><span class="RktIn">1111111 1 01 ??ssss</span><span class="hspace"></span></span> - right shift
-the current accumulator by the 4-bit immediate unsigned value
+signed value at the top of the stack by the 6-bit immediate unsigned
+value <span class="RktInBG"><span class="hspace"></span><span class="RktIn">mmmmmm</span><span class="hspace"></span></span>. The result of the multiplication should
+replace the value at the top of the stack, provided that no overflow
+occurred. If the multiplication would overflow a 16-bit result, the
+top of the stack must not be changed. After the operation, the
+accumulator must be set to 0 if the multiplication succeeded, and -1
+if an overflow occurred.</p></li><li><p><span class="RktInBG"><span class="hspace"></span><span class="RktIn">RSHIFT</span><span class="hspace"></span></span> - <span class="RktInBG"><span class="hspace"></span><span class="RktIn">1111111 1 01 ??ssss</span><span class="hspace"></span></span> - right shift
+the current signed accumulator by the 4-bit immediate unsigned value
 <span class="RktInBG"><span class="hspace"></span><span class="RktIn">ssss</span><span class="hspace"></span></span>. This is a zero-fill operation. The <span class="RktInBG"><span class="hspace"></span><span class="RktIn">??</span><span class="hspace"></span></span> bits
 are ignored.</p></li><li><p><span class="RktInBG"><span class="hspace"></span><span class="RktIn">DIV</span><span class="hspace"></span></span> - <span class="RktInBG"><span class="hspace"></span><span class="RktIn">1111111 1 10 ??????</span><span class="hspace"></span></span> - divide the
 16-bit signed number at the top stack location (<span class="RktInBG"><span class="hspace"></span><span class="RktIn">SP</span><span class="hspace"></span></span>) by the
 16-bit signed number at the location just under the top stack
-location (<span class="RktInBG"><span class="hspace"></span><span class="RktIn">SP+1</span><span class="hspace"></span></span>) and push on two new locations the remainder
-and quotient. The remainder should be at <span class="RktInBG"><span class="hspace"></span><span class="RktIn">SP-1</span><span class="hspace"></span></span> and the
-quotient should be at <span class="RktInBG"><span class="hspace"></span><span class="RktIn">SP-2</span><span class="hspace"></span></span>. If the absolute value of the
-divisor is greater than the absolute value of the dividend, the
-quotient should be set to <span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span> and the unsigned remainder set
-to the absolute value of the dividend. If the divisor is equal to
-<span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span>, the remainder should be set to <span class="RktInBG"><span class="hspace"></span><span class="RktIn">-1</span><span class="hspace"></span></span> and the
-quotient should be set to <span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span>. After the operation, the
-accumulator must be set to <span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span> if the division was legal, and
-<span class="RktInBG"><span class="hspace"></span><span class="RktIn">-1</span><span class="hspace"></span></span> if an attempt to divide by <span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span>. The
-<span class="RktInBG"><span class="hspace"></span><span class="RktIn">??????</span><span class="hspace"></span></span> bits are ignored.</p></li><li><p><span class="RktInBG"><span class="hspace"></span><span class="RktIn">HALT</span><span class="hspace"></span></span> - <span class="RktInBG"><span class="hspace"></span><span class="RktIn">1111111 1 11 ??????</span><span class="hspace"></span></span> - halt the
+location (<span class="RktInBG"><span class="hspace"></span><span class="RktIn">SP+1</span><span class="hspace"></span></span>) and push on two new locations the signed
+remainder and signed quotient. The remainder should be at
+<span class="RktInBG"><span class="hspace"></span><span class="RktIn">SP-1</span><span class="hspace"></span></span> and the quotient should be at <span class="RktInBG"><span class="hspace"></span><span class="RktIn">SP-2</span><span class="hspace"></span></span>. If the
+divisor is equal to <span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span>, the remainder should be set to
+<span class="RktInBG"><span class="hspace"></span><span class="RktIn">-1</span><span class="hspace"></span></span> and the quotient should be set to <span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span>. After the
+operation, the accumulator must be set to <span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span> if the division
+was legal, and <span class="RktInBG"><span class="hspace"></span><span class="RktIn">-1</span><span class="hspace"></span></span> if an attempt to divide by
+<span class="RktInBG"><span class="hspace"></span><span class="RktIn">0</span><span class="hspace"></span></span>. Legal divisions should satisfy the equations
+<span class="RktInBG"><span class="hspace"></span><span class="RktIn">dividend = divisor * quotient + remainder</span><span class="hspace"></span></span>,
+<span class="RktInBG"><span class="hspace"></span><span class="RktIn">abs(remainder) &lt; abs(divisor)</span><span class="hspace"></span></span>, and <span class="RktInBG"><span class="hspace"></span><span class="RktIn">sign(remainder) = sign(dividend)</span><span class="hspace"></span></span>. The <span class="RktInBG"><span class="hspace"></span><span class="RktIn">??????</span><span class="hspace"></span></span> bits are ignored.</p></li><li><p><span class="RktInBG"><span class="hspace"></span><span class="RktIn">HALT</span><span class="hspace"></span></span> - <span class="RktInBG"><span class="hspace"></span><span class="RktIn">1111111 1 11 ??????</span><span class="hspace"></span></span> - halt the
 processor. The <span class="RktInBG"><span class="hspace"></span><span class="RktIn">??????</span><span class="hspace"></span></span> bits are ignored.</p></li></ul></div></p><p>There are three example assembly programs that use these new
 instructions. You will need to use these as tests. The links are as
 follows:
