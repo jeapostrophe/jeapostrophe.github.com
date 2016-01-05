@@ -1,0 +1,1013 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title>TFP 2013 :: Symposium on Trends in Functional Programming</title>
+
+
+<style>
+/* CSS reset */
+
+/* v1.0 | 20080212 */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+
+/* remember to define focus styles! */
+:focus {
+	outline: 0;
+}
+
+/* remember to highlight inserts somehow! */
+ins {
+	text-decoration: none;
+}
+del {
+	text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+</style>
+
+<style>
+
+div#contents ul{
+  list-style: circle ;
+  margin-left: 20px ;
+}
+
+div#contents ol{
+  list-style: decimal ;
+  margin-left: 20px ;
+}
+
+div#contents ol li {
+  margin-top: 15px ;
+}
+
+
+div#contents li {
+  margin-left: 20px; 
+}
+
+a {
+ text-decoration: none ;
+}
+
+p {
+ margin-bottom: 15px ;
+}
+
+body {
+ padding-top: 10px ;
+ font-family: Palatino, Optima, Calibri, Tahoma, Helvetica, Arial, Georgia ;
+ background-color: #ed7515 ;
+ /*background-image: url(http://scheme2011.ucombinator.org/FCRC2011-mini.png) ;*/
+ background-repeat: no-repeat ;
+ color: #222222 ;
+}
+
+div.module {
+ float: left ;
+ border: 1px solid #777777;
+ -moz-border-radius: 6px ;
+ -webkit-border-radius: 6px ;
+ border-radius: 6px ;
+ background-color: #e4d98f ;
+ margin: 10px ;
+ padding: 20px ;
+}
+
+div.main-unit {
+ width: 500px;
+}
+
+div.unit {
+ width: 720px;
+ padding: 40px; 
+}
+
+
+div#container{
+ margin-left: auto ;
+ margin-right: auto ;
+ width: 780px;
+ padding: 0px;
+}
+
+div#contents {
+ margin-left: auto ;
+ margin-right: auto ;
+ width: 780px;
+ padding: 0px;
+}
+
+div#main {
+ width: 440px ;
+ float: left ;
+ padding: 0px;
+ margin: 0px ;
+}
+
+div#header {
+ /* color: #ffffff ; */
+ /* height: 50px; */
+ /* background-image: url(sanjose-night2.png) ; */
+ padding-top: 10px ;
+}
+
+
+div#navbar {
+ float: left ;
+ width: 200px ;
+}
+
+h2 {
+ text-align: center ;
+ font-size: 115% ;
+ margin-bottom: 20px ;
+}
+
+h3 {
+  margin-bottom: 15px ;
+}
+
+div#main td {
+ padding-right: 10px ;
+}
+
+div#header-area {
+ float: left;
+ width: 380px;
+}
+
+div#header-title {
+ float: left;
+ font-size: 44px;
+}
+
+div#header-subtitle {
+ float: left;
+ margin-left: 25px;
+ font-size: 18px;
+ margin-top: 4px;
+}
+
+div#fcrc-notice {
+ float: left ;
+ width: 370px ;
+ font-weight: bold ;
+ margin-left: 3px ;
+ font-size: 14px ;
+}
+
+div#fcrc-notice a {
+ color: blue ;
+}
+
+td {
+ padding-bottom: 6px ;
+}
+
+div#navbar h2 {
+ margin-bottom: 10px ;
+}
+
+h2.important {
+ color: #ff3333 ;
+}
+
+div.schedule {
+ padding-left: 20px ;
+}
+
+table.schedule td {
+  border: 1px solid black ;
+  padding: 10px ;
+}
+
+#topics td:nth-child(2) {
+text-align: right;
+}
+
+div#navbar tr:nth-child(2n+1) {
+font-weight: bold;
+}
+
+div#program td:nth-child(1) {
+min-width: 6em;
+}
+div#program tr.day {
+ font-size: 150%;
+ font-weight: bold;
+ text-align: center;
+}
+div#program tr.special {
+ font-weight: bold;
+}
+div#program tr.special td:nth-child(2) {
+ font-style: italic;
+}
+div#program tr.session {
+ font-size: 0%;
+ font-weight: bold;
+ text-align: center;
+}
+
+</style>
+
+
+<!--[if gte IE 6]>
+<style>
+div#header {
+ color: black ;
+ background-image: url(not-found.jpg) ;
+ height: 120px ;
+}
+
+div#header-area {
+ margin-top: 5px ;
+ float: none ;
+ height: 110px ;
+ display: block ;
+}
+
+div#header-title {
+ float: none ;
+ font-size: 44px;
+ height: 50px ;
+ display: block ;
+}
+
+div#header-subtitle {
+ float: none ;
+ height: 50px ;
+ display: block ;
+ font-size: 18px;
+ margin-top: 4px;
+ margin-left: 0px ;
+}
+
+div#fcrc-notice {
+ float: none;
+ display: block ;
+ width: 370px ;
+ font-size: 100% ; 
+ font-weight: bold ;
+ color: black ;
+ margin-left: 0px;
+}
+
+
+div#fcrc-notice a {
+ color: blue ;
+}
+
+</style>
+<![endif]-->
+
+
+
+</head>
+
+<body>
+
+<div id="container">
+
+
+ <div id="navbar" class="module">
+   
+   <h2 class="important">Important dates</h2>
+
+   <table>
+
+    <tr>
+      <td>Full papers/extended abstracts submission:</td>
+    </tr>
+    <tr>
+      <td>March 2nd to April <del>2nd</del> 16th, 2013</td>
+    </tr>
+
+    <tr>
+      <td>Notification of acceptance for presentation:</td>
+    </tr>
+    <tr>
+      <td>Submission + one week</td>
+    </tr>
+
+    <tr>
+      <td>Early registration deadline:</td>
+    </tr>
+    <tr>
+      <td>Tuesday, April 16th, 2013</td>
+    </tr>
+
+    <tr>
+      <td>Late registration deadline:</td>
+    </tr>
+    <tr>
+      <td>Tuesday, May 14, 2013</td>
+    </tr>
+
+    <tr>
+      <td>Camera ready for draft proceedings:</td>
+    </tr>
+    <tr>
+      <td><del>April 29th</del> May 7th, 2013</td>
+    </tr>
+
+    <tr>
+      <td>Symposium:</td>
+    </tr>
+    <tr>
+      <td>Tuesday, May 14th to Thursday, May 16th, 2013</td>
+    </tr>
+
+    <tr>
+      <td>Student papers feedback:</td>
+    </tr>
+    <tr>
+      <td>Friday, May 24th, 2013</td>
+    </tr>
+
+    <tr>
+      <td>Submission for formal review:</td>
+    </tr>
+    <tr>
+      <td>Friday, June 21st, 2013</td>
+    </tr>
+
+    <tr>
+      <td>Notification of acceptance for LNCS:</td>
+    </tr>
+    <tr>
+      <td>Friday, August 30th, 2013</td>
+    </tr>
+
+    <tr>
+      <td>Camera ready paper:</td>
+    </tr>
+    <tr>
+      <td>Friday, September 27th, 2013</td>
+    </tr>
+   </table>
+
+   
+  <br />
+
+   <h2 class="important">Important links</h2>
+   <ul>
+   <li>
+    <a href="https://www.easychair.org/conferences/?conf=tfp2013">Paper submission</a>
+   </li>
+   <li>
+     <a href="http://ce.byu.edu/cw/tfp/">Registration</a>
+   </li>
+   <li>
+     <a href="proceedings/">Proceedings</a>
+   </li>
+   <li>
+     <a href="#program">Program</a>
+   </li>
+   </ul>
+
+   <br />
+
+   <h2>Connect</h2>
+
+   <a href="http://www.tifp.org/">Symposium on Trends in Functional Programming</a>
+
+ </div>
+
+
+ <div id="main">
+
+ <div id="header" class="module main-unit">
+
+   <div id="header-area" style="">
+
+     <div id="header-title"><b>TFP 2013</b></div>
+
+     <div id="header-subtitle">
+         <b>Tuesday, May 14th to Thursday, May 16th, 2013</b>
+         <br />
+         <b>Provo, Utah, USA</b>
+     </div>
+
+     <div id="fcrc-notice">
+       <br />
+       Co-located with <a href="http://wwwhome.ewi.utwente.nl/~holzenspiespkf/TFPIE2013.html">TFPIE 2013</a>.
+     </div>
+     
+   </div>
+
+
+ </div> <!-- /header -->
+
+ <div id="definition" class="module main-unit">
+
+   <p>The  symposium  on  Trends  in  Functional  Programming  (TFP)  is  an
+international forum  for researchers with interests in  all aspects of
+functional  programming, taking  a broad  view of  current  and future
+trends  in  the area.   It  aspires to  be  a  lively environment  for
+presenting the  latest research results, and  other contributions (see
+below), described in draft papers  submitted prior to the symposium. A
+formal post-symposium refereeing process  then selects a subset of the
+articles  presented   at  the  symposium  and   submitted  for  formal
+publication.</p>
+
+<p>Selected  papers will  be published  as  a Springer  Lecture Notes  in
+Computer Science (<a href="http://www.springer.com/lncs">LNCS</a>)
+  volume. Specifically, number 8322.</p>
+
+<p>TFP 2013  will be the main  event of a pair  of functional programming
+events at  Brigham Young University.  First will be  the International
+Workshop on  Trends in  Functional Programming  in Education  and then
+TFP.</p>
+
+<p>The TFP  symposium is  the heir of  the successful series  of Scottish
+Functional Programming  Workshops. Previous TFP symposia  were held in
+Edinburgh (Scotland) in 2003, in  Munich (Germany) in 2004, in Tallinn
+(Estonia) in  2005, in Nottingham (UK)  in 2006, in New  York (USA) in
+2007, in Nijmegen (The Netherlands)  in 2008, in Komarno (Slovakia) in
+2009, in  Oklahoma (USA) in  2010, in Madrid  (Spain) in 2011,  and in
+St. Andrews (UK)  in 2012.  For further general  information about TFP
+please see <a href="http://www.tifp.org/">the TFP homepage</a>.</p>
+
+ </div>
+ 
+ </div> <!-- /main -->
+ 
+
+ <div id="contents" style="float: left; width: 725px; ">
+
+
+<!--
+ <div id="news" class="module unit">
+
+ <h2>News</h2>
+
+ <ul>
+   <li><b>28 May 2012</b>: Website and submission site live.</li>
+ </ul>
+   
+ </div> 
+-->
+
+<!--
+ <div id="registration" class="module unit" style="display: none">
+
+   <h2>Registration</h2>
+
+
+   <p>
+   </p>
+
+   <p>
+   You can register to attend this workshop 
+   through the <a href="http://splashcon.org/2011/attending/registering">SPLASH registration system</a>:
+   </p>
+
+   <p style="text-align: center;">
+    <a href="http://splashcon.org/2011/attending/registering">http://splashcon.org/2011/attending/registering</a>
+   </pp>
+
+  <p>
+  If you only wish to attend the Scheme workshop,
+  choose the SPLASH "1-Day Workshops/Symposia" option.
+  </p>
+
+  </div>
+-->
+
+ <div id="topics" class="module unit">
+
+   <h2>Scope</h2>
+
+<p>The  symposium recognises that  new trends  may arise  through various
+routes.  As part  of  the  symposium's focus  on  trends we  therefore
+identify the following  five article categories. High-quality articles
+are solicited in any of these categories:</p>
+
+<p><table>
+<tr>
+  <td>
+ Research Articles: </td><td>   leading-edge, previously unpublished research work
+ </td>
+</tr>
+<tr>
+  <td>
+ Position Articles: </td><td>   on what new trends should or should not be
+ </td>
+</tr>
+<tr>
+  <td>
+ Project Articles: </td><td>    descriptions of recently started new projects
+ </td>
+</tr>
+<tr>
+  <td>
+ Evaluation Articles: </td><td>  what lessons can be drawn from a finished project
+ </td>
+</tr>
+<tr>
+  <td>
+ Overview Articles: </td><td>   summarising work with respect to a trendy
+ subject
+ </td>
+</tr>
+</table></p>
+
+<p>Articles  must   be  original  and  not   submitted  for  simultaneous
+publication  to any  other  forum.  They may  consider  any aspect  of
+functional programming:  theoretical, implementation-oriented, or more
+experience oriented. Applications of functional programming techniques
+to other languages are also within the scope of the symposium.</p>
+
+<p>Articles on the following subject areas are particularly
+  welcome:</p>
+
+<p><ul>
+ <li>
+ Functional programming and multicore/manycore computing
+ </li><li>
+ Functional programming in the cloud
+ </li><li>
+ Functional programming in education
+ </li><li>
+ High performance functional computing
+ </li><li>
+ Extra-functional (behavioural) properties of functional programs
+ </li><li>
+ Dependently typed functional programming
+ </li><li>
+ Validation and verification of functional programs
+ </li><li>
+ Using functional techniques to verify/reason about imperative/object-oriented programs
+ </li><li>
+ Debugging for functional languages
+ </li><li>
+ Functional programming in different application areas: security, mobility, 
+    telecommunications applications, embedded systems, global computing, grids, etc.
+ </li><li>
+ Interoperability with imperative programming languages
+ </li><li>
+ Novel memory management techniques
+ </li><li>
+ Program transformation techniques
+ </li><li>
+ Empirical performance studies
+ </li><li>
+ Abstract/virtual machines and compilers for functional languages
+ </li><li>
+ New implementation strategies
+ </li><li>
+ Any new emerging trend in the functional programming area
+ </li>
+</ul></p>
+
+<p>If you  are in doubt  on whether your  article is within the  scope of
+TFP, please  contact the TFP 2013 program  chair, <a href="mailto:tfp2013@easychair.org">Jay McCarthy</a>.</p>
+   
+ </div> <!-- /topics -->
+
+ <div id="student_paper" class="module unit">
+
+   <h2>Best Student Paper Award</h2>
+
+<p>TFP  traditionally  pays   special  attention  to  research  students,
+acknowledging  that students  are  almost by  definition  part of  new
+subject trends.  A student  paper is one  for which the  authors state
+that the paper is mainly the work of students, the students are listed
+as first authors,  and a student would present the  paper. A prize for
+the best student paper is awarded each year.</p>
+   
+ </div>
+
+ <div id="submission" class="module unit" style="display: block;">
+
+ <h2>Submission and Draft Proceedings</h2>
+
+<p>
+Acceptance of papers  for presentation at the symposium is  based on a
+lightweight screening process of extended  abstracts (2 to 10 pages in
+length) or  full papers (max 16  pages). Accepted abstracts are  to be
+completed to full  papers before the symposium for  publication in the
+draft proceedings. Latex style files are available from Springer's web
+page (<a href="ftp://ftp.springer.de/pub/tex/latex/llncs/latex2e/llncs2e.zip">llncs2e.zip</a>).
+</p>
+
+<p>
+The  submission must clearly  indicate which  category it  belongs to:
+research, position, project, evaluation,  or overview paper. It should
+also  indicate  whether  the  main  author  or  authors  are  research
+students. </p>
+
+<p>
+Paper submission is done through TFP13's EasyChair page:
+</p>
+  
+<div style="text-align: center; margin-bottom: 15px;">
+<a href="https://www.easychair.org/conferences/?conf=tfp2013">https://www.easychair.org/conferences/?conf=tfp2013</a>
+</div>
+
+<p>
+The  papers of  the  local  proceedings will  also  be made  available
+on-line under  some copyright conditions,  with which all  authors are
+asked to agree.
+</p>
+
+ </div> <!-- /submission -->
+
+ <div id="post_submission" class="module unit">
+
+   <h2>Post-Symposium Refereeing and Publication</h2>
+
+<p>In addition to  the symposium draft proceedings, we  will continue the
+previous  years'  decision  of  publishing a  high-quality  subset  of
+contributions in the Springer Lecture Notes in Computer Science (LNCS)
+series.   Proceedings of  the last  three instances  of TFP  have been
+published  as LNCS  6546 (TFP10),  LNCS 7193  (TFP11), and  LNCS TBA
+(TFP12).  All  TFP authors  will be invited  to submit  revised papers
+after the  symposium. These will  be refereed using  normal conference
+standards and a  subset of the submitted papers,  over all categories,
+will  be selected  for publication.   Papers will  be judged  on their
+contribution to the research area with appropriate criteria applied to
+each category of paper.</p>
+
+<p>Student papers will  be given extra feedback by  the Program Committee
+in order to  assist those unfamiliar with the  publication process and
+to help in improving the quality of the paper.</p>
+   
+ </div>
+
+ <div id="registration" class="module unit">
+
+   <h2>Registration</h2>
+
+<p>Registration for TFP13, as well  as the adjoined workshops, is handled
+through the on-line registration page linked below.  Note that for guaranteed
+on-site  accommodation, registration  must be  completed by  the early
+registration deadline.</p>
+
+<div style="text-align: center; margin-bottom: 15px;">
+<a href="http://ce.byu.edu/cw/tfp/">Registration Site</a>
+</div>
+
+<p>If you are registering for TFPIE as well, it is referred to as the
+  "One Day Workshop" on the registration site.</p>
+   
+ </div>
+
+ <div id="local" class="module unit">
+
+   <h2>Local Arrangments</h2>
+
+<p>The conference will be held on BYU campus in the <a href="https://wilk.byu.edu/">Wilkinson Student
+  Center</a> (building 88 or WSC
+  on <a href="http://maps.byu.edu/">BYU's campus map</a>) in room
+  5519. (Many participants are curious about the
+  impact <a href="http://en.wikipedia.org/wiki/Brigham_Young_University_Honor_Code">the
+  BYU Honor Code</a> will have on their attendance. This code is for
+  students, not for visitors to BYU. The only way it will impact
+  participants is, for example, potential confusion from on-lookers
+  who see you smoke in areas permitted by the Utah Clean Air Act, and
+  in the inability of the conference to pay for or provide prohibited
+  substances like alcohol, tea, or coffee. You can, of course, bring
+  your own drinks, etc.)</p>
+
+<p>We have arranged for a room block at
+  the <a href="http://www.marriott.com/hotels/travel/slcvo-provo-marriott-hotel-and-conference-center/">Provo
+  Marriott Hotel & Conference Center</a> in Downtown Provo. We will be
+  running shuttles to and from the hotel and BYU. Please use the group
+  code <code>tfptfpa</code>
+  or <a href="http://www.marriott.com/hotels/travel/slcvo-provo-marriott-hotel-and-conference-center/?toDate=5/16/13&groupCode=tfptfpa&stop_mobi=yes&fromDate=5/13/13&app=resvlink">this
+  reservation link</a>.</p>
+
+<p>When planning your flight, you should plan on flying into Salt
+  Lake International Airport (Code: <code>SLC</code>). There are
+  variety of option for traveling to Provo from the airport, such as
+  <a href="https://www.google.com/search?q=salt+lake+international+airport&aq=0&oq=salt+lake+int&aqs=chrome.0.0l4j62l2.3480&sourceid=chrome&ie=UTF-8#hl=en&safe=off&sclient=psy-ab&q=salt+lake+international+airport+shuttle+to+provo&oq=salt+lake+international+airport+shuttle+to+provo&gs_l=serp.3..33i29i30l2.17906.20201.0.20408.17.17.0.0.0.0.155.1834.8j9.17.0.cappsweb..0.0...1.1.7.psy-ab.7NuW-mpS2QM&pbx=1&bav=on.2,or.r_cp.r_qf.&bvm=bv.44158598,d.cGE&fp=3a6ad971fb0eeac6&biw=958&bih=997">shuttles</a>
+  and <a href="http://www.rideuta.com/ridinguta/tripplanner/rideitinerary.aspx?Date=4/1/2013%208:15%20AM&Start=-111.981351|40.785908&StartAddr=&Stop=-111.658905|40.223887&StopAddr=&Affecting=Dep&StartCity=&StopCity=&StartLM=373756&StoppingLM=373826&StartLMID=21&StopLMID=21">public
+  transit</a>. You may want to coordinate with other attendees via
+  Facebook to share transportation costs.</p>
+   
+
+  <p>Part way through the conference, we will be organizing an
+  excursion to <a href="http://www.visittemplesquare.com/">Historic
+  Temple Square</a> and
+  the <a href="http://www.shopcitycreekcenter.com/">City Creek
+  Center</a>, the most popular tourist attraction in Utah. As part of
+  the excursion, we'll have the chance to listen to a live choir and
+  organ concert, visit the world's largest genealogical library, and
+  have a small tour in one of 40 different languages, including nearly
+  all European languages, so you can have a tour with a guide from
+  your home country in your native tongue.</p>
+
+ </div>
+
+ <div id="program" class="module unit">
+
+   <table>
+     <tr class="day"><td colspan="2">Tuesday, May 14th</td></tr>
+     <tr class="special"><td>08:30-09:00</td><td>Registration</td></tr>
+
+     <tr class="session"><td colspan="2">Session 1</td></tr>
+
+     <tr><td>09:00-09:25</td>
+       <td><a href="proceedings/tfp2013_submission_3.pdf">Expelled
+           From Class No More: Constraining Your Problem Kind</a><br />
+         Philip K.F. Hölzenspies<br />
+         (University of Twente)</td></tr>
+
+     <tr><td>09:25-09:50</td><td><a href="proceedings/tfp2013_submission_8.pdf">Correctness
+     of Functionally Specified Denotational and Operational
+     Semantics</a><br />
+         Marko van Eekelen<br />
+         (Radboud University Nijmegen and Open University of the Netherlands)</td></tr>
+
+     <tr><td>09:50-10:15</td><td><a href="proceedings/tfp2013_submission_12.pdf">Total
+     Functional Software Engineering</a><br />
+         Trancón Widemann, Baltasar &lt;baltasar.trancon
+     AT tu-ilmenau.de&gt;<br />
+         (Ilmenau University of Technology)</td></tr>
+
+     <tr class="special"><td>10:15-10:45</td><td>Break</td></tr>
+
+     <tr class="session"><td colspan="2">Session 2</td></tr>
+
+     <tr><td>10:45-11:10</td>
+       <td><a href="proceedings/tfp2013_submission_4.pdf">A Dataflow Inspired Programming Paradigm for Coarse-Grained Reconfigurable Arrays</a><br />
+         Anja Niedermeier<br />
+         (University of Twente)</td></tr>
+
+     <tr><td>11:10-11:35</td>
+       <td><a href="proceedings/tfp2013_submission_22.pdf">Using Rewriting to Synthesize Functional Languages to Digital Circuits</a><br />
+         Christiaan Baaij &lt;c.p.r.baaij AT utwente.nl&gt;<br />
+         (University of Twente)<br />
+     <a href="http://clash.ewi.utwente.nl">http://clash.ewi.utwente.nl</a></td></tr>
+
+     <tr><td>11:35-12:00</td>
+       <td><a href="proceedings/tfp2013_submission_7.pdf">A
+         Transformation-Based Foundation for Semantics-Directed Code Generation</a><br />
+         Arthur Nunes-Harwitt<br />
+         (RIT)</tr>
+
+     <tr class="special"><td>12:00-13:45</td><td>Lunch (SC Meeting)</td></tr>
+
+     <tr class="session"><td colspan="2">Session 3</td></tr>
+
+     <tr><td>13:45-14:10</td>
+       <td><a href="proceedings/tfp2013_submission_17.pdf">Distributed Places</a><br />
+         Kevin Tew &lt;tew AT byu.edu&gt;<br />
+         (Brigham Young University and PLT)</td></tr>
+
+     <tr><td>14:10-14:35</td>
+       <td><a href="proceedings/tfp2013_submission_18.pdf">Bytecode Closures</a><br />
+         Marco T. Morazán &lt;morazanm AT gmail.com&gt;<br />
+         (Seton Hall University)</td></tr>
+
+     <tr><td>14:35-15:00</td>
+       <td><a href="proceedings/tfp2013_submission_5.pdf">Towards Efficient Abstractions for Concurrent Consensus</a><br />
+         Carlo Spaccasassi<br />
+         (Trinity College Dublin)<br />
+     <a href="https://www.scss.tcd.ie/~spaccasc/">https://www.scss.tcd.ie/~spaccasc/</a></td></tr>
+
+     <tr class="special"><td>15:00-15:30</td><td>Break</td></tr>
+
+     <tr class="session"><td colspan="2">Session 4</td></tr>
+
+     <tr><td>15:30-15:55</td>
+       <td><a href="proceedings/tfp2013_submission_26.pdf">Design and development of Proof Pad, A Pedagogic Development Environment for the ACL2 Theorem Prover</a><br />
+         Caleb Eggensperger &lt;calebegg AT gmail.com&gt;<br />
+         (University of Oklahoma)</td></tr>
+
+     <tr><td>15:55-16:20</td>
+       <td><a href="proceedings/tfp2013_submission_23.pdf">A Comparison of Task Oriented Programming with GUIs in Functional Languages</a><br />
+         Peter Achten &lt;P.Achten AT cs DOT ru DOT nl&gt;<br />
+         (Radboud University Nijmegen, the Netherlands)<br />
+         <a href="http://www.cs.ru.nl/P.Achten/">http://www.cs.ru.nl/P.Achten/</a></td></tr>
+
+     <tr><td>16:20-16:45</td>
+       <td><a href="proceedings/tfp2013_submission_27.pdf">Analyzing ACL2's Usability</a><br />
+         Ryan Ralston<br />
+         (University of Oklahoma)</td></tr>
+
+     <tr class="day"><td colspan="2">Wednesday, May 15th</td></tr>
+     <tr class="special"><td>08:30-09:00</td><td>Registration</td></tr>
+
+     <tr class="session"><td colspan="2">Session 1</td></tr>
+
+     <tr><td>09:00-09:25</td>
+       <td><a href="proceedings/tfp2013_submission_10.pdf">HLearn: A Machine Learning Library for Haskell</a><br />
+         Mike Izbicki &lt;mike AT izbicki.me&gt;<br />
+         (UC Riverside)<br />
+     <a href="http://izbicki.me">http://izbicki.me</a></td></tr>
+
+     <tr><td>09:25-09:50</td>
+       <td><a href="proceedings/tfp2013_submission_24.pdf">Running Probabilistic Programs Backwards</a><br />
+         Neil Toronto &lt;neil.toronto AT gmail.com&gt;<br />
+         (Brigham Young University)</td></tr>
+
+     <tr><td>09:50-10:15</td>
+       <td><a href="proceedings/tfp2013_submission_13.pdf">Sunroof: A Monadic DSL to Generate JavaScript</a><br />
+         Jan Bracker &lt;jbra AT informatik.uni-kiel.de&gt;<br />
+         (ITTC / EECS @ The University of Kansas and Institut für
+         Informatik @ Christian-Albrechts-Universität)</td></tr>
+
+     <tr class="special"><td>10:15-10:45</td><td>Break</td></tr>
+
+     <tr><td>10:45-11:45</td>
+       <td>Invited Talk: The gradual typing approach to
+mixing static and dynamic typing<br />
+         <blockquote>
+           <p><em>The gradual typing approach to mixing static and dynamic typing
+enables the programmer to choose which parts of a program should be
+statically typed and which parts should be dynamically typed.  The
+gradual typing approach was proposed in 2006 and we have made
+considerable progress in understanding the design and implementation
+of languages with gradual typing, but much more research is needed.
+In this talk I give a whirlwind tour of the problems and research
+results from the past seven years and discuss some open problems.</em></p>
+           </blockquote>
+         Jeremy Siek<br />
+         (University of Colorado at Boulder)</td></tr>
+
+     <tr class="special"><td>11:45-12:45</td><td>Lunch</td></tr>
+     <tr class="special"><td>13:00-18:30</td><td>Excursion</td></tr>
+     <tr class="special"><td>18:30-20:00</td><td>Dinner</td></tr>
+
+     <tr class="day"><td colspan="2">Thursday, May 16th</td></tr>
+     <tr class="special"><td>08:30-09:00</td><td>Registration</td></tr>
+
+     <tr class="session"><td colspan="2">Session 1</td></tr>
+
+     <tr><td>09:00-09:25</td>
+       <td><a href="proceedings/tfp2013_submission_2.pdf">DOMain Specific Type Error Diagnosis</a><br />
+         Jurriaan Hage<br />
+         (Utrecht University)<br />
+     <a href="http://www.cs.uu.nl/wiki/Hage/WebHome">http://www.cs.uu.nl/wiki/Hage/WebHome</a></td></tr>
+
+     <tr><td>09:25-09:50</td>
+       <td><a href="proceedings/tfp2013_submission_25.pdf">Blame Prediction</a><br />
+         Dries Harnie &lt;dries.harnie AT vub.ac.be&gt;<br />
+         (Vrije Universiteit Brussel)</td></tr>
+
+     <tr><td>09:50-10:15</td>
+       <td><a href="proceedings/tfp2013_submission_15.pdf">Model-Based Shrinking for State Based Testing</a><br />
+         Pieter Koopman &lt;pieter AT cs.ru.nl&gt;<br />
+         (Radboud University Nijmegen, The Netherlands)<br />
+         <a href="http://www.mbsd.cs.ru.nl/">http://www.mbsd.cs.ru.nl/</a></td></tr>
+
+     <tr class="special"><td>10:15-10:45</td><td>Break</td></tr>
+
+     <tr class="session"><td colspan="2">Session 2</td></tr>
+
+     <tr><td>10:45-11:10</td>
+       <td><a href="proceedings/tfp2013_submission_20.pdf">Implementing a Vau-based Language With Multiple Evaluation Strategies</a><br />
+         Logan Kearsley &lt;chronosurfer AT gmail.com&gt;<br />
+         (Brigham Young University)</td></tr>
+
+     <tr><td>11:10-11:35</td>
+       <td><a href="proceedings/tfp2013_submission_11.pdf">Control Flow Analysis with SAT Solvers</a><br />
+         Steven Lyde<br />
+         (University of Utah)<br />
+     <a href="http://matt.might.net/">http://matt.might.net/</a></td></tr>
+
+     <tr><td>11:35-12:00</td>
+       <td><a href="proceedings/tfp2013_submission_9.pdf">A Survey of Polyvariance in Control-Flow Analysis</a><br />
+         Thomas Gilray<br />
+         (University of Utah)<br />
+     <a href="http://matt.might.net/">http://matt.might.net/</a></td></tr>
+
+     <tr class="special"><td>12:00-13:45</td><td>Lunch</td></tr>
+
+     <tr class="session"><td colspan="2">Session 3</td></tr>
+
+     <tr><td>13:45-14:10</td>
+       <td><a href="proceedings/tfp2013_submission_14.pdf">How to Interact with a HERMIT</a><br />
+         Andy Gill<br />
+         (University of Kansas)<br />
+     <a href="http://www.ittc.ku.edu/csdl/fpg/users/andygill.html">http://www.ittc.ku.edu/csdl/fpg/users/andygill.html</a></td></tr>
+
+     <tr><td>14:10-14:35</td>
+       <td><a href="proceedings/tfp2013_submission_16.pdf">A Language for Domain Specific Optimizations in Haskell</a><br />
+         Andrew Farmer<br />
+         (University of Kansas)<br />
+     <a href="http://andrewfarmer.name">http://andrewfarmer.name</a></td></tr>
+
+     <tr><td>14:35-15:00</td>
+       <td><a href="proceedings/tfp2013_submission_6.pdf">A Target Implementation for High-Performance Functional Programs</a><br />
+         Andy Jost &lt;ajost AT synopsys.com&gt;<br />
+         (Synopsys, Inc. and Portland State University)</td></tr>
+
+     <tr class="special"><td>15:00-15:30</td><td>Break</td></tr>
+
+     <tr class="session"><td colspan="2">Session 4</td></tr>
+
+     <tr><td>15:30-15:55</td>
+       <td><a href="proceedings/tfp2013_submission_19.pdf">Pure Continuation Marks</a><br />
+         Kimball Germane<br />
+         (University of Utah)</td></tr>
+
+     <tr><td>15:55-16:20</td>
+       <td><a href="proceedings/tfp2013_submission_1.pdf">Functional Video Games in CS1 III</a><br />
+         Marco T. Morazán &lt;morazanm AT gmail.com&gt;<br />
+         (Seton Hall University)</td></tr>
+
+   </table>
+
+</div>
+
+ <div id="sponsors" class="module unit">
+
+   <h2>Sponsors</h2>
+
+<p>TFP 2013 is sponsored by the Brigham Young University
+Computer Science department.</p>
+   
+ </div>
+
+<div id="organizers" class="module unit">
+
+ <h2>Organizers</h2>
+   
+ <table>
+   <tr>
+     <td style="width: 200px; "><b>Steering Committee Chair</b></td>
+     <td>Marko van Eekelen, Radboud University Nijmegen and Open University, NL </td>
+   </tr>
+   <tr>
+     <td style="width: 200px; "><b>Steering Committee Treasurer</b></td>
+     <td>Hans-Wolfgang Loidl, Heriot-Watt University, UK</td>
+   </tr>
+   <tr>
+     <td style="width: 200px; "><b>Steering Committee Secretary</b></td>
+     <td>Marco T. Morazán, Seton Hall University, New Jersey, U.S.A.</td>
+   </tr>
+   <tr>
+     <td style="width: 200px; "><b>Chair</b></td>
+     <td>Jay McCarthy, Brigham Young University, Utah, U.S.A.</td>
+   </tr>
+   <tr><td/><td/></tr>
+
+ <tr><td><b>Program Committee</b></td>
+     <td>Andy Gill           from the University of Kansas</td></tr>
+ <tr><td></td><td>Arjun Guha          from Cornell University</td></tr>
+ <tr><td></td><td>Clara Segura        from Complutense University of Madrid</td></tr>
+ <tr><td></td><td>Henrik Nilsson      from University of Nottingham</td></tr>
+ <tr><td></td><td>James Caldwell      from the University of Wyoming</td></tr>
+ <tr><td></td><td>John Clements       from California Polytechnic State University</td></tr>
+ <tr><td></td><td>Jurriaan Hage       from Universiteit Utrecht</td></tr>
+ <tr><td></td><td>Keiko Nakata        from Institute of Cybernetics at Tallinn University of Technology</td></tr>
+ <tr><td></td><td>Marko van Eekelen   from Open University of the Netherlands and Radboud University Nijmegen</td></tr>
+ <tr><td></td><td>Nikhil Swamy        from Microsoft Research</td></tr>
+ <tr><td></td><td>Rita Loogen         from Philipps-Universität Marburg</td></tr>
+ <tr><td></td><td>Sergio Antoy        from Portland State University</td></tr>
+ <tr><td></td><td>Suresh Jagannathan  from Purdue University</td></tr>
+ <tr><td></td><td>Tom Schrijvers      from Ghent University</td></tr>
+ <tr><td></td><td>Viktória Zsók       from Eötvös Loránd University, Budapest</td></tr>
+ <tr><td></td><td>Wolfgang De Meuter  from Vrije Universiteit Brussel</td></tr>
+  </table>
+
+ </div> <!-- /pc -->
+
+ </div> <!-- /contents -->
+
+</div> <!-- /container -->
+
+</body>
+</html>
