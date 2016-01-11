@@ -1,0 +1,42 @@
+This is the version of Peterson's synchronization algorithm
+for 2 processes, process 0 and process 1.  As seen in the text,
+the algorithm can easily be extended to support any number of 
+processes.  The two processes using the code below repeatedly 
+enter their critical sections, do their critical sections and 
+then leave their critical sections.
+
+Assume that when process == 0, other == 1 
+        and when process == 1, other == 0.
+
+#define 	FALSE 	0
+#define 	TRUE 		1
+#define		N		2  // number of processes
+
+// GLOBALS
+
+int   turn;              // whose turn is it?
+int   interested[N];     // all values initially 0 (FALSE)
+
+void enter_region(int process); // process is 0 or 1
+{
+  int other;                    // other process number
+  other = 1 - process;          // the opposite of process 
+  interested[process] = TRUE;   // raise my interested flag
+  turn = process;               // set turn to yourself
+
+  // the conjunction below is reversed from the book version
+  // since this version is correct and more efficient
+
+  while(interested[other] == TRUE && turn == process); // spin
+}
+
+
+// call enter_region(process_value) where process_value is 1 or 0
+// execute critical section
+// call leave_region(process_value) where process_value is 1 or 0
+
+
+void leave_region(int process)  // process is 0 or 1
+{
+  interested[process] = FALSE;  // drop my interested flag now
+}
