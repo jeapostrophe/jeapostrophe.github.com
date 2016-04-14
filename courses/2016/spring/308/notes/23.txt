@@ -1,0 +1,41 @@
+Virtual Machine Reqs:
+1 Efficient (run on real hardware)
+2  Accurate (allow un-changed OS code)
+3    Safety (protect host from guest)
+
+3 requires input from Intel
+
+"Sensitive" instruction...
+- Behavior is different in kernel mode
+  from user mode
+- X86 Rings: 0 (kernel), 1, 2, 3 (user)
+- Instr: "Switch ring to 3"
+- Instr: "Turn off interrupts"
+-- Ring 0: Really change a flag (stop listen)
+-- Ring 3: NOP (actual X86 pre 2005)
+-- Ring 3: Trap (X86 post 2005)
+
+Privileged Instruction...
+- Instructions that trap outside of ring 0
+
+Sensitive ⊆ Privileged => Efficient Virt is pos.
+
+VMware came out in 1999. Started in 1994
+-- Used to do binary rewriting (and still do)
+
+Paravirtualization
+- VM not of X86 but of fake CPU
+- Xen
+
+---------------
+
+IBM 1972
+1974 theory of VMs 
+
+OS/360 - hardware + software
+OS/370 - new hardware + new software + VM/360
+
+-------
+
+Type 1 - Machine > Hypervisor > Guests
+Type 2 - Machine > Host > VM > Guests
