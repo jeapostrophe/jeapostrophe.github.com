@@ -1,0 +1,34 @@
+Type 1 VM - Machine > Hypervisor > Guest(s)
+ [Xen]
+ [VMware ESX server]
+Type 2 VM - Machine > Host OS > VM > Guest(s)
+ [VirtualBox]
+ [VMware Workstation]
+
+-------
+Amazon EC2/Microsoft Cloud (Type 1)
+- VM marketplace
+- AWS = "Amazon Web Services"
+Scaling under-utilized hardware (Type 1)
+- Host WWW, Mail, DB, etc all together
+Best of both worlds (Type 2)
+- Best laptop (Macbook Pro)
+- Worst software (Windows, cause you have to)
+- Best software (Linux)
+Testing X-platform/new kernels code (Type 2)
+- Cheaper in expense
+- " in setup
+- Particularly in OS development
+Run untrusted code (Type 2)
+- Does it have a virus?
+- Problematic if hardware intensive
+- Link to trusted world is dangerous
+-------
+
+ Def 1 -  Sensitive inst: Behave different in user mode
+ Def 2 - Privileged inst: It traps from user mode 
+Prop 1 - Sensitive ⊆ Privileged
+w/o this: inefficiency and/or binary rewriting
+
+-------
+
