@@ -1,0 +1,70 @@
+How to start the extra-credit...
+- Make a block/drive api
+- Make a simple shell
+- diskinfo
+- exit
+- mkdir / rmdir
+- ls
+- cd
+- mv
+- touch (create a file)
+- cp
+- chmod
+- chown
+- cat
+- ed
+
+-----------------------------------
+
+Hypervisors - Type 1 (Machine > Hypervisor > Guest(s))
+
+VM - Efficient, Accurate, and Secure
+
+Why Accurate?
+- Valid testing
+- Acts like a real computer cheaply
+- Real Un-modified OSes
+
+How would an OS be different if it "knew" it was in a VM?
+- Cooperate with the VM (hypervisor)
+- Explicit APIs for sharing between Host and Guest (Type 2)
+- Implicit: Turn off block cache!
+-- Real machine has 16 GB
+-- OS (in VM) wants to use ALL of memory (8 GB)
+-- It does e.g. block cache (even though real 2GB)
+-- This causes unnecessary virtual page usage/contention.
+- Implicit: Support only one hard-drive driver.
+-- Simplifies the OS and perf.
+- Explicit: What kind of hard-drive does a VM support?
+-- API for making it bigger (i.e. more features)
+- Explicit: Tell the host what you are doing
+-- VM wants to know the REAL memory that isn't in cache
+-- Linux could tell Xen ... "I will need this page soon"
+-- API for telling the VMM what's happening
+- Explicit: Inter-VM communication API
+-- 3 VMs and they communicate
+-- On a fake network (Ethernet hub)
+-- Efficiency of SHM vs Writing/Reading to Files
+
+Take all the APIs of the Hypervisor..
+- Para-virtualization
+.... it's not a VMM, it's just an OS
+- It's a kind of MICROKERNEL
+.....
+- Microkernels that WON!
+
+Unikernel / Exokernel
+- Why is my VM running multiple tty?
+- Take away everything from an OS that you don't need
+- Ring-0 only OSes
+- Unified address space
+- For a DB... remove the filesystem
+- For a compute server... remove all persistent storage
+- Q: How expensive to make?
+-- Surprisingly easy
+- Q: How much do we save?
+
+Tour of Unikernels
+- IncludeOS
+- BareMetal
+
