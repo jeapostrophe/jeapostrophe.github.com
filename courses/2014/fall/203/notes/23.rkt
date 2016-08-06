@@ -24,18 +24,39 @@
 
 (struct T:C2 T (color left key val right))
 
+(define (search t k)
+  (match t
+    [(T:0) #f]
+    [(T:1 n) (search n k)]
+    [(or (T:2 l tk tv r)
+         (T:C2 _ l tk tv r))
+     (cond
+       [(= k tk) tv]
+       [(< k tk)
+        (search l k)]
+       [else
+        (search r k)])]))
+
+(define (height t)
+  (match t
+    [(T:0) 0]
+    [(T:1 n) (add1 (height n))]
+    [(or (T:2 l tk tv r)
+         (T:C2 _ l tk tv r))
+     (add1 (max (height l) (height r)))]))
+
 (define (insert T k v)
   (match T
     [(T:0)
      (T:2 T k v T)]
     [(T:2 L K V R)
      (cond
-      [(= k K)
-       (T:2 L K v R)]
-      [(< k K)
-       (T:2 (insert L k v) K V R)]
-      [else
-       (T:2 L K V (insert R k v))])]))
+       [(= k K)
+        (T:2 L K v R)]
+       [(< k K)
+        (T:2 (insert L k v) K V R)]
+       [else
+        (T:2 L K V (insert R k v))])]))
 
 (define (rb-insert T k v)
   (blacken (rb-insert/inner T k v)))
@@ -46,12 +67,12 @@
      (T:C2 RED T k v T)]
     [(T:C2 C L K V R)
      (cond
-      [(= k K)
-       (T:C2 C L K v R)]
-      [(< k K)
-       (balance C (rb-insert/inner L k v) K V R)]
-      [else
-       (balance C L K V (rb-insert/inner R k v))])]))
+       [(= k K)
+        (T:C2 C L K v R)]
+       [(< k K)
+        (balance C (rb-insert/inner L k v) K V R)]
+       [else
+        (balance C L K V (rb-insert/inner R k v))])]))
 
 (define (blacken T)
   (match T
@@ -91,12 +112,12 @@
        (fake:1 (step1 N))]
       [(T:2 L K V R)
        (cond
-        [(= k K)
-         (fake:2 L K v R)]
-        [(< k K)
-         (fake:2 (step1 L) K V R)]
-        [else
-         (fake:2 L K V (step1 R))])]))
+         [(= k K)
+          (fake:2 L K v R)]
+         [(< k K)
+          (fake:2 (step1 L) K V R)]
+         [else
+          (fake:2 L K V (step1 R))])]))
   ;; step2 is "rebuild the tree around it"
   (define (step2 fake-tree)
     (match fake-tree
@@ -143,7 +164,7 @@
                 (insert T (first Ks) (first Ks))
                 (rest Ks))))
 
-(module+ main
+(module+ main-other
   (require slideshow
            pict/tree-layout)
 
@@ -200,3 +221,36 @@
      (show-tree (smart->avl smart-tree))
      (t "Red-Black")
      (show-tree (insert-n rb-insert (T:0) the-real-list)))))
+
+(module+ main
+  (require plot)
+  (plot-new-window? #t)
+  (define (time-it f)
+    (collect-garbage) (collect-garbage) (collect-garbage)
+    (define-values (ans cpu real gc)
+      (time-apply f '()))
+    (values (first ans) cpu))
+  (define (time-insert the-insert the-real-list)
+    (time-it
+     (λ () (insert-n the-insert (T:0) the-real-list))))
+  (define (time-search k t)
+    (time-it
+     (λ () (search t k))))
+  (for ([i (in-range 7)])
+    (define n (expt 10 i))
+    (define the-real-list
+      (shuffle (build-list n add1)))
+    (define-values
+      (avl-t avl-it)
+      (time-insert smart-insert the-real-list))
+    (define-values
+      (rb-t rb-it)
+      (time-insert rb-insert the-real-list))
+    (define k (random n))
+    (define-values (_avl avl-st) (time-search k avl-t))
+    (define-values (_rb rb-st) (time-search k rb-t))
+    (printf "~v\ti: ~v ~v\ts: ~v ~v\th: ~v ~v\n"
+            n
+            avl-it rb-it
+            avl-st rb-st
+            (height avl-t) (height rb-t))))
