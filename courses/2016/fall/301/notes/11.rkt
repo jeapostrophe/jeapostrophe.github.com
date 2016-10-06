@@ -462,7 +462,7 @@
                         named-expr))
            (withC name
                   (appC (idC 'make-name)
-                        (idC 'SOMETHING))
+                        (idC 'make-name))
                   body)))
 
   ;;
