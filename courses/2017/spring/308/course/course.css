@@ -8,6 +8,7 @@ table.lectures tr:nth-child(odd) {
 
 table.lectures tr {
     padding: 10px;
+    height: 2em;
 }
 table.lectures td {
     padding: 1px;
@@ -25,15 +26,15 @@ table.lectures tr:nth-child(1) td:nth-child(7) {
 
 table.lectures td:nth-child(1) {
     text-align: right;
-    max-width: 1em;
+    max-width: 1.5em;
 }
 table.lectures td:nth-child(3) {
     text-align: right;
-    max-width: 1em;
+    max-width: 1.5em;
 }
 table.lectures td:nth-child(5) {
     text-align: left;
-    max-width: 1em;
+    max-width: 2em;
 }
 table.lectures td:nth-child(7) {
     text-align: left;
