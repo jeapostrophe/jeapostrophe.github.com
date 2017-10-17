@@ -1,6 +1,12 @@
 #lang scribble/manual
 @(require (for-label racket/base
-                     rackunit
+                     (except-in rackunit
+                                check-not-false
+                                check-not-exn
+                                check-not-equal?
+                                check-false
+                                check-exn
+                                check-equal?)
                      rackunit/chk
                      syntax/parse
                      syntax/parse/define)

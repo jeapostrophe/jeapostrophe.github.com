@@ -1,6 +1,6 @@
 #lang scribble/lp
 @(require (for-label racket/base
-                     rackunit
+                     rackunit/chk
                      racket/list
                      racket/generator
                      racket/file)
@@ -203,7 +203,6 @@ this order:
        (require racket/mpair
                 racket/match
                 racket/shared
-                rackunit
                 rackunit/chk)
 
        (define undefined
