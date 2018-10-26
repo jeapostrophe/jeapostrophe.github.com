@@ -64,41 +64,16 @@ the format is for humans, the uglier the parser is. In general, that
 seems like a good trade.
 
 @chunk[<parser>
-       (define hrule "-----------")
-
-       (define (board . ss)
-         (match-define
-          (list r1 r2 r3 (== hrule)
-                r4 r5 r6 (== hrule)
-                r7 r8 r9)
-          ss)
-         (define rs
-           (list r1 r2 r3 r4 r5 r6 r7 r8 r9))
-         (flatten
-          (for/list ([r (in-list rs)]
-                     [y (in-naturals)])
-            (parse-row y r))))
-
-       (define (parse-row y r)
-         (for/list ([c (in-string r)]
-                    [i (in-naturals)])
-           (cond
-             [(or (= i 3) (= i 7))
-              (if (char=? c #\|)
-                empty
-                (error 'parse-row))]
-             [else
-              (define x
-                (cond [(< i 3) (- i 0)]
-                      [(< i 7) (- i 1)]
-                      [   else (- i 2)]))
-              (parse-cell y x c)])))
-
-       (define (parse-cell y x c)
-         (cell x y
-               (if (char=? #\space c)
-                 anything
-                 (seteq (string->number (string c))))))]
+        (define (board . ss)
+          (for*/fold ([cells null]
+                      #:result (reverse cells))
+                     ([str (in-list ss)]
+                      [c (in-port read-char (open-input-string str))]
+                      #:unless (memv c '(#\- #\|)))
+            (define-values (row col) (quotient/remainder (length cells) 9))
+            (cons (cell col row (cond
+                                  [(string->number (string c)) => seteq]
+                                  [else anything])) cells)))]
 
 The only cute thing in the parser is the way I use @racket[flatten]
 and @racket[empty] to ignore the vertical rules in the ASCII
