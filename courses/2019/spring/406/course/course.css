@@ -1,3 +1,11 @@
+table.tasks tr:nth-child(odd) {
+    background-color: #f0f0e0;
+}
+table.tasks td {
+    padding: 5px;
+    border-bottom: 1px solid black;
+}
+
 table.lectures {
     min-width: 100%;
     text-align: center;
