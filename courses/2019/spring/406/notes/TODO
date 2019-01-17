@@ -83,7 +83,7 @@ Extend your emitter from X0 to X1 programs.
 Write a half-dozen X1 test programs.
 Extend your interpreter from X0 to X1 programs.
 Extend the resolve-complex pass from R1 to R2 programs, with a few test cases to check its output.
-Write a half-dozen tests for explicate-control that predict its output on R2 programs.
+Extend the explicate-control pass from R1 to R2 programs, with a half-dozen tests that predict its output.
 Extend the uncover-locals pass for C1 programs.
 Extend the select-instr pass for C1 programs, with a few test cases to check its output.
 Write a half-dozen tests for the uncover-live pass.
@@ -92,6 +92,7 @@ Extend your build-interference pass for X1 programs, with a few test cases to ch
 Extend the patch-instructions pass for X1 programs, with a few test cases to check its output.
 Update your runtime to support printing out booleans, in addition to integers.
 Update your main-generation pass for boolean-outputting programs.
+Extend your compiler to support conditional moves.
 Extend your data types from R2 to R3.
 Extend your pretty printer from R2 to R3.
 Write a dozen test R3 programs.
@@ -115,12 +116,12 @@ Extend your explicate-control pass to target C2.
 Extend your uncover-locals pass from C1 to C2.
 Extend your data types from X1 to X2.
 Extend your emitter from X1 to X2 programs.
+Extend the select-instr pass to target X2.
 Write a half-dozen X2 test programs.
 Extend your interpreter from X1 to X2 programs.
-Extend the select-instr pass to target X2.
-Extend allocate-registers (and its helper passes) for X2.
-Update your runtime to support printing out vectors.
+Extend remaining passes for X2.
 Update your runtime to support the allocation interface.
+Update your runtime to support printing out vectors.
 Update your runtime to actually do garbage collection.
 Extend your data types from R3 to R4.
 Extend your pretty printer from R3 to R4.
@@ -160,11 +161,9 @@ Write some R5-specific optimizer tests.
 Extend your optimizer from R4 to R5.
 Extend the boring passes from R4 to R5 programs.
 Implement the convert-to-closure pass on R5 programs.
-Implement k-CFA for R5 and incorporate it into your optimizer.
 Add a simple macro system based on syntax-rules to your compiler.
 Use your macro system to replace some of the syntactic sugar in your compiler, like the and & or transformations.
 Write a parser for your programs.
 Expand R5 to have more features.
-Add a macro system based on sets-of-scopes to your compiler.
+Implement k-CFA for R5 and incorporate it into your optimizer.
 Connect your compiler to LLVM.
-Connect your compiler to a managed runtime.
