@@ -1,0 +1,37 @@
+(HL) Define data structures to represent J0 programs.
+(HL) Write a pretty-printer for J0 programs.
+(HL) Write a test-suite of a dozen J0 programs.
+(HL) Implement a big-step interpreter for J0.
+(HL) Define a data structure to represent Sexprs.
+(HL) Convert your J0 test-suite into Sexprs.
+(HL) Implement a desugar function that converts Sexprs into J0.
+(HL) Define data structures to represent J1 programs, with pretty printers.
+(HL) Write a test-suite of a dozen J1 programs.
+(HL) Extend desugar to emit J1 programs.
+(HL) Extend your interpreter for J1.
+(HL) Define data structures to represent contexts.
+(HL) Implement plug, a function that files the hole in a context with a program.
+(HL) Implement find-redex, a function that breaks a term into a context and a redex.
+(HL) Implement a small-step interpreter for J1 using contexts.
+(HL) Refine your definition of contexts to only allow evaluation contexts.
+(HL) Refine find-redex so that it looks for evaluation contexts.
+(HL) Implement the CC0 machine interpreter for J1.
+(LL) Define data structures to represent J1 programs.
+(HL) Write a function that emit HL-J1 programs as LL-J1 programs.
+(LL) Define data structures to represent continuations.
+(LL) Implement the CK0 machine interpreter for J1.
+(HL) Connect your test-suite to your CK0 interpreter to verify that it works.
+(HL) Define data structures to represent J2 programs and function definitions.
+(HL) Write a test-suite of a dozen J2 programs.
+(HL) Define a substitution function that plugs the value of a variable into references to that variable.
+(HL) Extend your big-step interpreter to evaluate J2 programs.
+(LL) Define data structures to represent J2 programs and function definitions.
+(LL) Define a substitution function that plugs the value of a variable into references to that variable.
+(LL) Extend your CK0 machine into the CK1 to evaluate J2 programs.
+XXX.
+XXX.
+XXX.
+XXX.
+XXX.
+XXX.
+XXX.
