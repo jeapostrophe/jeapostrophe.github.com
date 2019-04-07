@@ -10,7 +10,7 @@
 (HL) Extend desugar to emit J1 programs.
 (HL) Extend your interpreter for J1.
 (HL) Define data structures to represent contexts.
-(HL) Implement plug, a function that files the hole in a context with a program.
+(HL) Implement plug, a function that fills the hole in a context with a program.
 (HL) Implement find-redex, a function that breaks a term into a context and a redex.
 (HL) Implement a small-step interpreter for J1 using contexts.
 (HL) Refine your definition of contexts to only allow evaluation contexts.
