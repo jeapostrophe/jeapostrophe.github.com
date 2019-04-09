@@ -158,6 +158,7 @@
 
 ; alloc : time -> var -> addr
 (define ((alloc time) var) (binding var time))
+#;(define (alloc time) (λ (var) (binding var time)))
 
 ;; k-CFA abstract interpreter
 
