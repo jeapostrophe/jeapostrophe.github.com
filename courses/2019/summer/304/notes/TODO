@@ -98,22 +98,22 @@ Write a simulator for multi-tape Turing machines.
 (Intersect) Write a function that takes two Turing machines and returns a 2-tape Turing machine that accepts the intersection of the two machines' languages.
 Write a computable function-style simulator for multi-tape Turing machines.
 Implement and test a two-tape computable function that adds two arbitrary-bit binary numbers separated by the + symbol.
-Define a data type to represent non-deterministic Turing machines.
-Write a few trivial example non-deterministic Turing machines.
-Write an oracle-style NTM interpreter.
-(Concatenation) Write a function that takes two Turing machines and returns a non-deterministic Turing machine that accepts the concatenation of the two machines' languages.
-Write a backtracking-style NTM interpreter.
 Define a data type to represent polynomials over a single variable.
 Write a dozen example polynomials.
 For a few of the example polynomials, figure out their roots.
 Write a function which given a polynomial determines its integral roots, if it has any.
-Write a function that accepts a CFG and returns whether it describes the empty language.
 Implement and test an integer pairing function.
 Implement an integer un-pairing function.
 Implement and test a K-arity integer pairing function.
 Implement a K-arity integer un-pairing function.
+Implement a function that accepts a sequence of real numbers and returns a real number that is not in the sequence.
+Write a function that accepts a CFG and returns whether it describes the empty language.
 Implement a function that encodes Turing machine description as integers.
 Implement a function that decodes Turing machines as encoded integers.
-Implement a function that accepts a sequence of real numbers and returns a real number that is not in the sequence.
 Implement a function that mimics the Halting Problem proof.
 Write a function that converts a PDA into an equivalent CFG.
+Define a data type to represent non-deterministic Turing machines.
+Write a few trivial example non-deterministic Turing machines.
+Write an oracle-style NTM interpreter.
+Write a backtracking-style NTM interpreter.
+(Concatenation) Write a function that takes two Turing machines and returns a non-deterministic Turing machine that accepts the concatenation of the two machines' languages.
