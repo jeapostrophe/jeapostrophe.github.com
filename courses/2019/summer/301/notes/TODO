@@ -42,9 +42,8 @@
 (LL) Extend the CEK1 machine to CEK2 to evaluate J4.
 (HL) Extend your J4 data structures to J5.
 (HL) Write a dozen test programs in J5 using the raw extensions.
-(HL) Extend desugar to allow the definition of algebraic data types and a match form.
 (HL) Extend your standard library to include options and basic list functions, like map, filter, and fold.
-(HL) Write a dozen test J5 programs that use the standard library and algebraic data types.
+(HL) Write a dozen test J5 programs that use the standard library.
 (LL) Extend your J4 data structures to J5 and extend the CEK2 machine to CEK3 to evaluate J5.
 (HL) Extend your data structures to represent J6 programs.
 (HL) Extend your desugar standard library with mutation helpers.
@@ -79,19 +78,19 @@
 (HL) Write a dozen programs that fail at runtime due to contract violations on untyped boundaries.
 (HL) Write a dozen programs that contain valid typed regions.
 (HL) Implement a gradual type checker and elaborator that runs after your desugar function.
-(HL) Extend your type system (and examples & violations) to support recursion.
-(HL) Extend your type system (and examples & violations) to support algebraic data.
-(HL) Extend your type system (and examples & violations) to support mutation.
-(HL) Extend your type system (and examples & violations) to support polymorphism.
-(HL) Extend your type system (and examples & violations) to support structural subtyping of object types.
-(HL) Extend your type system (and example & violations) to use constraint-solving inference.
 Note. After this, most tasks can be done in any order.
+(HL & LL) Modify your LL representation to use static variable offsets.
 (HL & LL) Modify your LL representation to use flat closures, rather than the nested ones we've used so far.
 (HL & LL) Create a bytecode format that enables your machine to instantly start without parsing.
+(HL & LL) Add seals to your language.
+(HL) Extend your macro system to support hygiene via sets-of-scopes.
+(HL & LL) Implement NaN boxing.
+(HL) Modify your type elaborator to optimize programs using type information.
 (HL) Implement a reader for your language and give it a real syntax.
-(HL) Modify your type elaborator to use unsafe functions in typed contexts.
+(HL) Extend your type system (and examples & violations) to support polymorphism.
+(HL) Extend your type system (and examples & violations) to support structural subtyping of object types.
+(HL) Extend your type system (and examples & violations) to use constraint-solving inference.
 (HL) Implement a teachlog-style logic programming environment in your language using the non-determinism monad.
-(HL) Extend your macro system to support hygiene via coloring.
 (HL & LL) Extend your system to support continuation marks.
 (HL) Use continuation marks to make parameters.
 (LL) Extend your virtual machine to support mark-and-sweep as an option.
@@ -104,6 +103,7 @@ Note. After this, most tasks can be done in any order.
 (HL) Use continuation marks (with keys) to implement sandboxed evaluation via security-through-stack-inspection.
 (HL) Implement select and asynchronous channels using message-passing concurrency.
 (HL & LL) Extend your system to support IO via special channels.
-(LL) Extend your virtual machine to support generational garbage collection.
-(HL) Extend your macro system to support procedural macros and a set-of-scopes expander.
+(HL) Extend your macro system to support procedural macros.
+(HL) Implement a match macro.
 (HL) Extend your macro system to support syntax-local-value.
+(LL) Extend your virtual machine to support generational garbage collection.
