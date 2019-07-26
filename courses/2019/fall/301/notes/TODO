@@ -1,0 +1,109 @@
+(HL) Define data structures to represent J0 programs.
+(HL) Write a pretty-printer for J0 programs.
+(HL) Write a test-suite of a dozen J0 programs.
+(HL) Implement a big-step interpreter for J0.
+(HL) Define a data structure to represent Sexprs.
+(HL) Convert your J0 test-suite into Sexprs.
+(HL) Implement a desugar function that converts Sexprs into J0.
+(HL) Define data structures to represent J1 programs, with pretty printers.
+(HL) Write a test-suite of a dozen J1 programs.
+(HL) Extend desugar to emit J1 programs.
+(HL) Extend your interpreter for J1.
+(HL) Define data structures to represent contexts.
+(HL) Implement plug, a function that fills the hole in a context with a program.
+(HL) Implement find-redex, a function that breaks a term into a context and a redex.
+(HL) Implement a small-step interpreter for J1 using contexts.
+(HL) Refine your definition of contexts to only allow evaluation contexts.
+(HL) Refine find-redex so that it looks for evaluation contexts.
+(HL) Implement the CC0 machine interpreter for J1.
+(LL) Define data structures to represent J1 programs.
+(HL) Write a function that emit HL-J1 programs as LL-J1 programs.
+(LL) Define data structures to represent continuations.
+(LL) Implement the CK0 machine interpreter for J1.
+(HL) Connect your test-suite to your CK0 interpreter to verify that it works.
+(HL & LL) Define data structures to represent J2 programs and function definitions.
+(HL) Write a test-suite of a dozen J2 programs.
+(HL) Define a substitution function that plugs the value of a variable into references to that variable.
+(HL) Extend your big-step interpreter to evaluate J2 programs.
+(LL) Define a substitution function that plugs the value of a variable into references to that variable.
+(LL) Extend your CK0 machine into the CK1 to evaluate J2 programs.
+(LL) Modify your CK1 machine into the CEK0 machine.
+(LL) Write test cases that verify your CEK0 machine does NOT have dynamic scope.
+(LL) Make a tweak to the CEK0 machine to give it dynamic scope, commit that, then revert it.
+(HL) Remove your big-step interpreter from the HL.
+(HL & LL) Define data structures to represent J3 programs and runtime values.
+(HL) Write a test-suite of a dozen J3 programs.
+(HL) Extend desugar to support let expressions.
+(LL) Extend CEK0 to CEK1 to evaluate J3 programs.
+(HL) Write a test program that evaluates factorial using only functions, except for a final conversion to numbers.
+(HL & LL) Extend your J3 data structures to J4.
+(HL) Extend desugar to allow not mentioning the recursive name, as well as provide a default.
+(HL) Write a dozen test J3 programs, including extensions to your standard library.
+(LL) Extend the CEK1 machine to CEK2 to evaluate J4.
+(HL) Extend your J4 data structures to J5.
+(HL) Write a dozen test programs in J5 using the raw extensions.
+(HL) Extend your standard library to include options and basic list functions, like map, filter, and fold.
+(HL) Write a dozen test J5 programs that use the standard library.
+(LL) Extend your J4 data structures to J5 and extend the CEK2 machine to CEK3 to evaluate J5.
+(HL) Extend your data structures to represent J6 programs.
+(HL) Extend your desugar standard library with mutation helpers.
+(HL) Write a dozen example J6 programs.
+(LL) Extend your data structures to J6 and the CEK3 machine to CEK4 to handle J6 programs.
+(HL) Write a dozen example J7 programs.
+(HL) Extend desugar so that J7 programs are elaborated into J6 programs.
+(HL) Extend desugar to support letrec.
+(HL & LL) Extend your data structures to represent J9 programs.
+(HL) Write a dozen example J9 programs.
+(LL) Extend your CEK4 machine to CEK5 to support J9 programs.
+(HL & LL) Extend your data structures to represent J10 programs, and remove support for J9 programs.
+(HL) Write a dozen example J10 programs.
+(HL) Modify your standard library and desugar to support J9 programs as J10 programs.
+(LL) Extend your CEK4 machine to CEK6.
+(HL) Extend your desugar to provide control constructs.
+(HL) Extend your standard library to support generators and write some example generators.
+(HL) Implement message-passing concurrency in your standard library.
+(HL) Write a dozen examples programs that use concurrency.
+(HL) Implement locks using message-passing concurrency.
+(HL) Implement futures (i.e. promises) using message-passing concurrency.
+(HL) Write a dozen example J12 programs.
+(HL & LL) Extend your system from J11 to J12, thereby supporting runtime type inspection.
+(HL) Update your standard library to check types before performing operations.
+(HL) Extend your standard library and desugar to support contracts.
+(HL) Implement a basic syntax-rules macro system.
+(HL) Refactor your desugar function so that many of its features are now implemented in the standard library as macros.
+(*) Download teachlog and write an interesting logic program.
+(HL) Write an example program that uses an obscene amount of memory without garbage collection.
+(LL) Modify your virtual machine to perform stop & copy garbage collection.
+(HL) Write a dozen programs that fail to type check.
+(HL) Write a dozen programs that fail at runtime due to contract violations on untyped boundaries.
+(HL) Write a dozen programs that contain valid typed regions.
+(HL) Implement a gradual type checker and elaborator that runs after your desugar function.
+Note. After this, most tasks can be done in any order.
+(HL & LL) Modify your LL representation to use static variable offsets.
+(HL & LL) Modify your LL representation to use flat closures, rather than the nested ones we've used so far.
+(HL & LL) Create a bytecode format that enables your machine to instantly start without parsing.
+(HL & LL) Add seals to your language.
+(HL) Extend your macro system to support hygiene via sets-of-scopes.
+(HL & LL) Implement NaN boxing.
+(HL) Modify your type elaborator to optimize programs using type information.
+(HL) Implement a reader for your language and give it a real syntax.
+(HL) Extend your type system (and examples & violations) to support polymorphism.
+(HL) Extend your type system (and examples & violations) to support structural subtyping of object types.
+(HL) Extend your type system (and examples & violations) to use constraint-solving inference.
+(HL) Implement a teachlog-style logic programming environment in your language using the non-determinism monad.
+(HL & LL) Extend your system to support continuation marks.
+(HL) Use continuation marks to make parameters.
+(LL) Extend your virtual machine to support mark-and-sweep as an option.
+(HL) Extend your type system to support F-bounded polymorphism.
+(HL) Change your implementation of polymorphism to monomorphize.
+(HL) Extend your type system (and examples & violations) to support iso-recursive types.
+(HL) Implement a logic programming environment in your language using first-class continuations and continuation marks.
+(HL) Use continuation marks to make exceptions work correctly with concurrency.
+(HL) Use continuation marks to make space-efficient contracts.
+(HL) Use continuation marks (with keys) to implement sandboxed evaluation via security-through-stack-inspection.
+(HL) Implement select and asynchronous channels using message-passing concurrency.
+(HL & LL) Extend your system to support IO via special channels.
+(HL) Extend your macro system to support procedural macros.
+(HL) Implement a match macro.
+(HL) Extend your macro system to support syntax-local-value.
+(LL) Extend your virtual machine to support generational garbage collection.
