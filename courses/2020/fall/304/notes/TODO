@@ -1,0 +1,119 @@
+Decide on a data type to represent alphabets and characters.
+Decide on a data type to represent strings.
+Write a function that generates the Nth string of a given alphabet's lexicographic order.
+Define a data type to represent DFAs.
+Write the definition of a DFA that accepts no strings.
+Write the definition of a DFA that accepts only the empty string.
+Write a function that when given a character returns a DFA that accepts only strings of exactly that character.
+Write a dozen example DFAs.
+For each example DFA, write a dozen tests of their behavior.
+Write a function that given a DFA and a string, determines if the string is accepted.
+Write a function that given a DFA and a string, returns the trace of configurations it visits.
+Write a function that given a DFA, returns a string that would be accepted (or false if this is not possible).
+(Complement) Write a function that takes one DFA and returns a DFA that accepts that the given one does not (and vice versa).
+(Union) Write a function that takes two DFAs and returns a third DFA that accepts a string if either argument accepts it.
+Write a dozen tests for your union function.
+(Intersect) Write a function that takes two DFAs and returns a third DFA that accepts a string if both arguments accepts it.
+Write a dozen tests for your intersection function.
+(Subset) Write a function which takes two DFAs (X and Y) and returns whether every string accepted by X is also accepted by Y.
+Write a dozen tests for your subset function.
+(Equality) Write a function which takes two DFAs (X and Y) and returns whether every string accepted by X is also accepted by Y and vice versa.
+Write a dozen tests for your equality function.
+Verify your complement, union, and intersect functions using the equality function.
+Define a data type to represent NFAs.
+Write a (trivial) function that converts DFAs into NFAs.
+Write a dozen example NFAs.
+For each example NFA, write a dozen traces of their behavior.
+(Oracle) Write a function that given an NFA, a string, a trace, and a boolean, determines if the trace is a valid execution of the NFA and accepts results in the given boolean.
+Define a data type to represent trace trees.
+For each example NFA, write a half-dozen trace trees of their behavior.
+(Forking) Write a function that given an NFA and a string, returns a tree of all possible traces.
+For each example NFA, write a dozen tests of their behavior.
+(Backtracking) Write a function that given an NFA and a string, determines if the string is accepted.
+(Union) Write a function that takes two NFAs and returns a third NFA that accepts a string if either argument accepts it.
+(Concatenation) Write a function that takes two NFAs and returns a third NFA that accepts a string if it can be broken into two pieces, one accepted by the first NFA and the other accepted by the second.
+Write a dozen tests for your concatenation function.
+(Kleene Star) Write a function that takes an NFA and returns a new NFA that accepts a string if it can be broken into N pieces, each accepted by the argument.
+Write a dozen tests for your Kleene star function.
+Write a function which converts an NFA into a DFA that accepts the same language.
+Ensure that all of your NFA tests return the correct results when converted to DFAs and run through the DFA accept function.
+Manually convert a few NFAs to DFAs and verify the output of your compiler with your DFA equality function.
+Define a data type to represent regular expressions.
+Write a printer for regular expressions.
+Write a dozen example regular expressions.
+For each regular expressions, write a few examples of accepted strings and rejected strings.
+(Generator) Write a function that accepts a regular expressions and generates a random string that would be accepted by it.
+Write a compiler from regular expressions to NFAs.
+Verify that your regular expression compiler works by using DFA equality testing in a few ways.
+Write an equality checker for regular expressions.
+Write a dozen tests for your regular expression equality checker.
+Write an optimizer for regular expressions that simplifies them.
+Define a data type to represent GNFAs.
+Write a function that converts DFAs into equivalent regular expressions.
+Verify that your ripper works by checking that the generator always produces strings accepted by the DFA.
+Verify that your ripper works by checking that the DFA is equal to the DFA produced by compiling the regular expression derived from it.
+Write a dozen examples of the regular pumping property holding true on your example machines.
+(Pumper) Write a function which given a DFA, a string, and an accepting trace returns three sub-strings (x, y, and z) that satisfy the clauses of the regular pumping lemma, if the input string is long enough.
+(Re-Pumper) Write a function which given three strings that satisfy the conclusion of the pumping lemma constructs a DFA.
+Verify that your pumper works by showing that your re-pumper's result is always a subset of the original DFA.
+Define a data type to represent context-free grammars.
+Define a data type to represent CFG parse trees.
+Write a dozen example context-free grammars.
+For each context-free grammar, write a few examples of generated strings and strings that are not generated.
+Write a function that accepts a CFG and returns a random string derived from the grammar along with its parse tree.
+(Generator) Write a function that accepts a CFG and a number N, and returns all strings generated by it where the derivation tree is less than N levels deep.
+Write a function that converts a DFA into a CFG.
+Write a function that accepts a CFG and a parse tree and returns whether the parse tree obeys the rules of the CFG.
+Write a function that accepts a CFG and returns whether it is Chomsky Normal Form.
+Write a function that accepts a CFG and converts it into Chomsky Normal Form.
+Define a data type to represent push-down automata.
+Write a dozen example PDAs.
+For each PDA, write a half-dozen examples of accepted and rejected strings.
+Write an oracle-style PDA interpreter, like you did for NFAs.
+Write a forking-style PDA interpreter, like you did for NFAs.
+Write a backtracking-style PDA interpreter, like you did for NFAs.
+Write a function that converts a CFG into an equivalent PDA.
+Write a half-dozen examples of the context free pumping property holding on your example CFGs.
+(Pumper) Write a function that accepts a CFG and a parse tree and returns the sub-strings that satisfy the conclusion of the context-free pumping property, if the output string is long enough.
+(Re-Pumper) Write a function that accepts the sub-strings of the CFPP for a CFG and generates a CFG.
+Verify that your pumper works by showing that your re-pumper's output generates strings accepted by a PDA corresponding to your original CFG.
+Define a data type to represent Turing machine tapes.
+Define a data type to representing Turing machines.
+Encode the example Turing machines from the book and from class.
+Write a dozen examples, per machine, of strings, some accepted and some rejected.
+For each machine, write out a trace of the execution of the machine on a non-trivial string.
+Write a function that simulates a Turing machine and returns a list of the configurations it visited.
+Write a function that simulates a Turing machine running on some input.
+Write a function that converts a DFA into a Turing machine.
+Write a function that simulates a Turing machine and returns the tape contents ahead of it when it accepts.
+Implement and test a computable function that increments a binary number.
+Implement and test a computable function that decrements a binary number.
+Implement and test a computable function that adds two arbitrary-bit binary numbers separated by the + symbol.
+Define a data type to represent stay-put Turing machines.
+Write a couple example stay-put Turing machines.
+Write a function that converts stay-put Turing machines into normal Turing machines.
+Define a data type to represent multi-tape Turing machines.
+Write a simulator for multi-tape Turing machines.
+(Union) Write a function that takes two Turing machines and returns a 2-tape Turing machine that accepts the union of the two machines' languages.
+(Intersect) Write a function that takes two Turing machines and returns a 2-tape Turing machine that accepts the intersection of the two machines' languages.
+Write a computable function-style simulator for multi-tape Turing machines.
+Implement and test a two-tape computable function that adds two arbitrary-bit binary numbers separated by the + symbol.
+Define a data type to represent polynomials over a single variable.
+Write a dozen example polynomials.
+For a few of the example polynomials, figure out their roots.
+Write a function which given a polynomial determines its integral roots, if it has any.
+Implement and test an integer pairing function.
+Implement an integer un-pairing function.
+Implement and test a K-arity integer pairing function.
+Implement a K-arity integer un-pairing function.
+Implement a function that accepts a sequence of real numbers and returns a real number that is not in the sequence.
+Write a function that accepts a CFG and returns whether it describes the empty language.
+Implement a function that encodes Turing machine description as integers.
+Implement a function that decodes Turing machines as encoded integers.
+Implement a function that mimics the Halting Problem proof.
+Write a function that converts a PDA into an equivalent CFG.
+Define a data type to represent non-deterministic Turing machines.
+Write a few trivial example non-deterministic Turing machines.
+Write an oracle-style NTM interpreter.
+Write a backtracking-style NTM interpreter.
+(Concatenation) Write a function that takes two Turing machines and returns a non-deterministic Turing machine that accepts the concatenation of the two machines' languages.
