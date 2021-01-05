@@ -1,0 +1,169 @@
+Define data types for R0 program ASTs.
+Write a pretty-printer for R0 programs.
+Build a test suite of a dozen R0 programs.
+Write an interpreter for R0 programs.
+Write a function that generates an R0 program that computes 2^N for a given N.
+Write a function that generates a random R0 program of depth N.
+Extend your test suite to generate a large number of random programs.
+Write some optimizer tests.
+Write an optimizer for R0.
+Extend your test suite to use your optimizer.
+Extend your data types from R0 to R1.
+Extend your pretty printer from R0 to R1.
+Write a dozen test R1 programs.
+Extend your interpreter from R0 to R1.
+Extend your random generation function from R0 to R1.
+Write some R1-specific optimizer tests.
+Extend your optimizer from R0 to R1.
+Define data types for X0 program ASTs.
+Write an emitter for X0 programs.
+Build a test suite of a dozen X0 programs.
+Write an interpreter for X0 programs.
+Connect your X0 test suite to your system assembler.
+Define data types for C0 program ASTs.
+Write a pretty printer for C0 programs.
+Build a test suite of a dozen C0 programs.
+Write an interpreter for C0 programs.
+Write a few tests for uniquify that predict its output.
+Implement the uniquify pass for R1 programs.
+Connect uniquify to your test suite.
+Write a half-dozen tests for resolve-complex that predict its output.
+Implement the resolve-complex pass for R1 programs.
+Connect resolve-complex to your test suite.
+Write a half-dozen tests for explicate-control that predict its output.
+Implement the explicate-control pass for R1 programs.
+Connect explicate-control to your test suite.
+Write a few tests for uncover-locals that predict its output.
+Implement the uncover-locals pass for C0 programs.
+Connect uncover-locals to your test suite.
+Write a half-dozen tests for select-instr that predict its output.
+Implement the select-instr pass for C0 programs.
+Connect select-instr to your test suite.
+Write a few tests for assign-homes that predict its output.
+Implement the assign-homes pass for X0 programs.
+Connect assign-homes to your test suite.
+Write a half-dozen tests for patch-instructions that predict its output.
+Implement the patch-instructions pass for X0 programs.
+Connect patch-instructions to your test suite.
+Implement your language runtime.
+Implement the main-generation pass for X0 programs.
+Connect your test suite to your system assembler and language runtime.
+Write a dozen tests for uncover-live that predict its output.
+Implement the uncover-live pass for X0 programs.
+Write a dozen tests for build-interferences that predict its output.
+Implement the build-interferences pass for X0 programs.
+Write a dozen tests for color-graph that predict its output.
+Implement the color-graph function on arbitrary graphs.
+Replace assign-homes with a new pass named assign-registers and implement the stupid-allocate-registers pass for X0 programs.
+Write a dozen tests for the assign-registers that predict its output and check their behavior.
+Write a dozen tests for allocate-registers that predict its output.
+Replace stupid-allocate-registers with a new allocate-registers pass on X0 programs.
+Update the main-generation pass to save and restore callee-saved registers.
+Connect your test suite to the new main-generation and allocate-registers passes.
+Write a few test programs that have opportunities for move-biasing to be effective.
+Extend your build-interferences pass to construct a move-graph.
+Extend your color-graph function to incorporate move-biasing with an optional input argument.
+Update your allocate-registers pass to make use of the move-biasing feature of color-graph.
+Extend your data types from R1 to R2.
+Extend your pretty printer from R1 to R2.
+Write a dozen test R2 programs.
+Extend your interpreter from R1 to R2.
+Write type-checker tests for R2.
+Write a type-checker for R2.
+Extend your random generation function from R1 to R2.
+Write some R2-specific optimizer tests.
+Extend your optimizer from R1 to R2.
+Extend the uniquify pass from R1 to R2 programs, with a few test cases to check its output.
+Extend your data types from C0 to C1.
+Extend your pretty-printer from C0 to C1 programs.
+Write a half-dozen C1 test programs.
+Extend your interpreter from C0 to C1 programs.
+Extend your data types from X0 to X1.
+Extend your emitter from X0 to X1 programs.
+Write a half-dozen X1 test programs.
+Extend your interpreter from X0 to X1 programs.
+Extend the resolve-complex pass from R1 to R2 programs, with a few test cases to check its output.
+Extend the explicate-control pass from R1 to R2 programs, with a half-dozen tests that predict its output.
+Extend the uncover-locals pass for C1 programs.
+Extend the select-instr pass for C1 programs, with a few test cases to check its output.
+Write a half-dozen tests for the uncover-live pass.
+Extend your uncover-live pass for X1 programs.
+Extend your build-interference pass for X1 programs, with a few test cases to check its output.
+Extend the patch-instructions pass for X1 programs, with a few test cases to check its output.
+Update your runtime to support printing out booleans, in addition to integers.
+Update your main-generation pass for boolean-outputting programs.
+Extend your compiler to support conditional moves.
+Extend your data types from R2 to R3.
+Extend your pretty printer from R2 to R3.
+Write a dozen test R3 programs.
+Extend your interpreter from R2 to R3.
+Write type-checker tests for R3.
+Extend your type-checker from R2 to R3.
+Extend your random generation function from R2 to R3.
+Write a function that generates an R3 program that uses N bytes of memory and makes it unreachable M times.
+Write some R3-specific optimizer tests.
+Extend your optimizer from R2 to R3.
+Modify your type-checker so that it wraps every expression in its type.
+Extend the uniquify pass from R2 to R3 programs, with a few test cases to check its output.
+Implement the expose-allocation pass on typed R3 programs.
+Extend your R3 interpreter to handle these new forms.
+Extend the resolve-complex pass from R2 to R3 programs, with a few test cases to check its output.
+Extend your data types from C1 to C2.
+Extend your pretty-printer from C1 to C2 programs.
+Write a half-dozen tests for C2.
+Extend your interpreter from C1 to C2 programs.
+Extend your explicate-control pass to target C2.
+Extend your uncover-locals pass from C1 to C2.
+Extend your data types from X1 to X2.
+Extend your emitter from X1 to X2 programs.
+Extend the select-instr pass to target X2.
+Write a half-dozen X2 test programs.
+Extend your interpreter from X1 to X2 programs.
+Extend remaining passes for X2.
+Update your runtime to support the allocation interface.
+Update your runtime to support printing out vectors.
+Update your runtime to actually do garbage collection.
+Extend your data types from R3 to R4.
+Extend your pretty printer from R3 to R4.
+Write a dozen test R4 programs.
+Extend your interpreter from R3 to R4.
+Write type-checker tests for R4.
+Extend your type-checker from R3 to R4.
+Extend your random generation function from R3 to R4.
+Write some R4-specific optimizer tests.
+Extend your optimizer from R3 to R4.
+Extend the uniquify pass from R3 to R4 programs, with a few test cases to check its output.
+Implement the reveal-fun pass on R4 programs.
+Implement the limit-fun pass on R4 programs.
+Extend the resolve-complex pass to R4 programs.
+Extend your data types from C2 to C3.
+Extend your pretty-printer from C2 to C3 programs.
+Write a half-dozen tests for C3.
+Extend your interpreter from C2 to C3 programs.
+Extend your explicate-control pass to target C3.
+Extend your uncover-locals pass from C2 to C3.
+Extend your data types from X2 to X3.
+Extend your emitter from X2 to X3 programs.
+Write a half-dozen X3 test programs.
+Extend your interpreter from X2 to X3 programs.
+Extend the select-instr pass to target X3.
+Extend allocate-registers (and its helper passes) for X3.
+Extend patch-instructions for X3.
+Update your runtime to deal with printing references to functions and function types.
+Extend your data types from R4 to R5.
+Extend your pretty printer from R4 to R5.
+Write a dozen test R5 programs.
+Extend your interpreter from R4 to R5.
+Write type-checker tests for R5.
+Extend your type-checker from R4 to R5.
+Extend your random generation function from R4 to R5.
+Write some R5-specific optimizer tests.
+Extend your optimizer from R4 to R5.
+Extend the boring passes from R4 to R5 programs.
+Implement the convert-to-closure pass on R5 programs.
+Add a simple macro system based on syntax-rules to your compiler.
+Use your macro system to replace some of the syntactic sugar in your compiler, like the and & or transformations.
+Write a parser for your programs.
+Expand R5 to have more features.
+Implement k-CFA for R5 and incorporate it into your optimizer.
+Connect your compiler to LLVM.
