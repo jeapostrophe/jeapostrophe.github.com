@@ -57,25 +57,25 @@
 (HL) Modify your standard library and desugar to support J9 programs as J10 programs.
 (LL) Extend your CEK4 machine to CEK6.
 (HL) Extend your desugar to provide control constructs.
-(HL) Extend your standard library to support generators and write some example generators.
-(HL) Implement message-passing concurrency in your standard library.
-(HL) Write a dozen examples programs that use concurrency.
-(HL) Implement locks using message-passing concurrency.
-(HL) Implement futures (i.e. promises) using message-passing concurrency.
 (HL) Write a dozen example J12 programs.
 (HL & LL) Extend your system from J11 to J12, thereby supporting runtime type inspection.
 (HL) Update your standard library to check types before performing operations.
-(HL) Extend your standard library and desugar to support contracts.
-(HL) Implement a basic syntax-rules macro system.
-(HL) Refactor your desugar function so that many of its features are now implemented in the standard library as macros.
-(*) Download teachlog and write an interesting logic program.
 (HL) Write an example program that uses an obscene amount of memory without garbage collection.
 (LL) Modify your virtual machine to perform stop & copy garbage collection.
+(HL) Extend your standard library and desugar to support contracts.
 (HL) Write a dozen programs that fail to type check.
 (HL) Write a dozen programs that fail at runtime due to contract violations on untyped boundaries.
 (HL) Write a dozen programs that contain valid typed regions.
 (HL) Implement a gradual type checker and elaborator that runs after your desugar function.
 Note. After this, most tasks can be done in any order.
+(HL) Implement a basic syntax-rules macro system.
+(HL) Refactor your desugar function so that many of its features are now implemented in the standard library as macros.
+(*) Download teachlog and write an interesting logic program.
+(HL) Extend your standard library to support generators and write some example generators.
+(HL) Implement message-passing concurrency in your standard library.
+(HL) Write a dozen examples programs that use concurrency.
+(HL) Implement locks using message-passing concurrency.
+(HL) Implement futures (i.e. promises) using message-passing concurrency.
 (HL & LL) Modify your LL representation to use static variable offsets.
 (HL & LL) Modify your LL representation to use flat closures, rather than the nested ones we've used so far.
 (HL & LL) Create a bytecode format that enables your machine to instantly start without parsing.
