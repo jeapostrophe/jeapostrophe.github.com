@@ -32,18 +32,19 @@
 @centered{@emph{``Cowards die many times before their deaths, @(linebreak) The valiant never taste of death but once.''}}
 
 This is the blog of @link["http://jeapostrophe.github.io/home/"]{Jay
-McCarthy}. I am an associate professor at
-@link["http://www.uml.edu"]{UMass Lowell} in the
+McCarthy}. I am the CTO and co-founder of @link["https://www.reach.sh/"]{Reach}. Previously, I was an associate professor at the
+@link["http://www.uml.edu/"]{University of Massachusetts at Lowell} in
+the
 @link["http://www.uml.edu/Sciences/computer-science/default.aspx"]{Computer
-Science Department}. I work on @link["http://racket-lang.org/"]{the
+Science Department}. I also work on @link["http://racket-lang.org/"]{the
 Racket programming language}.
 
 @itemize[
 
-@item{For course and other teaching information, visit my
+@item{For archived course and other teaching information, visit my
 @link["http://jeapostrophe.github.io/home/"]{home page}.}
 
-@item{For publications and other professional activities, visit my
+@item{For publications, visit my
 @link["http://jeapostrophe.github.io/home/"]{home page}.}
 
 @item{For software projects, visit my
