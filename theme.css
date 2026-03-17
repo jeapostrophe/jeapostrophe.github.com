@@ -1,0 +1,141 @@
+/*
+ * Tomorrow Theme — Light & Dark
+ *
+ * Usage:
+ *
+ *   1. Include this file in your HTML:
+ *        <link rel="stylesheet" href="theme.css">
+ *
+ *   2. The light theme is active by default. The dark theme activates
+ *      automatically when the user's OS is set to dark mode via
+ *      @media (prefers-color-scheme: dark).
+ *
+ *   3. To force a theme, add a data attribute to <html> or <body>:
+ *        <html data-theme="dark">   — force dark
+ *        <html data-theme="light">  — force light
+ *
+ *   4. Use the variables in your CSS:
+ *
+ *        body    { background: var(--bg); color: var(--fg); }
+ *        a       { color: var(--blue); }
+ *        .error  { color: var(--red); }
+ *        .badge  { background: var(--accent); }
+ *        .border { border: 1px solid var(--border); }
+ *
+ *   Variable reference:
+ *
+ *     Base               Terminal / ANSI         UI
+ *     ────               ───────────────         ──
+ *     --fg               --black                 --border
+ *     --bg               --red                   --muted
+ *     --cursor           --green                 --accent
+ *                        --yellow                --selection
+ *                        --blue
+ *                        --magenta
+ *                        --cyan
+ *                        --white
+ *                        --bright-black
+ *                        --bright-red
+ *                        --bright-green
+ *                        --bright-yellow
+ *                        --bright-blue
+ *                        --bright-magenta
+ *                        --bright-cyan
+ *                        --bright-white
+ */
+
+/* ── Shared ─────────────────────────────────────────────────── */
+
+:root {
+  --bright-white: #FFFFFF;
+}
+
+/* ── Light theme (default) ──────────────────────────────────── */
+
+:root,
+[data-theme="light"] {
+  --fg: #4D4D4C;
+  --bg: #FFFFFF;
+  --cursor: #4D4D4C;
+
+  --black: #000000;
+  --red: #C82829;
+  --green: #718C00;
+  --yellow: #EAB700;
+  --blue: #4271AE;
+  --magenta: #8959A8;
+  --cyan: #3E999F;
+  --white: #FFFFFF;
+  --bright-black: #8E908C;
+  --bright-red: #F5871F;
+  --bright-green: #718C00;
+  --bright-yellow: #EAB700;
+  --bright-blue: #4271AE;
+  --bright-magenta: #8959A8;
+  --bright-cyan: #3E999F;
+
+  --border: #D6D6D6;
+  --muted: #EFEFEF;
+  --accent: #EFEFEF;
+  --selection: #D6D6D6;
+}
+
+/* ── Dark theme (auto via OS preference) ────────────────────── */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fg: #C5C8C6;
+    --bg: #1D1F21;
+    --cursor: #C5C8C6;
+
+    --black: #1D1F21;
+    --red: #CC6666;
+    --green: #B5BD68;
+    --yellow: #F0C674;
+    --blue: #81A2BE;
+    --magenta: #B294BB;
+    --cyan: #8ABEB7;
+    --white: #C5C8C6;
+    --bright-black: #969896;
+    --bright-red: #DE935F;
+    --bright-green: #B5BD68;
+    --bright-yellow: #F0C674;
+    --bright-blue: #81A2BE;
+    --bright-magenta: #B294BB;
+    --bright-cyan: #8ABEB7;
+
+    --border: #373B41;
+    --muted: #282A2E;
+    --accent: #282A2E;
+    --selection: #373B41;
+  }
+}
+
+/* ── Dark theme (forced via data-theme="dark") ──────────────── */
+
+[data-theme="dark"] {
+  --fg: #C5C8C6;
+  --bg: #1D1F21;
+  --cursor: #C5C8C6;
+
+  --black: #1D1F21;
+  --red: #CC6666;
+  --green: #B5BD68;
+  --yellow: #F0C674;
+  --blue: #81A2BE;
+  --magenta: #B294BB;
+  --cyan: #8ABEB7;
+  --white: #C5C8C6;
+  --bright-black: #969896;
+  --bright-red: #DE935F;
+  --bright-green: #B5BD68;
+  --bright-yellow: #F0C674;
+  --bright-blue: #81A2BE;
+  --bright-magenta: #B294BB;
+  --bright-cyan: #8ABEB7;
+
+  --border: #373B41;
+  --muted: #282A2E;
+  --accent: #282A2E;
+  --selection: #373B41;
+}
