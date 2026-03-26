@@ -223,6 +223,23 @@
     });
   });
 
-  window.addEventListener("hashchange", route);
+  // Update image credit in footer based on visible panel
+  const creditEl = document.querySelector(".image-credit");
+  function updateCredit() {
+    if (!creditEl) return;
+    // Find the active main-panel or cycle-panel
+    const active = document.querySelector(".main-panel.active, .cycle-panel.active");
+    if (!active) { creditEl.hidden = true; return; }
+    const img = active.querySelector("[data-credit]");
+    if (img) {
+      creditEl.textContent = "Image: " + img.dataset.credit;
+      creditEl.hidden = false;
+    } else {
+      creditEl.hidden = true;
+    }
+  }
+
+  window.addEventListener("hashchange", function() { route(); updateCredit(); });
   route();
+  updateCredit();
 })();

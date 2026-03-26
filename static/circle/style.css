@@ -105,6 +105,11 @@ footer {
   font-size: 0.85em;
   border-top: 1px solid var(--border);
 }
+footer .image-credit {
+  margin-top: 0.25rem;
+  font-size: 0.9em;
+  font-style: italic;
+}
 
 /* Unified navigation bar */
 
@@ -505,25 +510,16 @@ footer {
 }
 
 @media (max-width: 600px) {
-  .theme-word {
-    position: static;
-  }
-
   .theme-tooltip {
     position: fixed;
+    top: 50%;
     bottom: auto;
-    top: auto;
     left: 1rem;
     right: 1rem;
-    transform: none;
+    transform: translateY(-50%);
     min-width: 0;
     max-width: none;
     width: auto;
-  }
-
-  .theme-word:hover .theme-tooltip {
-    top: 50%;
-    transform: translateY(-50%);
   }
 }
 
