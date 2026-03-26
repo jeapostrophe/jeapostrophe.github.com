@@ -213,6 +213,16 @@
     }
   }
 
+  // Clicking logo/title when already on #about should scroll to top, not to the #about anchor
+  document.querySelectorAll('.logo-link, .title-link').forEach(a => {
+    a.addEventListener('click', function(e) {
+      if (!location.hash || location.hash === '#about') {
+        e.preventDefault();
+        window.scrollTo(0, 0);
+      }
+    });
+  });
+
   window.addEventListener("hashchange", route);
   route();
 })();
