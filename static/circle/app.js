@@ -140,6 +140,79 @@
     updateNav({ main: hash });
   }
 
+  // --- Private tab decryption ---
+  const privatePanel = document.getElementById("private");
+  if (privatePanel) {
+    const STORAGE_KEY = "circle-private-pass";
+
+    function fromBase64(b64) {
+      const bin = atob(b64);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      return arr;
+    }
+
+    async function tryDecrypt(password) {
+      const salt = fromBase64(privatePanel.dataset.salt);
+      const iv = fromBase64(privatePanel.dataset.iv);
+      const ct = fromBase64(privatePanel.dataset.ct);
+
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]
+      );
+      const key = await crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: salt, iterations: 600000, hash: "SHA-256" },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["decrypt"]
+      );
+      const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct);
+      return new TextDecoder().decode(plain);
+    }
+
+    function showContent(html) {
+      privatePanel.querySelector(".private-lock").hidden = true;
+      const content = privatePanel.querySelector(".private-content");
+      content.innerHTML = html;
+      content.hidden = false;
+    }
+
+    const form = privatePanel.querySelector(".private-form");
+    const input = privatePanel.querySelector(".private-input");
+    const error = privatePanel.querySelector(".private-error");
+    const reveal = privatePanel.querySelector(".private-reveal");
+
+    reveal.addEventListener("click", function () {
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      reveal.querySelector(".eye-open").style.display = show ? "none" : "block";
+      reveal.querySelector(".eye-closed").style.display = show ? "block" : "none";
+    });
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const pass = input.value;
+      if (!pass) return;
+      error.hidden = true;
+      try {
+        const html = await tryDecrypt(pass);
+        localStorage.setItem(STORAGE_KEY, pass);
+        showContent(html);
+      } catch (err) {
+        console.error("Decryption failed:", err);
+        error.hidden = false;
+        input.select();
+      }
+    });
+
+    // Auto-unlock from localStorage
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      tryDecrypt(saved).then(showContent).catch(() => localStorage.removeItem(STORAGE_KEY));
+    }
+  }
+
   window.addEventListener("hashchange", route);
   route();
 })();

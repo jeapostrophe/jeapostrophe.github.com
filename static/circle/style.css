@@ -28,7 +28,8 @@
 }
 
 .schedule-link,
-.current-book-link {
+.current-book-link,
+.apply-link {
   display: inline-block;
   padding: 0.4rem 1.2rem;
   font-family: system-ui, -apple-system, sans-serif;
@@ -57,6 +58,19 @@
 
 .current-book-link:hover {
   background: var(--accent);
+  color: var(--bg);
+  text-decoration: none;
+}
+
+.apply-link {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.apply-link:hover {
+  background: var(--fg);
+  border-color: var(--fg);
   color: var(--bg);
   text-decoration: none;
 }
@@ -129,7 +143,7 @@ footer {
   right: 0.1rem;
 }
 
-/* Nav segments — hidden by default, inline when active */
+/* Nav segments — hidden by default, visible groups when active */
 
 .nav-segment {
   display: none;
@@ -139,15 +153,33 @@ footer {
   display: contents;
 }
 
-/* Divider between segments */
-
 .nav-divider {
-  display: block;
-  width: 1px;
-  height: 1.4rem;
-  background: var(--border);
-  margin: 0 0.4rem;
-  flex-shrink: 0;
+  display: none;
+}
+
+/* Segment children get a background to visually group them */
+.nav-segment.active > .tab {
+  background: var(--tab-bg);
+  margin: 0.15rem 0;
+}
+
+.nav-segment.active > .pill {
+  background-color: var(--tab-bg);
+  margin: 0.15rem 0.1rem;
+}
+
+/* Override: active/past pills keep their own backgrounds */
+.nav-segment.active > .pill.active {
+  background: var(--pill-active-bg);
+}
+
+.nav-segment.active > .pill.past:not(.active) {
+  background: var(--accent-light);
+}
+
+/* First item in segment gets left margin for spacing from previous group */
+.nav-segment.active > .nav-divider + * {
+  margin-left: 0.5rem;
 }
 
 /* Pill items inside nav */
@@ -281,6 +313,42 @@ footer {
   color: var(--accent);
 }
 
+/* Hero images: size 3 (top-level tabs) */
+.section-hero {
+  width: 100%;
+  max-height: 350px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+/* Hero images: size 2 (year about cards, cycle about) */
+.year-about-card .section-hero,
+.arc-card .section-hero {
+  max-height: 250px;
+}
+
+/* Founders: full-width photo between paragraphs */
+.founders-photo {
+  width: 100%;
+  border-radius: 4px;
+  margin: 1.5rem 0;
+}
+
+.book-cover {
+  float: right;
+  width: 120px;
+  height: 170px;
+  object-fit: cover;
+  margin: 0 0 0.75rem 1.25rem;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 500px) {
+  .book-cover { width: 90px; height: 128px; }
+}
+
 .book-description {
   margin-bottom: 1.5rem;
 }
@@ -293,6 +361,20 @@ footer {
 .virtue {
   display: inline;
   color: var(--fg-muted);
+}
+
+.book-find-it {
+  font-size: 0.9em;
+  color: var(--fg-muted);
+  margin-bottom: 1.5rem;
+}
+
+.book-find-it p {
+  margin: 0.2em 0;
+}
+
+.book-find-it a {
+  color: var(--accent);
 }
 
 .book-essays {
@@ -405,6 +487,29 @@ footer {
   font-family: system-ui, -apple-system, sans-serif;
 }
 
+@media (max-width: 600px) {
+  .theme-word {
+    position: static;
+  }
+
+  .theme-tooltip {
+    position: fixed;
+    bottom: auto;
+    top: auto;
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    min-width: 0;
+    max-width: none;
+    width: auto;
+  }
+
+  .theme-word:hover .theme-tooltip {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
 .theme-word:hover .theme-tooltip {
   display: flex;
   flex-direction: column;
@@ -474,6 +579,84 @@ footer {
 
 .schedule-current td {
   font-weight: 600;
+}
+
+/* Private tab */
+
+.private-lock {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.private-form {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.private-input-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.private-input {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg);
+  width: 16rem;
+  max-width: 60vw;
+}
+
+.private-reveal {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0.2rem;
+  cursor: pointer;
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+}
+
+.private-reveal:hover {
+  color: var(--fg);
+}
+
+.private-reveal .eye-closed {
+  display: none;
+}
+
+.private-submit {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--bg);
+  cursor: pointer;
+}
+
+.private-submit:hover {
+  opacity: 0.85;
+}
+
+.private-error {
+  color: var(--accent);
+  margin-top: 0.75rem;
+}
+
+.private-content {
+  max-width: 65ch;
+  margin: 0 auto;
 }
 
 /* Responsive */
