@@ -77,6 +77,7 @@
 
   function route() {
     const hash = location.hash.slice(1) || "about";
+    window.scrollTo(0, 0);
 
     // cycle-year-N-book-M
     const bookMatch = hash.match(/^cycle-year-(\d+)-book-(\d+)$/);
@@ -171,11 +172,38 @@
       return new TextDecoder().decode(plain);
     }
 
-    function showContent(html) {
+    function showContent(payload) {
+      const data = JSON.parse(payload);
       privatePanel.querySelector(".private-lock").hidden = true;
       const content = privatePanel.querySelector(".private-content");
-      content.innerHTML = html;
+      content.innerHTML = data.html;
       content.hidden = false;
+
+      // Inject private schedule columns
+      const table = document.querySelector(".schedule-table");
+      if (table && data.schedule) {
+        const thead = table.querySelector("thead tr");
+        const th1 = document.createElement("th");
+        th1.textContent = "Parent Discussion";
+        thead.appendChild(th1);
+        const th2 = document.createElement("th");
+        th2.textContent = "Salad";
+        thead.appendChild(th2);
+
+        const rows = table.querySelectorAll("tbody tr");
+        for (let i = 0; i < rows.length; i++) {
+          const bookIdx = Math.floor(i / 2);
+          const isDiscuss = i % 2 === 0;
+          const entry = data.schedule[bookIdx] || {};
+          const td1 = document.createElement("td");
+          td1.textContent = isDiscuss ? (entry.parent || "") : "";
+          rows[i].appendChild(td1);
+          const td2 = document.createElement("td");
+          td2.textContent = isDiscuss ? (entry.salad || "") : "";
+          rows[i].appendChild(td2);
+        }
+        table.classList.add("schedule-private");
+      }
     }
 
     const form = privatePanel.querySelector(".private-form");

@@ -277,8 +277,19 @@ footer .image-credit {
   padding-top: 1rem;
 }
 
-.cycle-intro table {
+#cycle-arc-0 table {
   margin: 1.5rem 0;
+}
+
+#cycle-arc-0 table a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: inherit;
+}
+
+#cycle-arc-0 table a:hover {
+  text-decoration: underline;
+  color: var(--accent);
 }
 
 /* Book cards & Arc cards */
@@ -367,8 +378,23 @@ footer .image-credit {
   box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 
+.book-covers {
+  float: right;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem 1.25rem;
+}
+
+.book-covers .book-cover {
+  float: none;
+  margin: 0;
+  width: 90px;
+  height: 128px;
+}
+
 @media (max-width: 500px) {
   .book-cover { width: 90px; height: 128px; }
+  .book-covers .book-cover { width: 70px; height: 100px; }
 }
 
 .book-description {
