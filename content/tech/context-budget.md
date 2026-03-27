@@ -51,7 +51,7 @@ Now *you've* lost context. What exactly did you ask for? What were the constrain
 
 As you get better at managing Claude's context, the bottleneck shifts to yours. The same discipline applies — write it down, keep it concise, make it retrievable. Before you switch away, externalize your state: what you asked, how you'll verify it, what comes after. A few lines in a notes file.
 
-Both of you are finite. Both of you degrade when overloaded. Both of you work better with clean, focused, externalized state.
+Both of you are finite. Both of you degrade when overloaded. Both of you work better with clean, focused, externalized state. I wrote more about [what this looks like in practice](https://jeapostrophe.github.io/tech/jc-workflow/).
 
 ## The Job
 
