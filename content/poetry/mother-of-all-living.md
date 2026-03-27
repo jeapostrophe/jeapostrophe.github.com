@@ -27,7 +27,7 @@ and stepped through clover, never thorn,
 
 That green was lost; an angel's blade  
   still burned across the way.  
-She stumbled east through dust and made  
+She stumbled west through dust and made  
   her bread from sweat and clay.  
 But through the gate she carried seed,  
   a quickening, half-known,  
