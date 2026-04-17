@@ -346,6 +346,47 @@ footer .image-credit {
   color: var(--accent);
 }
 
+/* Scripture epigraph — classical chapter-opening style */
+.section-epigraph {
+  margin: 0 0 2.25rem;
+  padding: 0 1.5rem;
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.section-epigraph .epigraph-text {
+  font-style: italic;
+  color: var(--fg);
+  margin: 0 0 0.5rem;
+}
+
+.section-epigraph .epigraph-text::before {
+  content: "\201C";
+  margin-right: 0.05em;
+}
+
+.section-epigraph .epigraph-text::after {
+  content: "\201D";
+  margin-left: 0.05em;
+}
+
+.section-epigraph .epigraph-ref {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  color: var(--fg-muted);
+  margin: 0;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Epigraph size 2 (cycle-about card) */
+.arc-card .section-epigraph {
+  padding: 0 1rem;
+  font-size: 0.9rem;
+}
+
 /* Hero images: size 3 (top-level tabs) */
 .section-hero {
   width: 100%;
