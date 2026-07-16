@@ -661,6 +661,20 @@ footer .image-credit {
   font-weight: 600;
 }
 
+.schedule-event td {
+  font-style: italic;
+  text-align: center;
+  font-size: 1.05rem;
+}
+
+.schedule-event td:first-child {
+  border-left: 3px solid var(--link);
+}
+
+.schedule-event.schedule-past td:first-child {
+  border-left-color: var(--border);
+}
+
 /* Private tab */
 
 .private-lock {

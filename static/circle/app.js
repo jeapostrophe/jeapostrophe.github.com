@@ -221,6 +221,39 @@
         }
         table.classList.add("schedule-private");
       }
+
+      // Inject private-only event rows (no reading/week/parent/salad — just a date + label)
+      if (table && Array.isArray(data.events) && data.events.length) {
+        const tbody = table.querySelector("tbody");
+        const colCount = table.querySelector("thead tr").children.length;
+        const evToday = new Date(); evToday.setHours(0, 0, 0, 0);
+        for (const ev of data.events) {
+          const evDate = new Date(ev.date); evDate.setHours(0, 0, 0, 0);
+          const tr = document.createElement("tr");
+          tr.className = "schedule-event";
+          if (evDate < evToday) tr.classList.add("schedule-past");
+          const dateTd = document.createElement("td");
+          dateTd.textContent = ev.date;
+          tr.appendChild(dateTd);
+          const labelTd = document.createElement("td");
+          labelTd.colSpan = colCount - 1;
+          labelTd.textContent = ev.time ? ev.label + " · " + ev.time : ev.label;
+          tr.appendChild(labelTd);
+          // Insert in chronological order among the existing rows
+          let placed = false;
+          const rows = tbody.querySelectorAll("tr");
+          for (let j = 0; j < rows.length; j++) {
+            const cellDate = new Date(rows[j].children[0].textContent);
+            cellDate.setHours(0, 0, 0, 0);
+            if (!isNaN(cellDate.getTime()) && cellDate > evDate) {
+              tbody.insertBefore(tr, rows[j]);
+              placed = true;
+              break;
+            }
+          }
+          if (!placed) tbody.appendChild(tr);
+        }
+      }
     }
 
     const form = privatePanel.querySelector(".private-form");
