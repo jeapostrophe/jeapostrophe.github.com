@@ -190,33 +190,33 @@
         th2.textContent = "Salad";
         thead.appendChild(th2);
 
+        // One schedule entry per week, matched to its row by date.
+        const byDate = {};
+        for (const e of data.schedule) byDate[e.date] = e;
+
         const rows = table.querySelectorAll("tbody tr");
         for (let i = 0; i < rows.length; i++) {
-          const bookIdx = Math.floor(i / 2);
-          const isDiscuss = i % 2 === 0;
-          const entry = data.schedule[bookIdx] || {};
+          const entry = byDate[rows[i].children[0].textContent] || {};
           const td1 = document.createElement("td");
-          if (isDiscuss) {
-            if (entry.parent) {
-              td1.appendChild(document.createTextNode(entry.parent));
-            }
-            if (entry.discussion && entry.discussion.title) {
-              if (entry.parent) td1.appendChild(document.createElement("br"));
-              if (entry.discussion.url) {
-                const a = document.createElement("a");
-                a.href = entry.discussion.url;
-                a.target = "_blank";
-                a.rel = "noopener";
-                a.textContent = entry.discussion.title;
-                td1.appendChild(a);
-              } else {
-                td1.appendChild(document.createTextNode(entry.discussion.title));
-              }
+          if (entry.parent) {
+            td1.appendChild(document.createTextNode(entry.parent));
+          }
+          if (entry.discussion && entry.discussion.title) {
+            if (entry.parent) td1.appendChild(document.createElement("br"));
+            if (entry.discussion.url) {
+              const a = document.createElement("a");
+              a.href = entry.discussion.url;
+              a.target = "_blank";
+              a.rel = "noopener";
+              a.textContent = entry.discussion.title;
+              td1.appendChild(a);
+            } else {
+              td1.appendChild(document.createTextNode(entry.discussion.title));
             }
           }
           rows[i].appendChild(td1);
           const td2 = document.createElement("td");
-          td2.textContent = isDiscuss ? (entry.salad || "") : "";
+          td2.textContent = entry.salad || "";
           rows[i].appendChild(td2);
         }
         table.classList.add("schedule-private");
