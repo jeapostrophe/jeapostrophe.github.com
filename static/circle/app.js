@@ -190,34 +190,32 @@
         th2.textContent = "Salad";
         thead.appendChild(th2);
 
-        // One schedule entry per week, matched to its row by date.
-        const byDate = {};
-        for (const e of data.schedule) byDate[e.date] = e;
-
-        const rows = table.querySelectorAll("tbody tr");
-        for (let i = 0; i < rows.length; i++) {
-          const entry = byDate[rows[i].children[0].textContent] || {};
+        // data.schedule holds one entry per week, indexed the same as the rows'
+        // data-week attribute — every meeting has its own parent, topic and salad.
+        for (const row of table.querySelectorAll("tbody tr")) {
+          const entry = data.schedule[row.dataset.week] || {};
+          const disc = entry.discussion;
           const td1 = document.createElement("td");
           if (entry.parent) {
-            td1.appendChild(document.createTextNode(entry.parent));
+            td1.append(entry.parent);
           }
-          if (entry.discussion && entry.discussion.title) {
+          if (disc && disc.title) {
             if (entry.parent) td1.appendChild(document.createElement("br"));
-            if (entry.discussion.url) {
+            if (disc.url) {
               const a = document.createElement("a");
-              a.href = entry.discussion.url;
+              a.href = disc.url;
               a.target = "_blank";
               a.rel = "noopener";
-              a.textContent = entry.discussion.title;
+              a.textContent = disc.title;
               td1.appendChild(a);
             } else {
-              td1.appendChild(document.createTextNode(entry.discussion.title));
+              td1.append(disc.title);
             }
           }
-          rows[i].appendChild(td1);
+          row.appendChild(td1);
           const td2 = document.createElement("td");
           td2.textContent = entry.salad || "";
-          rows[i].appendChild(td2);
+          row.appendChild(td2);
         }
         table.classList.add("schedule-private");
       }
