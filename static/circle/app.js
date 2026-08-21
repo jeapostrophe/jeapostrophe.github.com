@@ -172,7 +172,13 @@
       return new TextDecoder().decode(plain);
     }
 
+    let shown = false;
     function showContent(payload) {
+      // The lock form stays submittable while the saved-password auto-unlock
+      // runs its slow key derivation, so this can be reached twice; injecting
+      // the private columns and event rows a second time would corrupt them.
+      if (shown) return;
+      shown = true;
       const data = JSON.parse(payload);
       privatePanel.querySelector(".private-lock").hidden = true;
       const content = privatePanel.querySelector(".private-content");
