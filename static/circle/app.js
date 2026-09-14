@@ -1,6 +1,60 @@
 (function () {
   const currentYear = 1;
-  const currentBook = 1;
+
+  // "YYYY-MM-DD" -> local midnight, so comparisons are whole-day comparisons in
+  // the reader's own timezone.
+  function parseDay(s) {
+    const p = s.split("-");
+    return new Date(+p[0], +p[1] - 1, +p[2]);
+  }
+
+  // Mark everything the calendar decides — the header's "Next" link, the
+  // schedule rows, the book pills, the current book card — against the reader's
+  // clock. Nothing here is settled at build time: a page built in August has to
+  // still say "next" correctly in September, without a rebuild.
+  function applyDateState() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // The schedule table is the only copy of the dates. Rows are chronological;
+    // reading rows carry data-book, the private overlay's event rows do not.
+    const rows = [].slice.call(document.querySelectorAll(".schedule-table tbody tr[data-day]"));
+    const reading = rows.filter(tr => tr.dataset.book);
+    if (!reading.length) return;
+
+    // The first meeting not yet past is the live one, and its book is the one
+    // the group is on — which subsumes the two-week rule, since a book's rows
+    // both fall past only once its essay week has gone by. Past the end of the
+    // year nothing is live and the last book stays named.
+    const live = reading.filter(tr => parseDay(tr.dataset.day) >= today)[0] || null;
+    const nextBook = (live || reading[reading.length - 1]).dataset.book;
+
+    rows.forEach(tr => tr.classList.toggle("schedule-past", parseDay(tr.dataset.day) < today));
+    reading.forEach(tr => tr.classList.toggle("schedule-current", tr === live));
+
+    // A book's discussion row is the one carrying its link, whose text is
+    // already "N — Title" and whose href already points at its card.
+    const discussRow = {};
+    reading.forEach(tr => {
+      if (tr.querySelector("a") && !discussRow[tr.dataset.book]) discussRow[tr.dataset.book] = tr;
+    });
+
+    const link = document.querySelector(".current-book-link");
+    const a = discussRow[nextBook] && discussRow[nextBook].querySelector("a");
+    if (link && a) {
+      link.textContent = "Next: " + a.textContent;
+      link.setAttribute("href", a.getAttribute("href"));
+    }
+
+    const pills = ".book-pill[data-year='" + currentYear + "']";
+    activate(pills, "current", p => p.dataset.book === nextBook);
+    activate(pills, "past", p => {
+      const tr = discussRow[p.dataset.book];
+      return !!tr && parseDay(tr.dataset.day) <= today;
+    });
+    activate("#cycle-year-" + currentYear + " .book-card[data-book]", "current",
+      c => c.dataset.book === nextBook);
+  }
 
   function activate(selector, cls, fn) {
     document.querySelectorAll(selector).forEach(el => el.classList.toggle(cls, fn(el)));
@@ -230,12 +284,12 @@
       if (table && Array.isArray(data.events) && data.events.length) {
         const tbody = table.querySelector("tbody");
         const colCount = table.querySelector("thead tr").children.length;
-        const evToday = new Date(); evToday.setHours(0, 0, 0, 0);
         for (const ev of data.events) {
-          const evDate = new Date(ev.date); evDate.setHours(0, 0, 0, 0);
           const tr = document.createElement("tr");
           tr.className = "schedule-event";
-          if (evDate < evToday) tr.classList.add("schedule-past");
+          // No data-book: an event is never the "current" reading week. The
+          // past marking is applyDateState's, called once the rows are in.
+          tr.dataset.day = ev.day;
           const dateTd = document.createElement("td");
           dateTd.textContent = ev.date;
           tr.appendChild(dateTd);
@@ -245,11 +299,9 @@
           tr.appendChild(labelTd);
           // Insert in chronological order among the existing rows
           let placed = false;
-          const rows = tbody.querySelectorAll("tr");
+          const rows = tbody.querySelectorAll("tr[data-day]");
           for (let j = 0; j < rows.length; j++) {
-            const cellDate = new Date(rows[j].children[0].textContent);
-            cellDate.setHours(0, 0, 0, 0);
-            if (!isNaN(cellDate.getTime()) && cellDate > evDate) {
+            if (rows[j].dataset.day > ev.day) {
               tbody.insertBefore(tr, rows[j]);
               placed = true;
               break;
@@ -257,6 +309,7 @@
           }
           if (!placed) tbody.appendChild(tr);
         }
+        applyDateState();
       }
     }
 
@@ -322,6 +375,13 @@
   }
 
   window.addEventListener("hashchange", function() { route(); updateCredit(); });
+  // A household reference page sits open for days; re-mark whenever it is
+  // looked at again, so midnight does not strand it on yesterday's week.
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) applyDateState();
+  });
+  window.addEventListener("focus", applyDateState);
+  applyDateState();
   route();
   updateCredit();
 })();
