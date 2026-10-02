@@ -10,6 +10,7 @@ title: Jay McCarthy
 
 # Projects
 - [jc](https://github.com/jeapostrophe/jc) — keyboard-driven app for orchestrating Claude Code
+- [Boku no Natsuyasumi (PS1), in English](https://github.com/jeapostrophe/boku-p1) — a translation patch for the 2000 PlayStation original
 
 # Links
 - [Blog archive (2008--2013)](old-blog/)
